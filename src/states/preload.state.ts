@@ -1,25 +1,22 @@
 import State from './state';
-
-// Get URL to images
-const level1 = require('assets/levels/level1.json');
-
+import AssetsUtils from '../util/Assets';
 
 export class PreloadState extends State {
   constructor() {
     super();
+    console.log(this.load);
   }
 
   preload() {
-    let logo = this.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
-    let progressBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY + 128, 'progressBar');
 
-    logo.anchor.setTo(0.5);
-    progressBar.anchor.setTo(0.5);
-    this.load.setPreloadSprite(progressBar);
-
+    AssetsUtils.setLoadingScreen(this);
+    // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
+    AssetsUtils.loadAll();
   }
 
   create() {
+    // todo: Set main menu instead of level one
+
   }
 
   update() {

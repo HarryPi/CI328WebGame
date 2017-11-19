@@ -10,12 +10,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Component_1 = require("./Component");
-var Constants_1 = require("../constants/Constants");
+var component_1 = require("./component");
+var GameConstants_1 = require("../constants/GameConstants");
 var MovableComponent = /** @class */ (function (_super) {
     __extends(MovableComponent, _super);
     function MovableComponent() {
-        var _this = _super.call(this, Constants_1.ComponentType.MOVABLE) || this;
+        var _this = _super.call(this, GameConstants_1.ComponentType.MOVABLE) || this;
         _this._speed = 100;
         _this._isMoving = false;
         return _this;
@@ -29,6 +29,6 @@ var MovableComponent = /** @class */ (function (_super) {
     MovableComponent.prototype.update = function () {
     };
     return MovableComponent;
-}(Component_1.Component));
+}(component_1.Component));
 exports.MovableComponent = MovableComponent;
 //# sourceMappingURL=movable.component.js.map

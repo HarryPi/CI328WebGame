@@ -1,5 +1,5 @@
-import { Component } from './Component';
-import { ComponentType } from '../constants/Constants';
+import { Component } from './component';
+import { ComponentType } from '../constants/GameConstants';
 
 export class MovableComponent extends Component {
 
@@ -11,7 +11,6 @@ export class MovableComponent extends Component {
   }
 
   public moveRight(): void {
-
   }
   public moveLeft(): void {
 

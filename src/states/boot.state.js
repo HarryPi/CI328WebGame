@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var state_1 = require("./state");
-var Constants_1 = require("../constants/Constants");
+var GameConstants_1 = require("../constants/GameConstants");
 var Assets_1 = require("../util/Assets");
 var BootState = /** @class */ (function (_super) {
     __extends(BootState, _super);
@@ -19,15 +19,15 @@ var BootState = /** @class */ (function (_super) {
         return _super.call(this) || this;
     }
     BootState.prototype.preload = function () {
+        Assets_1.default.init(this.load);
+        Assets_1.default.loadBoot();
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.pageAlignVertically = true;
         this.scale.pageAlignHorizontally = true;
-        this.load.image('logo', Assets_1.default.getLogo());
-        this.load.image('progressBar', Assets_1.default.getProgressBar());
     };
     BootState.prototype.create = function () {
         this.game.stage.backgroundColor = '#000';
-        this.game.state.start(Constants_1.States.PRELOAD_STATE);
+        this.game.state.start(GameConstants_1.States.PRELOAD_STATE);
     };
     return BootState;
 }(state_1.default));

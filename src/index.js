@@ -15,7 +15,7 @@ require('pixi');
 require('p2');
 require('phaser');
 require("styles/style.styl");
-var Constants_1 = require("./constants/Constants");
+var GameConstants_1 = require("./constants/GameConstants");
 var boot_state_1 = require("./states/boot.state");
 var preload_state_1 = require("./states/preload.state");
 var game; // capture game object // todo: Is there a better way?
@@ -25,9 +25,9 @@ var App = /** @class */ (function (_super) {
     __extends(App, _super);
     function App(config) {
         var _this = _super.call(this, config) || this;
-        _this.state.add(Constants_1.States.BOOT_STATE, boot_state_1.BootState);
-        _this.state.add(Constants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
-        _this.state.start(Constants_1.States.BOOT_STATE);
+        _this.state.add(GameConstants_1.States.BOOT_STATE, boot_state_1.BootState);
+        _this.state.add(GameConstants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
+        _this.state.start(GameConstants_1.States.BOOT_STATE);
         return _this;
     }
     return App;

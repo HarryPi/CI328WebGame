@@ -1,17 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var movable_component_1 = require("../component/movable.component");
 var Entity = /** @class */ (function () {
     function Entity() {
     }
     Entity.prototype.addComponent = function (component) {
         this._components[component.name] = component;
-        this._components[component.name.toString()].target(this);
+        this._components[component.name].target(this);
         return component;
     };
-    Entity.prototype.create = function () {
-        this.addComponent(new movable_component_1.MovableComponent());
-    };
+    /*
+      protected create(){
+        this.addComponent();
+      }
+    */
     Entity.prototype.update = function () {
         var _this = this;
         Object.keys(this._components).forEach(function (componentType) {
@@ -31,4 +32,4 @@ var Entity = /** @class */ (function () {
     return Entity;
 }());
 exports.Entity = Entity;
-//# sourceMappingURL=Entity.js.map
+//# sourceMappingURL=entity.js.map

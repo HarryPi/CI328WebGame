@@ -5,7 +5,7 @@ require('p2');
 require('phaser');
 
 import 'styles/style.styl';
-import { States } from './constants/Constants';
+import { States } from './constants/GameConstants';
 import { BootState } from './states/boot.state';
 import { PreloadState } from './states/preload.state';
 
