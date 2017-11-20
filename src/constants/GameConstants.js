@@ -4,6 +4,7 @@ var States;
 (function (States) {
     States["BOOT_STATE"] = "bootState";
     States["PRELOAD_STATE"] = "preloadState";
+    States["GAME_STATE"] = "gameState";
 })(States = exports.States || (exports.States = {}));
 var Levels;
 (function (Levels) {
@@ -38,4 +39,14 @@ var ComponentType;
 (function (ComponentType) {
     ComponentType["MOVABLE"] = "movable";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
+var UIComponents;
+(function (UIComponents) {
+    UIComponents["PROGRESS_BAR"] = "progresBar";
+    UIComponents["LOGO"] = "logo";
+})(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
+var TileLayers;
+(function (TileLayers) {
+    TileLayers["GRASS_LAYER"] = "grassLayer";
+    TileLayers["BACKGROUND"] = "background";
+})(TileLayers = exports.TileLayers || (exports.TileLayers = {}));
 //# sourceMappingURL=GameConstants.js.map

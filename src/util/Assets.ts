@@ -1,5 +1,4 @@
-import {Levels, TankLayout} from '../constants/GameConstants';
-import game from '../index';
+import { Levels, TankLayout, TileLayers, UIComponents } from '../constants/GameConstants';
 
 class AssetLoader {
 
@@ -10,17 +9,28 @@ class AssetLoader {
   private _tankSpritesheetUrlXLM: string;
   private _progressBarUrl: string;
   private _logoUrl: string;
+  private _grassLayerUrl: string;
+  private _backgroundUrl: string;
 
   // Phaser.Loader
   private _loader: Phaser.Loader;
 
   constructor() {
 
+    // Images
     this._progressBarUrl = require('assets/images/progressBar.png');
-    this._tankSpritesheetUrl = require('assets/spritesheet/tanks.png');
     this._logoUrl = require('assets/images/logo.png');
+
+    // Levels
     this._levelOneUrl = require('assets/levels/level1.json');
+
+    // Atlas
     this._tankSpritesheetUrlXLM = require('assets/spritesheet/tanks_xml.xml');
+    this._tankSpritesheetUrl = require('assets/spritesheet/tanks.png');
+
+    // Spritesheet
+    this._grassLayerUrl = require('assets/spritesheet/grassLayer.png');
+    this._backgroundUrl = require('assets/spritesheet/backgroundElements.png');
   }
 
   /**
@@ -34,8 +44,8 @@ class AssetLoader {
 
   loadBoot(): void {
     try {
-      this.loader.image('progressBar', this._progressBarUrl);
-      this.loader.image('logo', this._logoUrl);
+      this.loader.image(UIComponents.PROGRESS_BAR, this._progressBarUrl);
+      this.loader.image(UIComponents.LOGO, this._logoUrl);
     } catch (e) {
       console.log(e);
       // todo: Exception handling class
@@ -43,8 +53,8 @@ class AssetLoader {
   }
 
   public setLoadingScreen(state: Phaser.State): void {
-    let logo = state.add.sprite(state.game.world.centerX, state.game.world.centerY, this.logo);
-    let progressBar = state.add.sprite(state.game.world.centerX, state.game.world.centerY + 128, this.progressBar);
+    let logo = state.add.sprite(state.game.world.centerX, state.game.world.centerY, UIComponents.LOGO);
+    let progressBar = state.add.sprite(state.game.world.centerX, state.game.world.centerY + 128, UIComponents.PROGRESS_BAR);
 
     logo.anchor.setTo(0.5);
     progressBar.anchor.setTo(0.5);
@@ -52,16 +62,10 @@ class AssetLoader {
   }
 
   loadAll(): void {
-    this.loader.tilemap(Levels.LEVEL_ONE, this._levelOneUrl);
+    this.loader.tilemap(Levels.LEVEL_ONE, this._levelOneUrl, null, Phaser.Tilemap.TILED_JSON);
     this.loader.atlasXML(TankLayout.TANK_SPRITESHEET, this._tankSpritesheetUrl, this._tankSpritesheetUrlXLM);
-  }
-
-  get progressBar(): string {
-    return 'progressBar';
-  }
-
-  get logo(): string {
-    return 'logo';
+    this.loader.image(TileLayers.GRASS_LAYER, this._grassLayerUrl);
+    this.loader.image(TileLayers.BACKGROUND, this._backgroundUrl);
   }
 
   get loader(): Phaser.Loader {

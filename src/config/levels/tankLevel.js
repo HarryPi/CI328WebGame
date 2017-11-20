@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var TankLevel = /** @class */ (function () {
-    function TankLevel() {
+    function TankLevel(game) {
+        this._game = game;
     }
     TankLevel.prototype.spawnEnemy = function () {
         return null;

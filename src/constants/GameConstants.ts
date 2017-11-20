@@ -1,6 +1,7 @@
 export enum States {
   BOOT_STATE = 'bootState',
-  PRELOAD_STATE = 'preloadState'
+  PRELOAD_STATE = 'preloadState',
+  GAME_STATE = 'gameState'
 }
 
 export enum Levels {
@@ -26,4 +27,14 @@ export enum TankLayout {
 
 export enum ComponentType {
   MOVABLE = 'movable'
+}
+
+export enum UIComponents {
+  PROGRESS_BAR = 'progresBar',
+  LOGO = 'logo'
+}
+
+export enum TileLayers {
+  GRASS_LAYER = 'grassLayer',
+  BACKGROUND = 'background'
 }

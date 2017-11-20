@@ -17,7 +17,7 @@ const IS_PRODUCTION     = process.env.NODE_ENV === 'production';
 const assetsPath        = path.join(__dirname, 'assets/');
 const stylesPath        = path.join(__dirname, 'styles/');
 
-const phaserRoot        = path.join(__dirname, 'node_modules/phaser/build/custom/');
+const phaserRoot        = path.join(__dirname, 'node_modules/phaser-ce/build/custom/');
 
 const phaserPath        = path.join(phaserRoot, 'phaser-split.js');
 const pixiPath          = path.join(phaserRoot, 'pixi.js');
@@ -138,7 +138,7 @@ module.exports = {
     /** Template */
     // Auto generation index HTML file
     new HtmlWebpackPlugin({
-      title:    'Phaser TypeScript boilerplate project',
+      title:    'Tank World',
       template: templatePath
     }),
 

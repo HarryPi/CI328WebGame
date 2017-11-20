@@ -10,13 +10,12 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = require("./index");
 var World = /** @class */ (function (_super) {
     __extends(World, _super);
-    function World(level) {
-        var _this = _super.call(this, index_1.default) || this;
-        index_1.default.physics.startSystem(Phaser.Physics.P2JS);
-        index_1.default.physics.p2.gravity.y = 1400;
+    function World(game) {
+        var _this = _super.call(this, game) || this;
+        game.physics.startSystem(Phaser.Physics.P2JS);
+        game.physics.p2.gravity.y = 1400;
         return _this;
     }
     Object.defineProperty(World.prototype, "player", {

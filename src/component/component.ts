@@ -1,5 +1,4 @@
 import { ComponentType } from '../constants/GameConstants';
-import game from '../index';
 
 export abstract class Component {
 

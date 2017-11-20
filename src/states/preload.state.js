@@ -12,6 +12,8 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var state_1 = require("./state");
 var Assets_1 = require("../util/Assets");
+var GameConstants_1 = require("../constants/GameConstants");
+var world_service_1 = require("../serivce/world.service");
 var PreloadState = /** @class */ (function (_super) {
     __extends(PreloadState, _super);
     function PreloadState() {
@@ -23,9 +25,12 @@ var PreloadState = /** @class */ (function (_super) {
         Assets_1.default.setLoadingScreen(this);
         // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
         Assets_1.default.loadAll();
+        // Init Services
+        world_service_1.default.game = this.game;
     };
     PreloadState.prototype.create = function () {
         // todo: Set main menu instead of level one
+        this.game.state.start(GameConstants_1.States.GAME_STATE);
     };
     PreloadState.prototype.update = function () {
     };

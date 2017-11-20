@@ -24,9 +24,10 @@ var BootState = /** @class */ (function (_super) {
         this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         this.scale.pageAlignVertically = true;
         this.scale.pageAlignHorizontally = true;
+        this.scale.setGameSize(window.innerWidth, window.innerHeight);
     };
     BootState.prototype.create = function () {
-        this.game.stage.backgroundColor = '#000';
+        this.game.stage.backgroundColor = '#FFF';
         this.game.state.start(GameConstants_1.States.PRELOAD_STATE);
     };
     return BootState;

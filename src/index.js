@@ -18,8 +18,8 @@ require("styles/style.styl");
 var GameConstants_1 = require("./constants/GameConstants");
 var boot_state_1 = require("./states/boot.state");
 var preload_state_1 = require("./states/preload.state");
-var game; // capture game object // todo: Is there a better way?
-exports.default = game;
+var game_state_1 = require("./states/game.state");
+var ScreenMetrics_1 = require("./util/ScreenMetrics");
 // The main class of our application
 var App = /** @class */ (function (_super) {
     __extends(App, _super);
@@ -27,6 +27,7 @@ var App = /** @class */ (function (_super) {
         var _this = _super.call(this, config) || this;
         _this.state.add(GameConstants_1.States.BOOT_STATE, boot_state_1.BootState);
         _this.state.add(GameConstants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
+        _this.state.add(GameConstants_1.States.GAME_STATE, game_state_1.GameState);
         _this.state.start(GameConstants_1.States.BOOT_STATE);
         return _this;
     }
@@ -37,15 +38,22 @@ exports.App = App;
 // of another program or it is executable.
 if (!module.parent) {
     window.onload = function () {
+        var gameWidth = ScreenMetrics_1.DEFAULT_GAME_WIDTH;
+        var gameHeight = ScreenMetrics_1.DEFAULT_GAME_HEIGHT;
+        if (ScreenMetrics_1.SCALE_MODE === 'USER_SCALE') {
+            var screenMetrics = ScreenMetrics_1.ScreenUtils.calculateScreenMetrics(gameWidth, gameHeight);
+            gameWidth = screenMetrics.gameWidth;
+            gameHeight = screenMetrics.gameHeight;
+        }
         var config = {
-            width: 800,
-            height: 600,
+            width: gameWidth,
+            height: gameHeight,
             renderer: Phaser.AUTO,
             parent: '',
             resolution: 1,
             forceSetTimeOut: false // tell Phaser to use `setTimeOut` even if `requestAnimationFrame` is available.
         };
-        game = new App(config); // Initialize the application. It will automatically inject <canvas /> into <body />
+        new App(config); // Initialize the application. It will automatically inject <canvas /> into <body />
     };
 }
 //# sourceMappingURL=index.js.map
