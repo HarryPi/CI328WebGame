@@ -1,5 +1,7 @@
 import TankLevel from './tankLevel';
 import { Levels, TankLayout, TileLayers } from '../../constants/GameConstants';
+import vec2 = p2.vec2;
+import Vector from '../../util/vector';
 
 export class LevelOne extends TankLevel {
   constructor(game: Phaser.Game){
@@ -17,11 +19,7 @@ export class LevelOne extends TankLevel {
     map.createLayer('GroundPrimary').resizeWorld();
 
     this._game.physics.p2.convertCollisionObjects(map, 'GroundPath');
-
-    let a = this._game.add.sprite(this._game.world.left, this._game.world.centerY, TankLayout.TANK_SPRITESHEET, TankLayout.CANDY_ARTILLERY);
-    this._game.physics.p2.enable(a);
-    a.body.allowGravity = true;
-    this._game.camera.follow(a);
+    this._playerStartPos = new Vector(this._game.world.left, this._game.world.centerY - 100);
   }
 
   public destroy(): void {

@@ -1,30 +1,40 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var state_1 = require("./state");
-var world_service_1 = require("../serivce/world.service");
-var levelOne_1 = require("../config/levels/levelOne");
-var GameState = /** @class */ (function (_super) {
-    __extends(GameState, _super);
-    function GameState() {
-        return _super.call(this) || this;
+const state_1 = require("./state");
+const world_service_1 = require("../serivce/world.service");
+const input_1 = require("../util/input");
+const levelOne_1 = require("../config/levels/levelOne");
+const GameConstants_1 = require("../constants/GameConstants");
+const entity_1 = require("../entities/entity");
+const movable_component_1 = require("../component/movable.component");
+const camera_component_1 = require("../component/camera.component");
+class GameState extends state_1.default {
+    constructor() {
+        super();
+        this._input = new input_1.default();
     }
-    GameState.prototype.preload = function () {
+    preload() {
+        // Setup level todo: Make this to be user selected
         world_service_1.default.level = new levelOne_1.LevelOne(this.game);
         world_service_1.default.initLevel();
-    };
-    GameState.prototype.create = function () {
-    };
-    return GameState;
-}(state_1.default));
+    }
+    create() {
+        let player = new entity_1.Entity(this.game, world_service_1.default.level.playerStartPos.x, world_service_1.default.level.playerStartPos.y)
+            .withComponent([new movable_component_1.MovableComponent(), new camera_component_1.CameraComponent(this.game)]);
+        // Input
+        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
+        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
+        this.subscription = this._input.emitter.subscribe((val) => {
+            let playerC = player.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            playerC.move(val);
+        });
+    }
+    update() {
+        this._input.run();
+    }
+    shutdown() {
+        this.subscription.unsubscribe();
+    }
+}
 exports.GameState = GameState;
 //# sourceMappingURL=game.state.js.map

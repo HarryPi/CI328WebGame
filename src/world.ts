@@ -1,4 +1,4 @@
-import { Entity } from './Entities/entity';
+import { Entity } from './entities/entity';
 
 export default class World extends Phaser.World {
   private _player: Entity;

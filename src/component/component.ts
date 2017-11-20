@@ -1,9 +1,10 @@
 import { ComponentType } from '../constants/GameConstants';
+import {Entity} from '../entities/entity';
 
 export abstract class Component {
 
   protected _name: ComponentType;
-  protected _target: string;
+  protected _target: Entity;
 
   constructor(name: ComponentType){
     this._name = name;
@@ -12,14 +13,13 @@ export abstract class Component {
     return this._name;
   }
 
-  get target(): string {
+  get target(): Entity {
     return this._target;
   }
 
-  set target(target) {
+  set target(target: Entity) {
     this._target = target;
   }
 
-  update(): void {
-  }
+  public update(params?: any): void {}
 }

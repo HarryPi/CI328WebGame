@@ -1,34 +1,36 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var component_1 = require("./component");
-var GameConstants_1 = require("../constants/GameConstants");
-var MovableComponent = /** @class */ (function (_super) {
-    __extends(MovableComponent, _super);
-    function MovableComponent() {
-        var _this = _super.call(this, GameConstants_1.ComponentType.MOVABLE) || this;
-        _this._speed = 100;
-        _this._isMoving = false;
-        return _this;
+const component_1 = require("./component");
+const GameConstants_1 = require("../constants/GameConstants");
+class MovableComponent extends component_1.Component {
+    constructor() {
+        super(GameConstants_1.ComponentType.MOVABLE);
+        this._speed = 100;
+        this._isMoving = false;
     }
-    MovableComponent.prototype.moveRight = function () {
-    };
-    MovableComponent.prototype.moveLeft = function () {
-    };
-    MovableComponent.prototype.stop = function () {
-    };
-    MovableComponent.prototype.update = function () {
-    };
-    return MovableComponent;
-}(component_1.Component));
+    moveRight() {
+        console.log('Moving right...');
+    }
+    moveLeft() {
+        console.log('Moving left...');
+    }
+    stop() {
+    }
+    update() {
+    }
+    move(input) {
+        switch (input) {
+            case GameConstants_1.InputType.LEFT_INPUT:
+                this.moveLeft();
+                break;
+            case GameConstants_1.InputType.RIGHT_INPUT:
+                this.moveRight();
+                break;
+            default:
+                console.log('No Input');
+                break;
+        }
+    }
+}
 exports.MovableComponent = MovableComponent;
 //# sourceMappingURL=movable.component.js.map

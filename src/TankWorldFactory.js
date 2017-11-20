@@ -1,13 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var TankWorldFactory = /** @class */ (function () {
-    function TankWorldFactory() {
+class TankWorldFactory {
+    constructor() { }
+    newPlayer() {
     }
-    TankWorldFactory.prototype.newPlayer = function () {
-    };
-    TankWorldFactory.prototype.newEnemy = function () {
-    };
-    return TankWorldFactory;
-}());
+    newEnemy() {
+    }
+}
 exports.TankWorldFactory = TankWorldFactory;
 //# sourceMappingURL=TankWorldFactory.js.map

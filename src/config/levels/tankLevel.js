@@ -1,13 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var TankLevel = /** @class */ (function () {
-    function TankLevel(game) {
+class TankLevel {
+    constructor(game) {
         this._game = game;
     }
-    TankLevel.prototype.spawnEnemy = function () {
+    spawnEnemy() {
         return null;
-    };
-    return TankLevel;
-}());
+    }
+    get enemies() {
+        return this._enemies;
+    }
+    get playerStartPos() {
+        return this._playerStartPos;
+    }
+    get enemyStartPos() {
+        return this._enemyStartPos;
+    }
+}
 exports.default = TankLevel;
 //# sourceMappingURL=tankLevel.js.map

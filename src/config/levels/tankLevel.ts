@@ -1,21 +1,33 @@
-import { Entity } from '../../Entities/entity';
-import vec2 = p2.vec2;
+import { Entity } from '../../entities/entity';
+import Vector from '../../util/vector';
 
 export default abstract class TankLevel {
   // vars
-  private _enemies: Phaser.Group;
-  private _playerStartPos: vec2;
-  private _enemyStartPos: vec2;
+  protected _enemies: Phaser.Group;
+  protected _playerStartPos: Vector;
+  protected _enemyStartPos: Vector;
   protected _game: Phaser.Game;
 
   constructor(game: Phaser.Game){
     this._game = game;
   }
+
   // functions
   public abstract init(): void;
   public abstract destroy(): void;
-
   protected spawnEnemy(): Entity {
     return null;
+  }
+
+  get enemies(): Phaser.Group {
+    return this._enemies;
+  }
+
+  get playerStartPos(): Vector {
+    return this._playerStartPos;
+  }
+
+  get enemyStartPos(): Vector {
+    return this._enemyStartPos;
   }
 }

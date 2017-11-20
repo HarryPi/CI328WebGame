@@ -26,6 +26,7 @@ export enum TankLayout {
 }
 
 export enum ComponentType {
+  CAMERA = 'camera',
   MOVABLE = 'movable'
 }
 
@@ -37,4 +38,8 @@ export enum UIComponents {
 export enum TileLayers {
   GRASS_LAYER = 'grassLayer',
   BACKGROUND = 'background'
+}
+export enum InputType {
+  RIGHT_INPUT = 'right',
+  LEFT_INPUT = 'left'
 }

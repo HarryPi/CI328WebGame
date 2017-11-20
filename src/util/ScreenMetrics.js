@@ -13,17 +13,11 @@ var ScreenOrientation;
     ScreenOrientation[ScreenOrientation["PORTRAIT"] = 0] = "PORTRAIT";
     ScreenOrientation[ScreenOrientation["LANDSCAPE"] = 1] = "LANDSCAPE";
 })(ScreenOrientation = exports.ScreenOrientation || (exports.ScreenOrientation = {}));
-var ScreenMetrics = /** @class */ (function () {
-    function ScreenMetrics() {
-    }
-    return ScreenMetrics;
-}());
+class ScreenMetrics {
+}
 exports.ScreenMetrics = ScreenMetrics;
-var ScreenUtils = /** @class */ (function () {
-    function ScreenUtils() {
-    }
-    ScreenUtils.calculateScreenMetrics = function (defaultWidth, defaultHeight, orientation, maxGameWidth, maxGameHeight) {
-        if (orientation === void 0) { orientation = ScreenOrientation.LANDSCAPE; }
+class ScreenUtils {
+    static calculateScreenMetrics(defaultWidth, defaultHeight, orientation = ScreenOrientation.LANDSCAPE, maxGameWidth, maxGameHeight) {
         // Just to give some explanation as to the numbers and colors in the included background;
         // The GREEN is the safe area and will be displayed fully on any device and is based on 16:10 aspect ratio, build your actual gameplay here
         // The YELLOW is the extra area that will be visible on devices with a 3:2 aspect ratio (iPhone 4S and below)
@@ -36,10 +30,10 @@ var ScreenUtils = /** @class */ (function () {
         this.screenMetrics.defaultGameWidth = defaultWidth;
         this.screenMetrics.defaultGameHeight = defaultHeight;
         // Swap width and height if necessary to match the specified orientation
-        var dimensionsOppositeForLandscape = ((this.screenMetrics.windowWidth < this.screenMetrics.windowHeight) && orientation === ScreenOrientation.LANDSCAPE);
-        var dimensionsOppositeForPortrait = ((this.screenMetrics.windowHeight < this.screenMetrics.windowWidth) && orientation === ScreenOrientation.PORTRAIT);
+        let dimensionsOppositeForLandscape = ((this.screenMetrics.windowWidth < this.screenMetrics.windowHeight) && orientation === ScreenOrientation.LANDSCAPE);
+        let dimensionsOppositeForPortrait = ((this.screenMetrics.windowHeight < this.screenMetrics.windowWidth) && orientation === ScreenOrientation.PORTRAIT);
         if (dimensionsOppositeForLandscape || dimensionsOppositeForPortrait) {
-            _a = [this.screenMetrics.windowHeight, this.screenMetrics.windowWidth], this.screenMetrics.windowWidth = _a[0], this.screenMetrics.windowHeight = _a[1];
+            [this.screenMetrics.windowWidth, this.screenMetrics.windowHeight] = [this.screenMetrics.windowHeight, this.screenMetrics.windowWidth];
         }
         // Calculate the max width and max height if not provided; ratios are based off iPad (4:3) and iPhone 5+ (16:9) as the extremes in both width and height
         if (!maxGameWidth || !maxGameHeight) {
@@ -56,8 +50,8 @@ var ScreenUtils = /** @class */ (function () {
             this.screenMetrics.maxGameWidth = maxGameWidth;
             this.screenMetrics.maxGameHeight = maxGameHeight;
         }
-        var defaultAspectRatio = ((orientation === ScreenOrientation.LANDSCAPE) ? (exports.DEFAULT_GAME_WIDTH / exports.DEFAULT_GAME_HEIGHT) : (exports.DEFAULT_GAME_HEIGHT / exports.DEFAULT_GAME_WIDTH));
-        var windowAspectRatio = (this.screenMetrics.windowWidth / this.screenMetrics.windowHeight);
+        let defaultAspectRatio = ((orientation === ScreenOrientation.LANDSCAPE) ? (exports.DEFAULT_GAME_WIDTH / exports.DEFAULT_GAME_HEIGHT) : (exports.DEFAULT_GAME_HEIGHT / exports.DEFAULT_GAME_WIDTH));
+        let windowAspectRatio = (this.screenMetrics.windowWidth / this.screenMetrics.windowHeight);
         if (windowAspectRatio > defaultAspectRatio) {
             this.screenMetrics.gameHeight = this.screenMetrics.defaultGameHeight;
             this.screenMetrics.gameWidth = (Math.ceil((this.screenMetrics.gameHeight * windowAspectRatio) * 0.5) * 2);
@@ -76,9 +70,7 @@ var ScreenUtils = /** @class */ (function () {
         this.screenMetrics.scaleX = (this.screenMetrics.windowWidth / this.screenMetrics.gameWidth);
         this.screenMetrics.scaleY = (this.screenMetrics.windowHeight / this.screenMetrics.gameHeight);
         return this.screenMetrics;
-        var _a;
-    };
-    return ScreenUtils;
-}());
+    }
+}
 exports.ScreenUtils = ScreenUtils;
 //# sourceMappingURL=ScreenMetrics.js.map

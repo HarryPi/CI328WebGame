@@ -1,5 +1,5 @@
 import { Component } from './component';
-import { ComponentType } from '../constants/GameConstants';
+import { ComponentType, InputType } from '../constants/GameConstants';
 
 export class MovableComponent extends Component {
 
@@ -11,14 +11,28 @@ export class MovableComponent extends Component {
   }
 
   public moveRight(): void {
+    console.log('Moving right...');
   }
   public moveLeft(): void {
-
+    console.log('Moving left...');
   }
   public stop(): void {
 
   }
   update(){
 
+  }
+  move(input: InputType){
+    switch (input) {
+      case InputType.LEFT_INPUT:
+        this.moveLeft();
+        break;
+      case InputType.RIGHT_INPUT:
+        this.moveRight();
+        break;
+      default:
+        console.log('No Input');
+        break;
+    }
   }
 }

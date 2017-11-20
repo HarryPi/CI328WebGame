@@ -37,6 +37,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["CAMERA"] = "camera";
     ComponentType["MOVABLE"] = "movable";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
 var UIComponents;
@@ -49,4 +50,9 @@ var TileLayers;
     TileLayers["GRASS_LAYER"] = "grassLayer";
     TileLayers["BACKGROUND"] = "background";
 })(TileLayers = exports.TileLayers || (exports.TileLayers = {}));
+var InputType;
+(function (InputType) {
+    InputType["RIGHT_INPUT"] = "right";
+    InputType["LEFT_INPUT"] = "left";
+})(InputType = exports.InputType || (exports.InputType = {}));
 //# sourceMappingURL=GameConstants.js.map
