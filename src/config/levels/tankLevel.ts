@@ -7,6 +7,8 @@ export default abstract class TankLevel {
   protected _playerStartPos: Vector;
   protected _enemyStartPos: Vector;
   protected _game: Phaser.Game;
+  protected _collisionLayer: Array<any>;
+
 
   constructor(game: Phaser.Game){
     this._game = game;
@@ -29,5 +31,8 @@ export default abstract class TankLevel {
 
   get enemyStartPos(): Vector {
     return this._enemyStartPos;
+  }
+  get collisionLayer(){
+    return this._collisionLayer;
   }
 }

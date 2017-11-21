@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
 const Assets_1 = require("../util/Assets");
 const GameConstants_1 = require("../constants/GameConstants");
-const world_service_1 = require("../serivce/world.service");
 class PreloadState extends state_1.default {
     constructor() {
         super();
@@ -13,8 +12,9 @@ class PreloadState extends state_1.default {
         Assets_1.default.setLoadingScreen(this);
         // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
         Assets_1.default.loadAll();
-        // Init Services
-        world_service_1.default.game = this.game;
+        // Set World variables
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.gravity.y = 1400;
     }
     create() {
         // todo: Set main menu instead of level one

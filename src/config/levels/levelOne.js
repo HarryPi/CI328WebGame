@@ -15,7 +15,7 @@ class LevelOne extends tankLevel_1.default {
         map.createLayer('SkyPrimary').resizeWorld();
         map.createLayer('GroundSecondary').resizeWorld();
         map.createLayer('GroundPrimary').resizeWorld();
-        this._game.physics.p2.convertCollisionObjects(map, 'GroundPath');
+        this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath');
         this._playerStartPos = new vector_1.default(this._game.world.left, this._game.world.centerY + 100);
     }
     destroy() {

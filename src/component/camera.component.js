@@ -8,7 +8,7 @@ class CameraComponent extends component_1.Component {
         this._game = game;
     }
     setFocus(entity) {
-        this._game.camera.focusOn(entity);
+        this._game.camera.follow(entity);
     }
 }
 exports.CameraComponent = CameraComponent;

@@ -1,23 +1,24 @@
 import { Component } from './component';
-import { ComponentType, Direction } from '../constants/GameConstants';
+import { ComponentType, InputType } from '../constants/GameConstants';
 import Print from '../util/print';
 
 export class MovableComponent extends Component {
 
-  private _speed: number = 180;
-  private _direction: Direction;
+  private _speed: number = 300;
+  private _direction: InputType;
   private _isMoving: boolean = false;
 
   constructor() {
     super(ComponentType.MOVABLE);
   }
 
-  private round(angleToRound){
-    let arr = [];
-    arr.push(Math.ceil(angleToRound));
-    arr.push(Math.floor(angleToRound));
-
-    return arr;
+  private _correctRotation() {
+    if (this.target.sprite.body.velocity.x > 0 && this.target.sprite.body.velocity.y < 0) {
+      this.target.sprite.body.angle = Math.atan2(this.target.sprite.body.velocity.y, this.target.sprite.body.velocity.x) * 180 / Math.PI;
+    }
+    if (this.target.sprite.body.velocity.x < 0 && this.target.sprite.body.velocity.y < 0) {
+      this.target.sprite.body.angle = Math.atan2(-this.target.sprite.body.velocity.y, -this.target.sprite.body.velocity.x) * 180 / Math.PI;
+    }
   }
 
   private moveRight(): void {
@@ -26,38 +27,28 @@ export class MovableComponent extends Component {
   private moveLeft(): void {
     this.target.sprite.body.velocity.x = -this._speed;
   }
-  public stop(): void {
-    this.target.sprite.body.velocity.x = 0;
-  }
-  public move(input: Direction){
-    switch (input) {
-      case Direction.LEFT_INPUT:
+  public update(){
+    switch (this._direction) {
+      case InputType.LEFT_INPUT:
         this.moveLeft();
-        this._direction = Direction.LEFT_INPUT;
+        this._correctRotation();
+        this._direction = InputType.STOP;
         break;
-      case Direction.RIGHT_INPUT:
+      case InputType.RIGHT_INPUT:
         this.moveRight();
-        this._direction = Direction.RIGHT_INPUT;
+        this._correctRotation();
+        this._direction = InputType.STOP;
         break;
       default:
-        console.log('No Input');
         break;
     }
   }
-  public update(){
-    let tankAngle = this.target.sprite.body.angle;
-    let worldPos = this.target.sprite.body.world.x;
-    Print.log('Sprite Location x:', this.round(this.target.sprite.world.x), 'y:', this.round(this.target.sprite.world.x));
-    Print.log(this._direction);
-    if (this._direction === Direction.RIGHT_INPUT && Math.ceil(worldPos) >= 396){
-      debugger;
-      console.log('funcking hell');
-      this.target.sprite.body.angle = 45;
-    } else if (this._direction === Direction.RIGHT_INPUT && this.round(worldPos).some((value) => {
-      console.log('WTF');
-        return value > 750;
-      })) {
-      this.target.sprite.body.angle = 0;
-    }
+
+  get direction(): InputType {
+    return this._direction;
+  }
+
+  set direction(value: InputType) {
+    this._direction = value;
   }
 }

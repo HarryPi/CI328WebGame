@@ -10,6 +10,6 @@ export class CameraComponent extends Component{
     this._game = game;
   }
   setFocus(entity: Phaser.Sprite) {
-    this._game.camera.focusOn(entity);
+    this._game.camera.follow(entity);
   }
 }

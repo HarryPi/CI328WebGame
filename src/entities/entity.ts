@@ -1,5 +1,5 @@
 import { Component } from '../component/component';
-import {ComponentType, TankLayout} from '../constants/GameConstants';
+import { ComponentType, TankLayout } from '../constants/GameConstants';
 
 export class Entity {
 
@@ -13,7 +13,7 @@ export class Entity {
         });
       debugger;
     }
-    this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET, TankLayout.CANDY_HUNTER);
+    this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
   }
 
   private addComponent(component: Component): Component {

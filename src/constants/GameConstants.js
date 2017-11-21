@@ -33,10 +33,18 @@ var TankLayout;
     TankLayout["DARK_HUNTER"] = "tanks_tankNavy3.png";
     TankLayout["DARK_RECON"] = "tanks_tankNavy4.png";
     TankLayout["DARK_LIGHT"] = "tanks_tankNavy5.png";
+    TankLayout["BULLET_ONE"] = "tank_bullet1.png";
+    TankLayout["BULLET_TWO"] = "tank_bullet2.png";
+    TankLayout["BULLET_THREE"] = "tank_bullet3.png";
+    TankLayout["BULLET_FOUR"] = "tank_bullet4.png";
+    TankLayout["BULLET_FIVE"] = "tank_bullet5.png";
+    TankLayout["BULLET_SIX"] = "tank_bullet6.png";
     TankLayout["TANK_SPRITESHEET"] = "tankSpritesheet";
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["LAYER"] = "layer";
+    ComponentType["SHOOT"] = "shoot";
     ComponentType["PHYSICS"] = "physics";
     ComponentType["CAMERA"] = "camera";
     ComponentType["MOVABLE"] = "movable";
@@ -51,9 +59,15 @@ var TileLayers;
     TileLayers["GRASS_LAYER"] = "grassLayer";
     TileLayers["BACKGROUND"] = "background";
 })(TileLayers = exports.TileLayers || (exports.TileLayers = {}));
-var Direction;
-(function (Direction) {
-    Direction["RIGHT_INPUT"] = "right";
-    Direction["LEFT_INPUT"] = "left";
-})(Direction = exports.Direction || (exports.Direction = {}));
+var InputType;
+(function (InputType) {
+    InputType["STOP"] = "stop";
+    InputType["RIGHT_INPUT"] = "right";
+    InputType["LEFT_INPUT"] = "left";
+    InputType["SHOOT"] = "shoot";
+})(InputType = exports.InputType || (exports.InputType = {}));
+var TankWorldEvents;
+(function (TankWorldEvents) {
+    TankWorldEvents["SPAWN_BULLET"] = "spawnBullet";
+})(TankWorldEvents = exports.TankWorldEvents || (exports.TankWorldEvents = {}));
 //# sourceMappingURL=GameConstants.js.map

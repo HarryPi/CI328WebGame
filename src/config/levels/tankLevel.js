@@ -16,6 +16,9 @@ class TankLevel {
     get enemyStartPos() {
         return this._enemyStartPos;
     }
+    get collisionLayer() {
+        return this._collisionLayer;
+    }
 }
 exports.default = TankLevel;
 //# sourceMappingURL=tankLevel.js.map
