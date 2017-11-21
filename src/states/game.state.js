@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
 const world_service_1 = require("../serivce/world.service");
 const input_1 = require("../util/input");
+const TankWorldFactory_1 = require("../TankWorldFactory");
 const levelOne_1 = require("../config/levels/levelOne");
 const GameConstants_1 = require("../constants/GameConstants");
-const entity_1 = require("../entities/entity");
-const movable_component_1 = require("../component/movable.component");
-const camera_component_1 = require("../component/camera.component");
+const behaviour_service_1 = require("../serivce/behaviour.service");
 class GameState extends state_1.default {
     constructor() {
         super();
+        this._entities = [];
         this._input = new input_1.default();
     }
     preload() {
@@ -19,21 +19,24 @@ class GameState extends state_1.default {
         world_service_1.default.initLevel();
     }
     create() {
-        let player = new entity_1.Entity(this.game, world_service_1.default.level.playerStartPos.x, world_service_1.default.level.playerStartPos.y)
-            .withComponent([new movable_component_1.MovableComponent(), new camera_component_1.CameraComponent(this.game)]);
         // Input
-        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
-        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
-        this.subscription = this._input.emitter.subscribe((val) => {
-            let playerC = player.getComponent(GameConstants_1.ComponentType.MOVABLE);
-            playerC.move(val);
+        let player = TankWorldFactory_1.default.newPlayer(this.game);
+        this._entities.push(player);
+        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.Direction.RIGHT_INPUT);
+        this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.Direction.LEFT_INPUT);
+        this._subscription = this._input.emitter.subscribe((val) => {
+            behaviour_service_1.default.moveEntity(player, val);
         });
     }
     update() {
         this._input.run();
+        this._entities.forEach((e) => {
+            e.update();
+        });
     }
     shutdown() {
-        this.subscription.unsubscribe();
+        // Ensure no memory leaks
+        this._subscription.unsubscribe();
     }
 }
 exports.GameState = GameState;

@@ -1,0 +1,1 @@
+{"version":3,"file":"physics.service.js","sourceRoot":"","sources":["physics.service.ts"],"names":[],"mappings":";;AAEA,8DAAyD;AAEzD;IACS,MAAM,CAAC,aAAa,CAAC,MAAc;QACxC,IAAI,UAAU,GAAG,MAAM,CAAC,YAAY,CAAmB,6BAAa,CAAC,OAAO,CAAC,CAAC;QAC9E,EAAE,CAAC,CAAC,UAAU,CAAC,CAAC,CAAC;YACf,UAAU,CAAC,UAAU,EAAE,CAAC;QAC1B,CAAC;IACH,CAAC;CACF;AAPD,iCAOC"}

@@ -1,16 +1,19 @@
 import State from './state';
 import WorldService from '../serivce/world.service';
 import Input from '../util/input';
+import TankWorldFactory from '../TankWorldFactory';
 
 import { LevelOne } from '../config/levels/levelOne';
-import { ComponentType, InputType } from '../constants/GameConstants';
+import { ComponentType, Direction } from '../constants/GameConstants';
 import { Entity } from '../entities/entity';
 import { MovableComponent } from '../component/movable.component';
-import { CameraComponent } from '../component/camera.component';
+import BehaviourService from '../serivce/behaviour.service';
 
 export class GameState extends State {
   private _input: Input;
-  private subscription;
+  private _subscription;
+  private _entities: Array<Entity> = [];
+
   constructor() {
     super();
     this._input = new Input();
@@ -24,22 +27,25 @@ export class GameState extends State {
   }
 
   create() {
-    let player = new Entity(this.game, WorldService.level.playerStartPos.x, WorldService.level.playerStartPos.y)
-                 .withComponent([new MovableComponent(), new CameraComponent(this.game)]);
     // Input
-    this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
-    this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);
+    let player: Entity = TankWorldFactory.newPlayer(this.game);
+    this._entities.push(player);
+    this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), Direction.RIGHT_INPUT);
+    this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), Direction.LEFT_INPUT);
 
-    this.subscription = this._input.emitter.subscribe((val: InputType) => {
-     let playerC =  player.getComponent(ComponentType.MOVABLE) as MovableComponent;
-     playerC.move(val);
+    this._subscription = this._input.emitter.subscribe((val: Direction) => {
+      BehaviourService.moveEntity(player, val);
     });
   }
 
   update() {
     this._input.run();
+    this._entities.forEach((e) => {
+      e.update();
+    });
   }
   shutdown(){
-    this.subscription.unsubscribe();
+    // Ensure no memory leaks
+    this._subscription.unsubscribe();
   }
 }

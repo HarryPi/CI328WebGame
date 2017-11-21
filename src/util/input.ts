@@ -1,27 +1,27 @@
 import { Subject } from 'rxjs/Subject';
-import { InputType } from '../constants/GameConstants';
+import { Direction } from '../constants/GameConstants';
 
 export default class Input {
-  private _emitter: Subject<InputType>;
-  private _map: Map<any, InputType>;
+  private _emitter: Subject<Direction>;
+  private _map: Map<any, Direction>;
   private _game: Phaser.Game;
 
   constructor(){
-    this._map = new Map<Phaser.Key, InputType>();
+    this._map = new Map<Phaser.Key, Direction>();
     this._emitter = new Subject();
   }
-  add(condition: Phaser.Key, action: InputType){
+  add(condition: Phaser.Key, action: Direction){
     this._map.set(condition, action);
   }
 
   run(){
-    this._map.forEach((value: InputType, key: Phaser.Key) => {
+    this._map.forEach((value: Direction, key: Phaser.Key) => {
       if (key.isDown === true)  {
         this._emitter.next(value);
       }
     });
   }
-  get emitter(): Subject<InputType> {
+  get emitter(): Subject<Direction> {
     return this._emitter;
   }
 }

@@ -1,6 +1,5 @@
 import TankLevel from './tankLevel';
 import { Levels, TankLayout, TileLayers } from '../../constants/GameConstants';
-import vec2 = p2.vec2;
 import Vector from '../../util/vector';
 
 export class LevelOne extends TankLevel {
@@ -19,7 +18,7 @@ export class LevelOne extends TankLevel {
     map.createLayer('GroundPrimary').resizeWorld();
 
     this._game.physics.p2.convertCollisionObjects(map, 'GroundPath');
-    this._playerStartPos = new Vector(this._game.world.left, this._game.world.centerY - 100);
+    this._playerStartPos = new Vector(this._game.world.left, this._game.world.centerY + 100);
   }
 
   public destroy(): void {
