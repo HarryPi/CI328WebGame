@@ -8,24 +8,49 @@ import { LevelOne } from './config/levels/levelOne';
 import { ShootComponent } from './component/shoot.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import { LayerComponent } from './component/layer.component';
-import Vector from './util/vector';
+import { BulletComponent } from './component/bullet.component';
+import { debug } from 'util';
+import { CollisionsComponent } from './component/collisions.component';
 
 export default class TankWorldFactory {
-  private _bullets: CollisionGroup;
-  private _levels: Array<TankLevel> = [];
+
   private _game: Phaser.Game;
+
+  // Levels
   private _currentLevel: TankLevel;
-  private _levelCollisionLayer: Array<any>;
+
+  // Arrays
+  private _levels: Array<TankLevel> = [];
+  private _levelGroupBodies: Array<Phaser.Physics.P2.Body> = [];
+  private _entities: Array<Entity> = [];
+
+  // Collision Groups
+  // They must be created after world boundaries have been finalized/fixed for the groups to collide with bondaries
+
+ /* private _tanksCollisionGroup: CollisionGroup;
+  private _groundCollisionGroup: CollisionGroup;
+  private _bulletsCollisionGroup: CollisionGroup;
+*/
 
   constructor(game: Phaser.Game) {
     this._levels.push(new LevelOne(game));
     this._levels.forEach((level: TankLevel) => {
       level.init();
     });
+
     this._currentLevel = this._levels[0];
     this._game = game;
-    this._bullets = game.physics.p2.createCollisionGroup();
-    this._levelCollisionLayer = this._currentLevel.collisionLayer;
+
+    this._levelGroupBodies = this._currentLevel.collisionLayer;
+
+/*
+
+    this._bulletsCollisionGroup = game.physics.p2.createCollisionGroup();
+    this._tanksCollisionGroup = game.physics.p2.createCollisionGroup();
+    this._groundCollisionGroup = game.physics.p2.createCollisionGroup();
+*/
+
+
   }
 
   public newPlayer(): Entity {
@@ -33,10 +58,18 @@ export default class TankWorldFactory {
       .withComponent(
         [new MovableComponent(), new CameraComponent(this._game),
           new PhysicsComponent(this._game), new ShootComponent(this._game, this),
-          new LayerComponent()]);
+          new LayerComponent(), new CollisionsComponent()]);
+
     player.getComponent<CameraComponent>(ComponentType.CAMERA).setFocus(player.sprite);
-    player.getComponent<PhysicsComponent>(ComponentType.PHYSICS).addPhysics();
+    player.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
+      .addPhysics()
+      .delayGravity(false);
+
     player.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.CANDY_HUNTER);
+  //  player.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._tanksCollisionGroup, [this._bulletsCollisionGroup, this._groundCollisionGroup]);
+
+    this._entities.push(player);
+
     return player;
   }
 
@@ -44,18 +77,30 @@ export default class TankWorldFactory {
 
   }
 
-  public newBullet(x: number, y: number): Entity {
+  public newBullet(x: number, y: number, owner: Entity): Entity {
+
     let bullet = new Entity(this._game, x, y)
-      .withComponent([new PhysicsComponent(this._game), new LayerComponent()]);
+      .withComponent([new PhysicsComponent(this._game), new LayerComponent(),
+        new BulletComponent(this._game), new CollisionsComponent()])
+      .withOwner(owner);
 
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
-      .addPhysics()
-      .setVelocity(new Vector(1500, 0))
-      .setAngle(90)
-      .delayGravity(true, 1000);
+      .addPhysics(false)
+      .delayGravity(true);
 
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.BULLET_FIVE);
+    bullet.getComponent<BulletComponent>(ComponentType.BULLET).bulletInit();
+  //  bullet.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._bulletsCollisionGroup, [this._tanksCollisionGroup, this._groundCollisionGroup]);
+
+    bullet.sprite.body.
+    this._entities.push(bullet);
+
     return bullet;
+
+  }
+
+  get entities(): Array<Entity> {
+    return this._entities;
   }
 
 }

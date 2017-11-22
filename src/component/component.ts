@@ -1,10 +1,11 @@
 import { ComponentType } from '../constants/GameConstants';
-import {Entity} from '../entities/entity';
+import { Entity } from '../entities/entity';
 
 export abstract class Component {
 
   protected _name: ComponentType;
   protected _target: Entity;
+
 
   constructor(name: ComponentType){
     this._name = name;

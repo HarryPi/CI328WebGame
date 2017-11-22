@@ -17,10 +17,10 @@ class MovableComponent extends component_1.Component {
         }
     }
     moveRight() {
-        this.target.sprite.body.velocity.x = this._speed;
+        this.target.sprite.body.moveRight(this._speed);
     }
     moveLeft() {
-        this.target.sprite.body.velocity.x = -this._speed;
+        this.target.sprite.body.moveLeft(this._speed);
     }
     update() {
         switch (this._direction) {

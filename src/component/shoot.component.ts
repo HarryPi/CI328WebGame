@@ -1,10 +1,9 @@
 import { ComponentType, InputType, TankWorldEvents } from '../constants/GameConstants';
 import { Component } from './component';
-import { EventEmitter } from 'events';
 import TankWorldFactory from '../TankWorldFactory';
 
 export class ShootComponent extends Component{
-  private _canShoot: boolean;
+  private _canShoot: boolean = false;
   private _factory: TankWorldFactory;
   private _timer = 0;
 
@@ -15,7 +14,7 @@ export class ShootComponent extends Component{
 
     update(){
       if (this._canShoot) {
-        console.log(Date.now() - this._timer );
+        this._canShoot = false;
         if (Date.now() - this._timer > 1500) {
           this.shootBullet();
         }
@@ -26,8 +25,7 @@ export class ShootComponent extends Component{
   }
 
   private shootBullet(){
-    this._canShoot = false;
-    this._factory.newBullet(this.target.sprite.x + 50 , this.target.sprite.y - 30);
+    this._factory.newBullet(this.target.sprite.x + 50 , this.target.sprite.y - 20, this.target);
     this._timer = Date.now();
   }
 }

@@ -43,6 +43,8 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["COLLISION"] = "collision";
+    ComponentType["BULLET"] = "bullet";
     ComponentType["LAYER"] = "layer";
     ComponentType["SHOOT"] = "shoot";
     ComponentType["PHYSICS"] = "physics";

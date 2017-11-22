@@ -29,6 +29,8 @@ export enum TankLayout {
 }
 
 export enum ComponentType {
+  COLLISION = 'collision',
+  BULLET = 'bullet',
   LAYER = 'layer',
   SHOOT = 'shoot',
   PHYSICS = 'physics',

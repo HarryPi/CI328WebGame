@@ -1,19 +1,14 @@
 import State from './state';
 import Input from '../util/input';
 import TankWorldFactory from '../TankWorldFactory';
-
-import { LevelOne } from '../config/levels/levelOne';
 import { ComponentType, InputType } from '../constants/GameConstants';
 import { Entity } from '../entities/entity';
 import { MovableComponent } from '../component/movable.component';
-import { type } from 'os';
 import { ShootComponent } from '../component/shoot.component';
-import Print from '../util/print';
 
 export class GameState extends State {
   private _input: Input;
   private _inputSubscription;
-  private _entities: Array<Entity> = [];
   private _direction: InputType;
   private _factory: TankWorldFactory;
   constructor() {
@@ -22,13 +17,13 @@ export class GameState extends State {
   }
 
   preload() {
+    // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
     this._factory = new TankWorldFactory(this.game);
   }
 
   create() {
     // Input
     let player: Entity = this._factory.newPlayer();
-    this._entities.push(player);
     this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
     this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);
     this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), InputType.SHOOT);
@@ -40,8 +35,10 @@ export class GameState extends State {
 
   update() {
     this._input.run();
-    this._entities.forEach((e) => {
+    this._factory.entities.forEach((e) => {
       e.update();
+      this.game.physics.p2.collisionGroups.forEach((e)=> {
+      });
     });
   }
   shutdown(){

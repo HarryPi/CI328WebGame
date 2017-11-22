@@ -5,12 +5,13 @@ const component_1 = require("./component");
 class ShootComponent extends component_1.Component {
     constructor(game, factory) {
         super(GameConstants_1.ComponentType.SHOOT);
+        this._canShoot = false;
         this._timer = 0;
         this._factory = factory;
     }
     update() {
         if (this._canShoot) {
-            console.log(Date.now() - this._timer);
+            this._canShoot = false;
             if (Date.now() - this._timer > 1500) {
                 this.shootBullet();
             }
@@ -20,8 +21,7 @@ class ShootComponent extends component_1.Component {
         this._canShoot = value;
     }
     shootBullet() {
-        this._canShoot = false;
-        this._factory.newBullet(this.target.sprite.x + 50, this.target.sprite.y - 30);
+        this._factory.newBullet(this.target.sprite.x + 50, this.target.sprite.y - 20, this.target);
         this._timer = Date.now();
     }
 }

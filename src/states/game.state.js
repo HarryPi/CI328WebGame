@@ -7,16 +7,15 @@ const GameConstants_1 = require("../constants/GameConstants");
 class GameState extends state_1.default {
     constructor() {
         super();
-        this._entities = [];
         this._input = new input_1.default();
     }
     preload() {
+        // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
         this._factory = new TankWorldFactory_1.default(this.game);
     }
     create() {
         // Input
         let player = this._factory.newPlayer();
-        this._entities.push(player);
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), GameConstants_1.InputType.SHOOT);
@@ -27,8 +26,10 @@ class GameState extends state_1.default {
     }
     update() {
         this._input.run();
-        this._entities.forEach((e) => {
+        this._factory.entities.forEach((e) => {
             e.update();
+            this.game.physics.p2.collisionGroups.forEach((e) => {
+            });
         });
     }
     shutdown() {

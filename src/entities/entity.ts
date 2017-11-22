@@ -5,13 +5,13 @@ export class Entity {
 
   private _components: Map<string, Component> = new Map();
   private _sprite: Phaser.Sprite;
+  private _owner: Entity;
 
   constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>) {
     if (components) {
         components.forEach((component: Component) => {
           this.addComponent(component);
         });
-      debugger;
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
   }
@@ -39,7 +39,14 @@ export class Entity {
       return this;
     }
   }
+  withOwner(entity: Entity): this {
+    this._owner = entity;
+    return this;
+  }
   get sprite(): Phaser.Sprite {
     return this._sprite;
+  }
+  get owner(): Entity{
+    return this._owner;
   }
 }

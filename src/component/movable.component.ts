@@ -22,10 +22,10 @@ export class MovableComponent extends Component {
   }
 
   private moveRight(): void {
-    this.target.sprite.body.velocity.x = this._speed;
+    this.target.sprite.body.moveRight(this._speed);
   }
   private moveLeft(): void {
-    this.target.sprite.body.velocity.x = -this._speed;
+    this.target.sprite.body.moveLeft(this._speed);
   }
   public update(){
     switch (this._direction) {

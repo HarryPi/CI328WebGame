@@ -8,7 +8,6 @@ class Entity {
             components.forEach((component) => {
                 this.addComponent(component);
             });
-            debugger;
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
     }
@@ -33,8 +32,15 @@ class Entity {
             return this;
         }
     }
+    withOwner(entity) {
+        this._owner = entity;
+        return this;
+    }
     get sprite() {
         return this._sprite;
+    }
+    get owner() {
+        return this._owner;
     }
 }
 exports.Entity = Entity;
