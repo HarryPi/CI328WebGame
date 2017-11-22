@@ -26,7 +26,7 @@ export class Entity {
     return this._components.get(componentName) as T;
   }
 
-  public update() {
+  public update(): void {
     this._components.forEach((componentType) => {
       this._components.get(componentType.name).update();
     });
@@ -39,7 +39,7 @@ export class Entity {
       return this;
     }
   }
-  get sprite() {
+  get sprite(): Phaser.Sprite {
     return this._sprite;
   }
 }

@@ -49,8 +49,10 @@ export default class TankWorldFactory {
       .withComponent([new PhysicsComponent(this._game), new LayerComponent()]);
 
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
-      .addPhysics(0, new Vector(1.4, 0.9))
-      .setVelocity(new Vector(1500, 0));
+      .addPhysics()
+      .setVelocity(new Vector(1500, 0))
+      .setAngle(90)
+      .delayGravity(true, 1000);
 
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.BULLET_FIVE);
     return bullet;

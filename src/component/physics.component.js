@@ -2,16 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
-const vector_1 = require("../util/vector");
 class PhysicsComponent extends component_1.Component {
     constructor(game) {
         super(GameConstants_1.ComponentType.PHYSICS);
         this._game = game;
     }
-    addPhysics(gravity = 1, anchor = new vector_1.default(0.5, 0.5)) {
+    addPhysics() {
         this._game.physics.p2.enable(this.target.sprite);
-        this.target.sprite.anchor.setTo(anchor.x, anchor.y);
-        this.target.sprite.body.data.gravityScale = gravity;
         this.target.sprite.body.angularDamping = 0.7;
         console.log(this.target.sprite);
         return this;
@@ -20,6 +17,18 @@ class PhysicsComponent extends component_1.Component {
         this.target.sprite.body.velocity.x = vec.x;
         this.target.sprite.body.velocity.y = vec.y;
         return this;
+    }
+    setAngle(angle) {
+        this.target.sprite.body.angle = angle;
+        return this;
+    }
+    delayGravity(bool, delay = 1000) {
+        this.target.sprite.body.enableGravity = false;
+        if (bool) {
+            setInterval(() => {
+                this.target.sprite.body.enableGravity = true;
+            }, delay);
+        }
     }
 }
 exports.PhysicsComponent = PhysicsComponent;

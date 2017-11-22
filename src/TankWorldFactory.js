@@ -37,8 +37,10 @@ class TankWorldFactory {
         let bullet = new entity_1.Entity(this._game, x, y)
             .withComponent([new physics_component_1.PhysicsComponent(this._game), new layer_component_1.LayerComponent()]);
         bullet.getComponent(GameConstants_1.ComponentType.PHYSICS)
-            .addPhysics(0, new vector_1.default(1.4, 0.9))
-            .setVelocity(new vector_1.default(1500, 0));
+            .addPhysics()
+            .setVelocity(new vector_1.default(1500, 0))
+            .setAngle(90)
+            .delayGravity(true, 1000);
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.BULLET_FIVE);
         return bullet;
     }
