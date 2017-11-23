@@ -70,7 +70,6 @@ export default class TankWorldFactory {
     bullet.getComponent<BulletComponent>(ComponentType.BULLET).bulletInit();
 
     this._entities.push(bullet);
-
     return bullet;
 
   }
