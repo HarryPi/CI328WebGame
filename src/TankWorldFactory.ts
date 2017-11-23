@@ -6,10 +6,8 @@ import { PhysicsComponent } from './component/physics.component';
 import TankLevel from './config/levels/tankLevel';
 import { LevelOne } from './config/levels/levelOne';
 import { ShootComponent } from './component/shoot.component';
-import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import { LayerComponent } from './component/layer.component';
 import { BulletComponent } from './component/bullet.component';
-import { debug } from 'util';
 import { CollisionsComponent } from './component/collisions.component';
 
 export default class TankWorldFactory {
@@ -21,16 +19,7 @@ export default class TankWorldFactory {
 
   // Arrays
   private _levels: Array<TankLevel> = [];
-  private _levelGroupBodies: Array<Phaser.Physics.P2.Body> = [];
   private _entities: Array<Entity> = [];
-
-  // Collision Groups
-  // They must be created after world boundaries have been finalized/fixed for the groups to collide with bondaries
-
- /* private _tanksCollisionGroup: CollisionGroup;
-  private _groundCollisionGroup: CollisionGroup;
-  private _bulletsCollisionGroup: CollisionGroup;
-*/
 
   constructor(game: Phaser.Game) {
     this._levels.push(new LevelOne(game));
@@ -40,16 +29,6 @@ export default class TankWorldFactory {
 
     this._currentLevel = this._levels[0];
     this._game = game;
-
-    this._levelGroupBodies = this._currentLevel.collisionLayer;
-
-/*
-
-    this._bulletsCollisionGroup = game.physics.p2.createCollisionGroup();
-    this._tanksCollisionGroup = game.physics.p2.createCollisionGroup();
-    this._groundCollisionGroup = game.physics.p2.createCollisionGroup();
-*/
-
 
   }
 
@@ -66,7 +45,6 @@ export default class TankWorldFactory {
       .delayGravity(false);
 
     player.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.CANDY_HUNTER);
-  //  player.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._tanksCollisionGroup, [this._bulletsCollisionGroup, this._groundCollisionGroup]);
 
     this._entities.push(player);
 
@@ -90,9 +68,7 @@ export default class TankWorldFactory {
 
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.BULLET_FIVE);
     bullet.getComponent<BulletComponent>(ComponentType.BULLET).bulletInit();
-  //  bullet.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._bulletsCollisionGroup, [this._tanksCollisionGroup, this._groundCollisionGroup]);
 
-    bullet.sprite.body.
     this._entities.push(bullet);
 
     return bullet;

@@ -11,16 +11,9 @@ const layer_component_1 = require("./component/layer.component");
 const bullet_component_1 = require("./component/bullet.component");
 const collisions_component_1 = require("./component/collisions.component");
 class TankWorldFactory {
-    // Collision Groups
-    // They must be created after world boundaries have been finalized/fixed for the groups to collide with bondaries
-    /* private _tanksCollisionGroup: CollisionGroup;
-     private _groundCollisionGroup: CollisionGroup;
-     private _bulletsCollisionGroup: CollisionGroup;
-   */
     constructor(game) {
         // Arrays
         this._levels = [];
-        this._levelGroupBodies = [];
         this._entities = [];
         this._levels.push(new levelOne_1.LevelOne(game));
         this._levels.forEach((level) => {
@@ -28,13 +21,6 @@ class TankWorldFactory {
         });
         this._currentLevel = this._levels[0];
         this._game = game;
-        this._levelGroupBodies = this._currentLevel.collisionLayer;
-        /*
-        
-            this._bulletsCollisionGroup = game.physics.p2.createCollisionGroup();
-            this._tanksCollisionGroup = game.physics.p2.createCollisionGroup();
-            this._groundCollisionGroup = game.physics.p2.createCollisionGroup();
-        */
     }
     newPlayer() {
         let player = new entity_1.Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
@@ -46,7 +32,6 @@ class TankWorldFactory {
             .addPhysics()
             .delayGravity(false);
         player.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.CANDY_HUNTER);
-        //  player.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._tanksCollisionGroup, [this._bulletsCollisionGroup, this._groundCollisionGroup]);
         this._entities.push(player);
         return player;
     }
@@ -62,9 +47,7 @@ class TankWorldFactory {
             .delayGravity(true);
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.BULLET_FIVE);
         bullet.getComponent(GameConstants_1.ComponentType.BULLET).bulletInit();
-        //  bullet.getComponent<CollisionsComponent>(ComponentType.COLLISION).enableCollision(this._bulletsCollisionGroup, [this._tanksCollisionGroup, this._groundCollisionGroup]);
-        bullet.sprite.body.
-            this._entities.push(bullet);
+        this._entities.push(bullet);
         return bullet;
     }
     get entities() {
