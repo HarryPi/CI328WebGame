@@ -76,6 +76,7 @@ export default class TankWorldFactory {
 
   get entities(): Array<Entity> {
     return this._entities;
+
   }
 
 }
