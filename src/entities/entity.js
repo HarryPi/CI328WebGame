@@ -10,6 +10,9 @@ class Entity {
             });
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
+        this._components.forEach((c) => {
+            c.validateComponentRequirements();
+        });
     }
     addComponent(component) {
         this._components.set(component.name, component);

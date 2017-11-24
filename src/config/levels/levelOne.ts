@@ -9,6 +9,8 @@ export class LevelOne extends TankLevel {
   }
 
   public init(): void {
+    let collgroup = this._game.physics.p2.createCollisionGroup();
+    let collgroup1 = this._game.physics.p2.createCollisionGroup();
     let map = this._game.add.tilemap(Levels.LEVEL_ONE);
     map.addTilesetImage(TileLayers.GRASS_LAYER, TileLayers.GRASS_LAYER);
     map.addTilesetImage(TileLayers.BACKGROUND, TileLayers.BACKGROUND);
@@ -18,8 +20,14 @@ export class LevelOne extends TankLevel {
     map.createLayer('GroundSecondary').resizeWorld();
     map.createLayer('GroundPrimary').resizeWorld();
 
-    this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath');
-    this._playerStartPos = new Vector(this._game.world.left, this._game.world.centerY + 100);
+    this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath', true);
+   /* this._collisionLayer.forEach((b) => {
+      b.setCollisionGroup(collgroup);
+      b.collides(collgroup1);
+      console.log(b);
+    });*/
+    this._playerStartPos = new Vector(this._game.world.bounds.left, this._game.world.centerY + 100);
+    this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
 
   }
 

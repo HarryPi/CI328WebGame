@@ -15,6 +15,9 @@ class AssetLoader {
   // Phaser.Loader
   private _loader: Phaser.Loader;
 
+  // Animations
+  private _animations: Map<string, Phaser.Animation> = new Map();
+
   constructor() {
 
     // Images
@@ -38,6 +41,7 @@ class AssetLoader {
    * @param {Phaser.Loader} loader   The phaser loader
    * @return {void}
    **/
+
   init(loader: Phaser.Loader): void {
     this.loader = loader;
   }

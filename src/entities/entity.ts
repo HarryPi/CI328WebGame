@@ -14,6 +14,9 @@ export class Entity {
         });
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
+    this._components.forEach( (c) => {
+      c.validateComponentRequirements();
+    });
   }
 
   private addComponent(component: Component): Component {

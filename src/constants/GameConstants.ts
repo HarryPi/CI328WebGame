@@ -9,7 +9,7 @@ export enum Levels {
   LEVEL_TWO = 'levelTwo'
 }
 
-export enum TankLayout {
+export enum   TankLayout {
   GREEN_FORTRESS = 'tanks_tankGreen1.png', GREEN_ARTILERY = 'tanks_tankGreen2.png',
   GREEN_HUNTER = 'tanks_tankGreen3.png', GREEN_RECON = 'tanks_tankGreen4.png',
   GREEN_LIGHT = 'tanks_tankGreen5.png',
@@ -25,7 +25,19 @@ export enum TankLayout {
   BULLET_ONE = 'tank_bullet1.png', BULLET_TWO = 'tank_bullet2.png',
   BULLET_THREE = 'tank_bullet3.png', BULLET_FOUR = 'tank_bullet4.png',
   BULLET_FIVE = 'tank_bullet5.png', BULLET_SIX = 'tank_bullet6.png',
-  TANK_SPRITESHEET = 'tankSpritesheet'
+  EXPLOSION_ONE = 'tank_explosion1.png',
+  EXPLOSION_TWO = 'tank_explosion2.png',
+  EXPLOSION_THREE = 'tank_explosion3.png',
+  EXPLOSION_FOUR = 'tank_explosion4.png',
+  EXPLOSION_FIVE = 'tank_explosion5.png',
+  EXPLOSION_SIX = 'tank_explosion6.png',
+  EXPLOSION_SEVEN = 'tank_explosion7.png',
+  EXPLOSION_EIGHT = 'tank_explosion8.png',
+  EXPLOSION_NINE = 'tank_explosion9.png',
+  EXPLOSION_TEN = 'tank_explosion10.png',
+  EXPLOSION_ELEVEN = 'tank_explosion11.png',
+  EXPLOSION_TWELVE = 'tank_explosion12.png',
+  TANK_SPRITESHEET  = 'tankSpritesheet'
 }
 
 export enum ComponentType {
@@ -54,6 +66,16 @@ export enum InputType {
   LEFT_INPUT = 'left',
   SHOOT = 'shoot'
 }
+
 export enum TankWorldEvents {
   SPAWN_BULLET = 'spawnBullet',
+}
+
+export enum Action {
+  EXPLODE = 'explode_action',
+  DAMAGE = 'damage_action'
+}
+
+export enum AnimationTypes {
+  EXPLOSION = 'explosion_animation'
 }

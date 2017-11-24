@@ -13,6 +13,13 @@ class Component {
     set target(target) {
         this._target = target;
     }
+    validateComponentRequirements(components) {
+        components.forEach((comp) => {
+            if (!this.target.getComponent(comp)) {
+                throw new Error(`Failed to find required component ${comp}`);
+            }
+        });
+    }
     update(params) { }
 }
 exports.Component = Component;

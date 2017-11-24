@@ -5,7 +5,7 @@ export abstract class Component {
 
   protected _name: ComponentType;
   protected _target: Entity;
-
+  protected _requiredComponents: Array<ComponentType>;
 
   constructor(name: ComponentType){
     this._name = name;
@@ -22,5 +22,12 @@ export abstract class Component {
     this._target = target;
   }
 
+  public validateComponentRequirements(components: Array<ComponentType>): void {
+    components.forEach((comp) => {
+      if (!this.target.getComponent(comp)) {
+        throw new Error (`Failed to find required component ${comp}`);
+      }
+    });
+  }
   public update(params?: any): void {}
 }

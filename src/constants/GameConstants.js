@@ -39,6 +39,18 @@ var TankLayout;
     TankLayout["BULLET_FOUR"] = "tank_bullet4.png";
     TankLayout["BULLET_FIVE"] = "tank_bullet5.png";
     TankLayout["BULLET_SIX"] = "tank_bullet6.png";
+    TankLayout["EXPLOSION_ONE"] = "tank_explosion1.png";
+    TankLayout["EXPLOSION_TWO"] = "tank_explosion2.png";
+    TankLayout["EXPLOSION_THREE"] = "tank_explosion3.png";
+    TankLayout["EXPLOSION_FOUR"] = "tank_explosion4.png";
+    TankLayout["EXPLOSION_FIVE"] = "tank_explosion5.png";
+    TankLayout["EXPLOSION_SIX"] = "tank_explosion6.png";
+    TankLayout["EXPLOSION_SEVEN"] = "tank_explosion7.png";
+    TankLayout["EXPLOSION_EIGHT"] = "tank_explosion8.png";
+    TankLayout["EXPLOSION_NINE"] = "tank_explosion9.png";
+    TankLayout["EXPLOSION_TEN"] = "tank_explosion10.png";
+    TankLayout["EXPLOSION_ELEVEN"] = "tank_explosion11.png";
+    TankLayout["EXPLOSION_TWELVE"] = "tank_explosion12.png";
     TankLayout["TANK_SPRITESHEET"] = "tankSpritesheet";
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
@@ -72,4 +84,13 @@ var TankWorldEvents;
 (function (TankWorldEvents) {
     TankWorldEvents["SPAWN_BULLET"] = "spawnBullet";
 })(TankWorldEvents = exports.TankWorldEvents || (exports.TankWorldEvents = {}));
+var Action;
+(function (Action) {
+    Action["EXPLODE"] = "explode_action";
+    Action["DAMAGE"] = "damage_action";
+})(Action = exports.Action || (exports.Action = {}));
+var AnimationTypes;
+(function (AnimationTypes) {
+    AnimationTypes["EXPLOSION"] = "explosion_animation";
+})(AnimationTypes = exports.AnimationTypes || (exports.AnimationTypes = {}));
 //# sourceMappingURL=GameConstants.js.map

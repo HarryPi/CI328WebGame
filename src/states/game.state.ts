@@ -31,14 +31,13 @@ export class GameState extends State {
         input !== InputType.SHOOT.toString() ? player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input
                                              : player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
     });
+    this._factory.newEnemy();
   }
 
   update() {
     this._input.run();
     this._factory.entities.forEach((e) => {
       e.update();
-      this.game.physics.p2.collisionGroups.forEach((e)=> {
-      });
     });
   }
   shutdown(){

@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 class AssetLoader {
     constructor() {
+        // Animations
+        this._animations = new Map();
         // Images
         this._progressBarUrl = require('assets/images/progressBar.png');
         this._logoUrl = require('assets/images/logo.png');

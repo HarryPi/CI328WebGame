@@ -24,9 +24,12 @@ class TankWorldFactory {
     }
     newPlayer() {
         let player = new entity_1.Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
-            .withComponent([new movable_component_1.MovableComponent(), new camera_component_1.CameraComponent(this._game),
-            new physics_component_1.PhysicsComponent(this._game), new shoot_component_1.ShootComponent(this._game, this),
-            new layer_component_1.LayerComponent(), new collisions_component_1.CollisionsComponent()]);
+            .withComponent([new movable_component_1.MovableComponent(),
+            new camera_component_1.CameraComponent(this._game),
+            new physics_component_1.PhysicsComponent(this._game),
+            new shoot_component_1.ShootComponent(this._game, this),
+            new layer_component_1.LayerComponent(),
+            new collisions_component_1.CollisionsComponent()]);
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
@@ -36,6 +39,20 @@ class TankWorldFactory {
         return player;
     }
     newEnemy() {
+        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y)
+            .withComponent([
+            new movable_component_1.MovableComponent(),
+            new physics_component_1.PhysicsComponent(this._game),
+            new shoot_component_1.ShootComponent(this._game, this),
+            new layer_component_1.LayerComponent(),
+            new collisions_component_1.CollisionsComponent()
+        ]);
+        enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
+            .addPhysics()
+            .delayGravity(false);
+        enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.DARK_ARTILLERY);
+        this._entities.push(enemy);
+        return enemy;
     }
     newBullet(x, y, owner) {
         let bullet = new entity_1.Entity(this._game, x, y)
@@ -47,6 +64,7 @@ class TankWorldFactory {
             .delayGravity(true);
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.BULLET_FIVE);
         bullet.getComponent(GameConstants_1.ComponentType.BULLET).bulletInit();
+        bullet.getComponent(GameConstants_1.ComponentType.COLLISION).enableCollision([GameConstants_1.Action.EXPLODE]);
         this._entities.push(bullet);
         return bullet;
     }
