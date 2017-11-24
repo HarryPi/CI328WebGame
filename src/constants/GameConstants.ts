@@ -73,7 +73,8 @@ export enum TankWorldEvents {
 
 export enum Action {
   EXPLODE = 'explode_action',
-  DAMAGE = 'damage_action'
+  DAMAGE = 'damage_action',
+  NOTHING = 'no_action'
 }
 
 export enum AnimationTypes {

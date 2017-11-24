@@ -16,7 +16,6 @@ export class BootState extends State {
     this.scale.pageAlignVertically = true;
     this.scale.pageAlignHorizontally = true;
     this.scale.setGameSize(window.innerWidth, window.innerHeight);
-
   }
 
   create(): void {

@@ -22,8 +22,8 @@ export abstract class Component {
     this._target = target;
   }
 
-  public validateComponentRequirements(components: Array<ComponentType>): void {
-    components.forEach((comp) => {
+  public validateComponentRequirements(): void {
+    this._requiredComponents.forEach((comp) => {
       if (!this.target.getComponent(comp)) {
         throw new Error (`Failed to find required component ${comp}`);
       }

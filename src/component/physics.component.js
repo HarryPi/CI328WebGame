@@ -25,13 +25,12 @@ class PhysicsComponent extends component_1.Component {
             }, delay);
         }
     }
-    stopSprite(sprite) {
-        /*sprite.body.data.shapes[0].sensor = true;
-         sprite.body.STATIC = true;
-         sprite.body.velocity.x = 0;
-         sprite.body.velocity.y = 0;
-         sprite.body.allowGravity = false;
-         sprite.body.restitution = 0.0;*/
+    stopSprite() {
+        this.target.sprite.body.STATIC = true;
+        this.target.sprite.body.velocity.x = 0;
+        this.target.sprite.body.velocity.y = 0;
+        this.target.sprite.body.allowGravity = false;
+        this.target.sprite.body.restitution = 0.0;
     }
 }
 exports.PhysicsComponent = PhysicsComponent;

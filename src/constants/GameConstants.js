@@ -88,6 +88,7 @@ var Action;
 (function (Action) {
     Action["EXPLODE"] = "explode_action";
     Action["DAMAGE"] = "damage_action";
+    Action["NOTHING"] = "no_action";
 })(Action = exports.Action || (exports.Action = {}));
 var AnimationTypes;
 (function (AnimationTypes) {

@@ -5,12 +5,15 @@ import { ComponentType, InputType } from '../constants/GameConstants';
 import { Entity } from '../entities/entity';
 import { MovableComponent } from '../component/movable.component';
 import { ShootComponent } from '../component/shoot.component';
+import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 
 export class GameState extends State {
   private _input: Input;
   private _inputSubscription;
   private _direction: InputType;
   private _factory: TankWorldFactory;
+
+
   constructor() {
     super();
     this._input = new Input();

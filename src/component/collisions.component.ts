@@ -1,38 +1,63 @@
 import { Component } from './component';
 import { Action, ComponentType, TankLayout } from '../constants/GameConstants';
-import {PhysicsComponent} from './physics.component';
+import { PhysicsComponent } from './physics.component';
+import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 
 export class CollisionsComponent extends Component {
   private _ignoreCollision: boolean = true;
+  private _game: Phaser.Game;
 
-  constructor() {
+  constructor(game: Phaser.Game) {
     super(ComponentType.COLLISION);
+    this._game = game;
     this._requiredComponents = [ComponentType.PHYSICS];
   }
-
-  public enableCollision(actions: Array<Action>, collisionGroups?: Array<Phaser.Group>){
-    this.target.sprite.body.onBeginContact.add( (contactWith, contactWith1, thisBody, shape, eqArr) => {
-      if (this._ignoreCollision) {
-        this._ignoreCollision = false;
-        return;
-      }
-     this.triggerCollisionAction(actions, eqArr, collisionGroups);
-    });
+  public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
+    this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
+    return this;
   }
-  private triggerCollisionAction(actions: Array<Action>, eqArr: Array<Object>, collisionGroups?: Array<Phaser.Group>){
-    actions.forEach( (action) => {
-      switch (action) {
-        case Action.EXPLODE:
-          this.target.sprite.animations.add(action.toString(), Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-          this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite(this.target.sprite);
-          this.target.sprite.animations.play(action.toString()).onComplete.add(() => {
-            this.target.sprite.kill();
-          });
+
+  public collidesWith(collidesWith: CollisionGroup, actions: Array<Action>): CollisionsComponent {
+    let body: Phaser.Physics.P2.Body = this.target.sprite.body;
+
+    if (body.collidesWith.includes(collidesWith)) {
+      return; // In case we attempt to set the same collision group twice
+    }
+
+    actions.forEach((action) => {
+      switch (action){
+        case Action.NOTHING:
+          body.collides(collidesWith);
           break;
+
+        case Action.EXPLODE:
+          body.collides(collidesWith, this.explode, this);
+          break;
+
+        case Action.DAMAGE:
+          break;
+
         default:
           break;
       }
     });
+    return this;
   }
 
+  private explode(owner: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
+    this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite();
+
+    if (!impacted.sprite) { // Ground Layer do not have sprites so we will explode the bullet instead
+      owner.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+      owner.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
+        owner.sprite.kill();
+      });
+    } else {
+      impacted.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+      impacted.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
+        owner.sprite.kill();
+      });
+    }
+
+  }
 }
