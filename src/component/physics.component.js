@@ -26,7 +26,7 @@ class PhysicsComponent extends component_1.Component {
         }
     }
     stopSprite() {
-        this.target.sprite.body.KINETIC = true;
+        this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;
         this.target.sprite.body.restitution = 0.0;
         this.target.sprite.body.velocity.x = 0;
         this.target.sprite.body.velocity.y = 0;
