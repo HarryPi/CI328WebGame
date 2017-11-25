@@ -33,20 +33,12 @@ export class PhysicsComponent extends Component {
   }
 
   public stopSprite() {
-    this.target.sprite.body.STATIC = true;
+    this.target.sprite.body.KINETIC = true;
+    this.target.sprite.body.restitution = 0.0;
     this.target.sprite.body.velocity.x = 0;
     this.target.sprite.body.velocity.y = 0;
     this.target.sprite.body.allowGravity = false;
-    this.target.sprite.body.restitution = 0.0;
+    this.target.sprite.body.angularDumping = 1;
   }
 }
-
-/*  public setVelocity(vec: Vector): PhysicsComponent {
-      this.target.sprite.body.velocity.x = vec.x;
-      this.target.sprite.body.velocity.y = vec.y;
-      return this;
-  }
-
-
-  }*/
 

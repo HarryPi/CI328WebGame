@@ -60,7 +60,7 @@ export default class TankWorldFactory {
           new PhysicsComponent(this._game),
           new ShootComponent(this._game, this),
           new LayerComponent(),
-          new CollisionsComponent(this._game)]);
+          new CollisionsComponent()]);
 
     player.getComponent<CameraComponent>(ComponentType.CAMERA).setFocus(player.sprite);
     player.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
@@ -79,7 +79,7 @@ export default class TankWorldFactory {
   }
 
   public newEnemy() {
-    let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y)
+    let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null, -1)
       .withComponent(
         [
           new MovableComponent(),
@@ -103,7 +103,7 @@ export default class TankWorldFactory {
 
     let bullet = new Entity(this._game, x, y)
       .withComponent([new PhysicsComponent(this._game), new LayerComponent(),
-        new BulletComponent(this._game), new CollisionsComponent(this._game)])
+        new BulletComponent(this._game), new CollisionsComponent()])
       .withOwner(owner);
 
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)

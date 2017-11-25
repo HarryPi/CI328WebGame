@@ -5,11 +5,9 @@ import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 
 export class CollisionsComponent extends Component {
   private _ignoreCollision: boolean = true;
-  private _game: Phaser.Game;
 
-  constructor(game: Phaser.Game) {
+  constructor() {
     super(ComponentType.COLLISION);
-    this._game = game;
     this._requiredComponents = [ComponentType.PHYSICS];
   }
   public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {

@@ -3,10 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
 class CollisionsComponent extends component_1.Component {
-    constructor(game) {
+    constructor() {
         super(GameConstants_1.ComponentType.COLLISION);
         this._ignoreCollision = true;
-        this._game = game;
         this._requiredComponents = [GameConstants_1.ComponentType.PHYSICS];
     }
     setCollisionGroup(ownerCollisionGroup) {

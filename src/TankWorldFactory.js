@@ -40,7 +40,7 @@ class TankWorldFactory {
             new physics_component_1.PhysicsComponent(this._game),
             new shoot_component_1.ShootComponent(this._game, this),
             new layer_component_1.LayerComponent(),
-            new collisions_component_1.CollisionsComponent(this._game)]);
+            new collisions_component_1.CollisionsComponent()]);
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
@@ -53,7 +53,7 @@ class TankWorldFactory {
         return player;
     }
     newEnemy() {
-        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y)
+        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null, -1)
             .withComponent([
             new movable_component_1.MovableComponent(),
             new physics_component_1.PhysicsComponent(this._game),
@@ -71,7 +71,7 @@ class TankWorldFactory {
     newBullet(x, y, owner) {
         let bullet = new entity_1.Entity(this._game, x, y)
             .withComponent([new physics_component_1.PhysicsComponent(this._game), new layer_component_1.LayerComponent(),
-            new bullet_component_1.BulletComponent(this._game), new collisions_component_1.CollisionsComponent(this._game)])
+            new bullet_component_1.BulletComponent(this._game), new collisions_component_1.CollisionsComponent()])
             .withOwner(owner);
         bullet.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics(false)

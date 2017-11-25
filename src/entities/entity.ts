@@ -7,13 +7,14 @@ export class Entity {
   private _sprite: Phaser.Sprite;
   private _owner: Entity;
 
-  constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>) {
+  constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>, scaleX: number = 1) {
     if (components) {
         components.forEach((component: Component) => {
           this.addComponent(component);
         });
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
+    this._sprite.scale.x = scaleX;
     this._components.forEach( (c) => {
       c.validateComponentRequirements();
     });
