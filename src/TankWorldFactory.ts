@@ -79,7 +79,7 @@ export default class TankWorldFactory {
   }
 
   public newEnemy() {
-    let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null, -1)
+    let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
       .withComponent(
         [
           new MovableComponent(),
@@ -93,7 +93,10 @@ export default class TankWorldFactory {
       .delayGravity(false);
 
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.DARK_ARTILLERY);
-
+    enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
+      .setCollisionGroup(this._tankCollisionGroup)
+      .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
+      .collidesWith(this._bulletCollisionGroup, [Action.DAMAGE, Action.EXPLODE]);
     this._entities.push(enemy);
 
     return enemy;

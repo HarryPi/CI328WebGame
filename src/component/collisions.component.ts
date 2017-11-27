@@ -1,6 +1,6 @@
-import { Component } from './component';
-import { Action, ComponentType, TankLayout } from '../constants/GameConstants';
-import { PhysicsComponent } from './physics.component';
+import {Component} from './component';
+import {Action, ComponentType, TankLayout} from '../constants/GameConstants';
+import {PhysicsComponent} from './physics.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 
 export class CollisionsComponent extends Component {
@@ -10,6 +10,7 @@ export class CollisionsComponent extends Component {
     super(ComponentType.COLLISION);
     this._requiredComponents = [ComponentType.PHYSICS];
   }
+
   public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
     this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
     return this;
@@ -23,7 +24,7 @@ export class CollisionsComponent extends Component {
     }
 
     actions.forEach((action) => {
-      switch (action){
+      switch (action) {
         case Action.NOTHING:
           body.collides(collidesWith);
           break;
@@ -45,17 +46,9 @@ export class CollisionsComponent extends Component {
   private explode(owner: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
     this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite();
 
-    if (!impacted.sprite) { // Ground Layer do not have sprites so we will explode the bullet instead
-      owner.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-      owner.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
-        owner.sprite.kill();
-      });
-    } else {
-      impacted.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-      impacted.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
-        owner.sprite.kill();
-      });
-    }
-
+    owner.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+    owner.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
+      owner.sprite.kill();
+    });
   }
 }

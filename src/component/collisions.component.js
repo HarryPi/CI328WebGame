@@ -35,18 +35,10 @@ class CollisionsComponent extends component_1.Component {
     }
     explode(owner, impacted) {
         this.target.getComponent(GameConstants_1.ComponentType.PHYSICS).stopSprite();
-        if (!impacted.sprite) {
-            owner.sprite.animations.add(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-            owner.sprite.animations.play(GameConstants_1.Action.EXPLODE).onComplete.add(() => {
-                owner.sprite.kill();
-            });
-        }
-        else {
-            impacted.sprite.animations.add(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-            impacted.sprite.animations.play(GameConstants_1.Action.EXPLODE).onComplete.add(() => {
-                owner.sprite.kill();
-            });
-        }
+        owner.sprite.animations.add(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+        owner.sprite.animations.play(GameConstants_1.Action.EXPLODE).onComplete.add(() => {
+            owner.sprite.kill();
+        });
     }
 }
 exports.CollisionsComponent = CollisionsComponent;

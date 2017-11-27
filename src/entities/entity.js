@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 class Entity {
-  constructor(game, x, y, components, scaleX = 1) {
+    constructor(game, x, y, components, scaleX = 1) {
         this._components = new Map();
         if (components) {
             components.forEach((component) => {
@@ -10,7 +10,7 @@ class Entity {
             });
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
-    this._sprite.scale.x = scaleX;
+        this._sprite.scale.x = scaleX;
         this._components.forEach((c) => {
             c.validateComponentRequirements();
         });

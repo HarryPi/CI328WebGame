@@ -53,7 +53,7 @@ class TankWorldFactory {
         return player;
     }
     newEnemy() {
-        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null, -1)
+        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
             .withComponent([
             new movable_component_1.MovableComponent(),
             new physics_component_1.PhysicsComponent(this._game),
@@ -65,6 +65,10 @@ class TankWorldFactory {
             .addPhysics()
             .delayGravity(false);
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.DARK_ARTILLERY);
+        enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
+            .setCollisionGroup(this._tankCollisionGroup)
+            .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.DAMAGE, GameConstants_1.Action.EXPLODE]);
         this._entities.push(enemy);
         return enemy;
     }

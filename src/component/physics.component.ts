@@ -11,8 +11,9 @@ export class PhysicsComponent extends Component {
   }
 
   public addPhysics(gravity: boolean = true): PhysicsComponent {
+    debugger;
     this._game.physics.p2.enable(this.target.sprite);
-    gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0;
+    gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
 
     return this;
   }
