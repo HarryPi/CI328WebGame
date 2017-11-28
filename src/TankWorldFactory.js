@@ -11,6 +11,10 @@ const layer_component_1 = require("./component/layer.component");
 const bullet_component_1 = require("./component/bullet.component");
 const collisions_component_1 = require("./component/collisions.component");
 const ai_component_1 = require("./component/ai.component");
+const state_component_1 = require("./component/state.component");
+const idle_state_1 = require("./fsm/idle.state");
+const seek_state_1 = require("./fsm/seek.state");
+const firing_state_1 = require("./fsm/firing.state");
 class TankWorldFactory {
     constructor(game) {
         // Arrays
@@ -49,7 +53,8 @@ class TankWorldFactory {
         player.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.CANDY_HUNTER);
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
-            .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING]);
+            .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING]);
         this._entities.push(player);
         this._player = player;
         return player;
@@ -62,8 +67,15 @@ class TankWorldFactory {
             new shoot_component_1.ShootComponent(this._game, this),
             new layer_component_1.LayerComponent(),
             new collisions_component_1.CollisionsComponent(),
+            new state_component_1.StateComponent(),
             new ai_component_1.AiComponent(this._player)
         ]);
+        enemy.getComponent(GameConstants_1.ComponentType.STATE)
+            .addState(GameConstants_1.FSMStates.SEEK, new seek_state_1.SeekState())
+            .addState(GameConstants_1.FSMStates.IDLE, new idle_state_1.IdleState())
+            .addState(GameConstants_1.FSMStates.FIRING, new firing_state_1.FiringState())
+            .setState(GameConstants_1.FSMStates.IDLE);
+        console.log(enemy.getComponent(GameConstants_1.ComponentType.STATE));
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
             .flipSprite();
@@ -71,6 +83,7 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING])
             .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.DAMAGE, GameConstants_1.Action.EXPLODE]);
         this._entities.push(enemy);
         return enemy;

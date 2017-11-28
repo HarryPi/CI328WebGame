@@ -1,6 +1,5 @@
+
 import {State} from './state';
-import {Entity} from '../entities/entity';
-import {FSMStates} from '../constants/GameConstants';
 
 export class IdleState extends State {
 
@@ -13,7 +12,6 @@ export class IdleState extends State {
   }
 
   update(): void {
-    this._entity.fsm.enter(FSMStates.HUNTING);
   }
 
 }

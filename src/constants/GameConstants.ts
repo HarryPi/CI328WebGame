@@ -41,6 +41,7 @@ export enum   TankLayout {
 }
 
 export enum ComponentType {
+  STATE = 'state_component',
   AI = 'ai_component',
   COLLISION = 'collision_component',
   BULLET = 'bullet_component',
@@ -83,7 +84,7 @@ export enum AnimationTypes {
 }
 export enum FSMStates {
   IDLE,
-  HUNTING,
+  SEEK,
   FIRING,
   FLEEING
 }

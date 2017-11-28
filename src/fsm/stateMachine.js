@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class StateMachine {
     constructor() {
+        this._states = new Map();
     }
     add(name, state) {
         this._states.set(name, state);
@@ -17,6 +18,12 @@ class StateMachine {
         if (this._current) {
             this._current.update();
         }
+    }
+    hasState(name) {
+        return this._states.has(name);
+    }
+    get current() {
+        return this._current;
     }
 }
 exports.default = StateMachine;

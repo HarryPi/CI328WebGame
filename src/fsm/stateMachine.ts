@@ -7,7 +7,7 @@ export default class StateMachine {
   private _current: State;
 
   constructor(){
-
+    this._states = new Map();
   }
   public add(name: FSMStates, state: State) {
     this._states.set(name, state);
@@ -24,4 +24,11 @@ export default class StateMachine {
       this._current.update();
     }
   }
+  public hasState(name: FSMStates): boolean {
+    return this._states.has(name);
+  }
+  public get current(): State{
+    return this._current;
+  }
+
 }

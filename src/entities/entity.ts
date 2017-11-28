@@ -7,7 +7,6 @@ export class Entity {
   private _components: Map<string, Component> = new Map();
   private _sprite: Phaser.Sprite;
   private _owner: Entity;
-  private _fsm: StateMachine;
 
   constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>, scaleX: number = 1) {
     if (components) {
@@ -55,7 +54,5 @@ export class Entity {
   get owner(): Entity{
     return this._owner;
   }
-  get fsm(): StateMachine{
-    return this._fsm;
-  }
+ 
 }

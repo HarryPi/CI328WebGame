@@ -55,6 +55,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["STATE"] = "state_component";
     ComponentType["AI"] = "ai_component";
     ComponentType["COLLISION"] = "collision_component";
     ComponentType["BULLET"] = "bullet_component";
@@ -98,7 +99,7 @@ var AnimationTypes;
 var FSMStates;
 (function (FSMStates) {
     FSMStates[FSMStates["IDLE"] = 0] = "IDLE";
-    FSMStates[FSMStates["HUNTING"] = 1] = "HUNTING";
+    FSMStates[FSMStates["SEEK"] = 1] = "SEEK";
     FSMStates[FSMStates["FIRING"] = 2] = "FIRING";
     FSMStates[FSMStates["FLEEING"] = 3] = "FLEEING";
 })(FSMStates = exports.FSMStates || (exports.FSMStates = {}));
