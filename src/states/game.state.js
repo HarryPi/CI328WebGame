@@ -19,6 +19,7 @@ class GameState extends state_1.default {
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
         this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), GameConstants_1.InputType.SHOOT);
+        // Subscribe to inputs
         this._inputSubscription = this._input.emitter.subscribe((input) => {
             input !== GameConstants_1.InputType.SHOOT.toString() ? player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input
                 : player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;

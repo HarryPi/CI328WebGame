@@ -8,7 +8,6 @@ class PhysicsComponent extends component_1.Component {
         this._game = game;
     }
     addPhysics(gravity = true) {
-        debugger;
         this._game.physics.p2.enable(this.target.sprite);
         gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
         return this;
@@ -18,13 +17,17 @@ class PhysicsComponent extends component_1.Component {
         this.target.sprite.body.angle = angle;
         return this;
     }
-    delayGravity(bool, delay = 2000) {
+    delayGravity(bool = true, delay = 2000) {
         this.target.sprite.body.enableGravity = false;
         if (bool) {
             setInterval(() => {
                 this.target.sprite.body.enableGravity = true;
             }, delay);
         }
+    }
+    flipSprite() {
+        this.target.sprite.scale.x = -1;
+        return this;
     }
     stopSprite() {
         this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;

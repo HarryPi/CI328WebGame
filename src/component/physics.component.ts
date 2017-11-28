@@ -11,7 +11,6 @@ export class PhysicsComponent extends Component {
   }
 
   public addPhysics(gravity: boolean = true): PhysicsComponent {
-    debugger;
     this._game.physics.p2.enable(this.target.sprite);
     gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
 
@@ -24,7 +23,7 @@ export class PhysicsComponent extends Component {
     return this;
   }
 
-  public delayGravity(bool: boolean, delay: number = 2000) {
+  public delayGravity(bool: boolean = true, delay: number = 2000) {
     this.target.sprite.body.enableGravity = false;
     if (bool) {
       setInterval(() => {
@@ -33,6 +32,10 @@ export class PhysicsComponent extends Component {
     }
   }
 
+  public flipSprite(): PhysicsComponent{
+    this.target.sprite.scale.x = -1;
+    return this;
+  }
   public stopSprite() {
     this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;
     this.target.sprite.body.restitution = 0.0;

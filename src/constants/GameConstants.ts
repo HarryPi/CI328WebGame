@@ -1,12 +1,12 @@
 export enum States {
-  BOOT_STATE = 'bootState',
-  PRELOAD_STATE = 'preloadState',
-  GAME_STATE = 'gameState'
+  BOOT_STATE = 'boot_state',
+  PRELOAD_STATE = 'preload_state',
+  GAME_STATE = 'game_state'
 }
 
 export enum Levels {
-  LEVEL_ONE = 'levelOne',
-  LEVEL_TWO = 'levelTwo'
+  LEVEL_ONE = 'level_one',
+  LEVEL_TWO = 'level_two'
 }
 
 export enum   TankLayout {
@@ -41,13 +41,14 @@ export enum   TankLayout {
 }
 
 export enum ComponentType {
-  COLLISION = 'collision',
-  BULLET = 'bullet',
-  LAYER = 'layer',
-  SHOOT = 'shoot',
-  PHYSICS = 'physics',
-  CAMERA = 'camera',
-  MOVABLE = 'movable'
+  AI = 'ai_component',
+  COLLISION = 'collision_component',
+  BULLET = 'bullet_component',
+  LAYER = 'layer_component',
+  SHOOT = 'shoot_component',
+  PHYSICS = 'physics_component',
+  CAMERA = 'camera_component',
+  MOVABLE = 'movable_component'
 }
 
 export enum UIComponents {
@@ -79,4 +80,10 @@ export enum Action {
 
 export enum AnimationTypes {
   EXPLOSION = 'explosion_animation'
+}
+export enum FSMStates {
+  IDLE,
+  HUNTING,
+  FIRING,
+  FLEEING
 }

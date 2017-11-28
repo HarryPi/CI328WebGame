@@ -10,11 +10,12 @@ import { LayerComponent } from './component/layer.component';
 import { BulletComponent } from './component/bullet.component';
 import { CollisionsComponent } from './component/collisions.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
+import { AiComponent } from './component/ai.component';
 
 export default class TankWorldFactory {
 
   private _game: Phaser.Game;
-
+  private _player: Entity;
   // Levels
   private _currentLevel: TankLevel;
 
@@ -74,7 +75,7 @@ export default class TankWorldFactory {
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING]);
 
     this._entities.push(player);
-
+    this._player = player;
     return player;
   }
 
@@ -86,17 +87,19 @@ export default class TankWorldFactory {
           new PhysicsComponent(this._game),
           new ShootComponent(this._game, this),
           new LayerComponent(),
-          new CollisionsComponent()]);
+          new CollisionsComponent(),
+          new AiComponent(this._player)]);
 
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics()
-      .delayGravity(false);
+      .flipSprite();
 
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.DARK_ARTILLERY);
     enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._tankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
       .collidesWith(this._bulletCollisionGroup, [Action.DAMAGE, Action.EXPLODE]);
+
     this._entities.push(enemy);
 
     return enemy;

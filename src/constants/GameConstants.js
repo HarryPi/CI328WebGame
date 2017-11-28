@@ -2,14 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var States;
 (function (States) {
-    States["BOOT_STATE"] = "bootState";
-    States["PRELOAD_STATE"] = "preloadState";
-    States["GAME_STATE"] = "gameState";
+    States["BOOT_STATE"] = "boot_state";
+    States["PRELOAD_STATE"] = "preload_state";
+    States["GAME_STATE"] = "game_state";
 })(States = exports.States || (exports.States = {}));
 var Levels;
 (function (Levels) {
-    Levels["LEVEL_ONE"] = "levelOne";
-    Levels["LEVEL_TWO"] = "levelTwo";
+    Levels["LEVEL_ONE"] = "level_one";
+    Levels["LEVEL_TWO"] = "level_two";
 })(Levels = exports.Levels || (exports.Levels = {}));
 var TankLayout;
 (function (TankLayout) {
@@ -55,13 +55,14 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
-    ComponentType["COLLISION"] = "collision";
-    ComponentType["BULLET"] = "bullet";
-    ComponentType["LAYER"] = "layer";
-    ComponentType["SHOOT"] = "shoot";
-    ComponentType["PHYSICS"] = "physics";
-    ComponentType["CAMERA"] = "camera";
-    ComponentType["MOVABLE"] = "movable";
+    ComponentType["AI"] = "ai_component";
+    ComponentType["COLLISION"] = "collision_component";
+    ComponentType["BULLET"] = "bullet_component";
+    ComponentType["LAYER"] = "layer_component";
+    ComponentType["SHOOT"] = "shoot_component";
+    ComponentType["PHYSICS"] = "physics_component";
+    ComponentType["CAMERA"] = "camera_component";
+    ComponentType["MOVABLE"] = "movable_component";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
 var UIComponents;
 (function (UIComponents) {
@@ -94,4 +95,11 @@ var AnimationTypes;
 (function (AnimationTypes) {
     AnimationTypes["EXPLOSION"] = "explosion_animation";
 })(AnimationTypes = exports.AnimationTypes || (exports.AnimationTypes = {}));
+var FSMStates;
+(function (FSMStates) {
+    FSMStates[FSMStates["IDLE"] = 0] = "IDLE";
+    FSMStates[FSMStates["HUNTING"] = 1] = "HUNTING";
+    FSMStates[FSMStates["FIRING"] = 2] = "FIRING";
+    FSMStates[FSMStates["FLEEING"] = 3] = "FLEEING";
+})(FSMStates = exports.FSMStates || (exports.FSMStates = {}));
 //# sourceMappingURL=GameConstants.js.map

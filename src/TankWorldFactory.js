@@ -10,6 +10,7 @@ const shoot_component_1 = require("./component/shoot.component");
 const layer_component_1 = require("./component/layer.component");
 const bullet_component_1 = require("./component/bullet.component");
 const collisions_component_1 = require("./component/collisions.component");
+const ai_component_1 = require("./component/ai.component");
 class TankWorldFactory {
     constructor(game) {
         // Arrays
@@ -50,6 +51,7 @@ class TankWorldFactory {
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING]);
         this._entities.push(player);
+        this._player = player;
         return player;
     }
     newEnemy() {
@@ -59,11 +61,12 @@ class TankWorldFactory {
             new physics_component_1.PhysicsComponent(this._game),
             new shoot_component_1.ShootComponent(this._game, this),
             new layer_component_1.LayerComponent(),
-            new collisions_component_1.CollisionsComponent()
+            new collisions_component_1.CollisionsComponent(),
+            new ai_component_1.AiComponent(this._player)
         ]);
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
-            .delayGravity(false);
+            .flipSprite();
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.DARK_ARTILLERY);
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
