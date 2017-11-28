@@ -46,6 +46,9 @@ class Entity {
     get owner() {
         return this._owner;
     }
+    get fsm() {
+        return this._fsm;
+    }
 }
 exports.Entity = Entity;
 //# sourceMappingURL=entity.js.map
