@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 class Entity {
-    constructor(game, x, y, components, scaleX = 1) {
+    constructor(game, x, y, components) {
         this._components = new Map();
         if (components) {
             components.forEach((component) => {
@@ -10,10 +10,6 @@ class Entity {
             });
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
-        this._sprite.scale.x = scaleX;
-        this._components.forEach((c) => {
-            c.validateComponentRequirements();
-        });
     }
     addComponent(component) {
         this._components.set(component.name, component);
@@ -36,9 +32,8 @@ class Entity {
             return this;
         }
     }
-    withOwner(entity) {
-        this._owner = entity;
-        return this;
+    get components() {
+        return this._components;
     }
     get sprite() {
         return this._sprite;

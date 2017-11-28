@@ -41,6 +41,7 @@ export enum   TankLayout {
 }
 
 export enum ComponentType {
+  OWNER = 'owner_component',
   STATE = 'state_component',
   AI = 'ai_component',
   COLLISION = 'collision_component',

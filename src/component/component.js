@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class Component {
     constructor(name) {
+        this._requiredComponents = [];
         this._name = name;
     }
     get name() {
@@ -12,13 +13,6 @@ class Component {
     }
     set target(target) {
         this._target = target;
-    }
-    validateComponentRequirements() {
-        this._requiredComponents.forEach((comp) => {
-            if (!this.target.getComponent(comp)) {
-                throw new Error(`Failed to find required component ${comp}`);
-            }
-        });
     }
     update(params) { }
 }

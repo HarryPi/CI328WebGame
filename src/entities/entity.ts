@@ -8,17 +8,14 @@ export class Entity {
   private _sprite: Phaser.Sprite;
   private _owner: Entity;
 
-  constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>, scaleX: number = 1) {
+  constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>) {
     if (components) {
         components.forEach((component: Component) => {
           this.addComponent(component);
         });
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
-    this._sprite.scale.x = scaleX;
-    this._components.forEach( (c) => {
-      c.validateComponentRequirements();
-    });
+
   }
 
   private addComponent(component: Component): Component {
@@ -44,9 +41,9 @@ export class Entity {
       return this;
     }
   }
-  withOwner(entity: Entity): this {
-    this._owner = entity;
-    return this;
+
+  get components(): Map<string, Component> {
+    return this._components;
   }
   get sprite(): Phaser.Sprite {
     return this._sprite;

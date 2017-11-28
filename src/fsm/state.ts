@@ -7,7 +7,7 @@ export abstract class State {
   public abstract leave(): void;
   public abstract update(): void;
 
-  protected set entity(entity: Entity) {
+  public set entity(entity: Entity) {
     this._entity = entity;
   }
 }

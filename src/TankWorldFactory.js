@@ -15,6 +15,8 @@ const state_component_1 = require("./component/state.component");
 const idle_state_1 = require("./fsm/idle.state");
 const seek_state_1 = require("./fsm/seek.state");
 const firing_state_1 = require("./fsm/firing.state");
+const owner_component_1 = require("./component/owner.component");
+const guid_1 = require("./util/guid");
 class TankWorldFactory {
     constructor(game) {
         // Arrays
@@ -30,10 +32,15 @@ class TankWorldFactory {
         this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._bulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
+        this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
+        this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
         // Have to do this here as we cannot enforce layer to be Entity to attach component
         this._currentLevel.collisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);
-            layer.collides([this._tankCollisionGroup, this._bulletCollisionGroup]);
+            layer.collides([
+                this._tankCollisionGroup, this._bulletCollisionGroup,
+                this._enemyBulletsCollisionGroup, this._enemyTankCollisionGroup
+            ]);
         });
         // Force all groups to collide with world bounds
         this._game.physics.p2.updateBoundsCollisionGroup();
@@ -54,9 +61,13 @@ class TankWorldFactory {
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING]);
+            .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._enemyBulletsCollisionGroup, [GameConstants_1.Action.NOTHING]);
         this._entities.push(player);
         this._player = player;
+        this._player.sprite.data = {
+            tag: guid_1.Guid.newGuid()
+        };
         return player;
     }
     newEnemy() {
@@ -75,31 +86,34 @@ class TankWorldFactory {
             .addState(GameConstants_1.FSMStates.IDLE, new idle_state_1.IdleState())
             .addState(GameConstants_1.FSMStates.FIRING, new firing_state_1.FiringState())
             .setState(GameConstants_1.FSMStates.IDLE);
-        console.log(enemy.getComponent(GameConstants_1.ComponentType.STATE));
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
             .flipSprite();
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.DARK_ARTILLERY);
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
-            .setCollisionGroup(this._tankCollisionGroup)
+            .setCollisionGroup(this._enemyTankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.DAMAGE, GameConstants_1.Action.EXPLODE]);
+            .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.NOTHING]);
         this._entities.push(enemy);
+        enemy.sprite.data = {
+            tag: guid_1.Guid.newGuid()
+        };
         return enemy;
     }
     newBullet(x, y, owner) {
         let bullet = new entity_1.Entity(this._game, x, y)
             .withComponent([new physics_component_1.PhysicsComponent(this._game), new layer_component_1.LayerComponent(),
-            new bullet_component_1.BulletComponent(this._game), new collisions_component_1.CollisionsComponent()])
-            .withOwner(owner);
+            new bullet_component_1.BulletComponent(this._game), new collisions_component_1.CollisionsComponent(),
+            new owner_component_1.OwnerComponent()]);
+        bullet.getComponent(GameConstants_1.ComponentType.OWNER).owner = owner;
         bullet.getComponent(GameConstants_1.ComponentType.PHYSICS)
-            .addPhysics(false)
-            .delayGravity(true);
+            .addPhysics(false);
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.BULLET_FIVE);
-        bullet.getComponent(GameConstants_1.ComponentType.BULLET).bulletInit();
+        bullet.getComponent(GameConstants_1.ComponentType.BULLET)
+            .bulletInit();
         bullet.getComponent(GameConstants_1.ComponentType.COLLISION)
-            .setCollisionGroup(this._bulletCollisionGroup)
+            .setCollisionGroup(this.setBulletColisionGroup(owner))
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.EXPLODE, GameConstants_1.Action.DAMAGE])
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.EXPLODE]);
         this._entities.push(bullet);
@@ -107,6 +121,12 @@ class TankWorldFactory {
     }
     get entities() {
         return this._entities;
+    }
+    setBulletColisionGroup(owner) {
+        if (owner.sprite.data.tag === this._player.sprite.data.tag) {
+            return this._bulletCollisionGroup;
+        }
+        return this._enemyBulletsCollisionGroup;
     }
 }
 exports.default = TankWorldFactory;

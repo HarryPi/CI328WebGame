@@ -1,7 +1,8 @@
-import {Component} from './component';
-import {Action, ComponentType, TankLayout} from '../constants/GameConstants';
-import {PhysicsComponent} from './physics.component';
+import { Component } from './component';
+import { Action, ComponentType, TankLayout } from '../constants/GameConstants';
+import { PhysicsComponent } from './physics.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
+import { OwnerComponent } from './owner.component';
 
 export class CollisionsComponent extends Component {
   private _ignoreCollision: boolean = true;
@@ -43,12 +44,24 @@ export class CollisionsComponent extends Component {
     return this;
   }
 
-  private explode(owner: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
+  private explode(ownerBody: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
+    debugger;
+    // If layout is imported with tiled, which we do the body doesn't have a sprite therefor would throw an exception
+    let impactedSprite = impacted.sprite;
+    let ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);
+    if (impactedSprite) {
+      // not all entities have an owner
+      if (ownerComponent) {
+        if (ownerComponent.owner.sprite.data.tag === impactedSprite.data.tag) {
+          return; // do nothing
+        }
+      }
+    }
     this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite();
-
-    owner.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-    owner.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
-      owner.sprite.kill();
+    ownerBody.sprite.animations.add(Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+    ownerBody.sprite.animations.play(Action.EXPLODE).onComplete.add(() => {
+      ownerBody.sprite.kill();
+      ownerBody.sprite.destroy();
     });
   }
 }

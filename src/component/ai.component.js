@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
+const math_util_1 = require("../util/math.util");
 class AiComponent extends component_1.Component {
     constructor(player) {
         super(GameConstants_1.ComponentType.AI);
@@ -12,24 +13,20 @@ class AiComponent extends component_1.Component {
         this.decide();
     }
     decide() {
-        let distance = this.normalize(this._player.sprite.x - this.target.sprite.x);
+        let distance = math_util_1.MathUtil.normalize(this._player.sprite.x - this.target.sprite.x);
         // Justify this in the report say tanks can only spawn on the right of the player
         let sComp = this._target.getComponent(GameConstants_1.ComponentType.STATE);
-        console.log(sComp);
-        console.log('At AI Component');
         if (sComp) {
             if (distance <= -0.15) {
-                console.log('Setting to seek');
                 sComp.setState(GameConstants_1.FSMStates.SEEK);
             }
             else {
-                console.log('Setting to fire');
                 sComp.setState(GameConstants_1.FSMStates.FIRING);
             }
         }
     }
-    normalize(val, max = 4941, min = -46) {
-        return (val - min) / (max - min);
+    get player() {
+        return this._player;
     }
 }
 exports.AiComponent = AiComponent;

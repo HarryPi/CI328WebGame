@@ -55,6 +55,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["OWNER"] = "owner_component";
     ComponentType["STATE"] = "state_component";
     ComponentType["AI"] = "ai_component";
     ComponentType["COLLISION"] = "collision_component";

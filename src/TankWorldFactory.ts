@@ -1,20 +1,22 @@
-import { CameraComponent } from './component/camera.component';
-import { MovableComponent } from './component/movable.component';
-import { Entity } from './entities/entity';
+import {CameraComponent} from './component/camera.component';
+import {MovableComponent} from './component/movable.component';
+import {Entity} from './entities/entity';
 import {Action, ComponentType, FSMStates, Levels, TankLayout} from './constants/GameConstants';
-import { PhysicsComponent } from './component/physics.component';
+import {PhysicsComponent} from './component/physics.component';
 import TankLevel from './config/levels/tankLevel';
-import { LevelOne } from './config/levels/levelOne';
-import { ShootComponent } from './component/shoot.component';
-import { LayerComponent } from './component/layer.component';
-import { BulletComponent } from './component/bullet.component';
-import { CollisionsComponent } from './component/collisions.component';
+import {LevelOne} from './config/levels/levelOne';
+import {ShootComponent} from './component/shoot.component';
+import {LayerComponent} from './component/layer.component';
+import {BulletComponent} from './component/bullet.component';
+import {CollisionsComponent} from './component/collisions.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import { AiComponent } from './component/ai.component';
+import {AiComponent} from './component/ai.component';
 import {StateComponent} from './component/state.component';
 import {IdleState} from './fsm/idle.state';
 import {SeekState} from './fsm/seek.state';
 import {FiringState} from './fsm/firing.state';
+import {OwnerComponent} from './component/owner.component';
+import {Guid} from './util/guid';
 
 export default class TankWorldFactory {
 
@@ -29,8 +31,14 @@ export default class TankWorldFactory {
 
   // Collision Groups
   private _tankCollisionGroup: CollisionGroup;
+  private _enemyTankCollisionGroup: CollisionGroup;
   private _bulletCollisionGroup: CollisionGroup;
+  private _enemyBulletsCollisionGroup: CollisionGroup;
   private _groundCollisionGroup: CollisionGroup;
+
+  // Phaser groups
+  private _tanks: Phaser.Group;
+  private _bullets: Phaser.Group;
 
   constructor(game: Phaser.Game) {
     this._levels.push(new LevelOne(game));
@@ -46,11 +54,16 @@ export default class TankWorldFactory {
     this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._bulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
+    this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
+    this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
 
     // Have to do this here as we cannot enforce layer to be Entity to attach component
-    this._currentLevel.collisionLayer.forEach( (layer) => {
+    this._currentLevel.collisionLayer.forEach((layer) => {
       layer.setCollisionGroup(this._groundCollisionGroup);
-      layer.collides([this._tankCollisionGroup, this._bulletCollisionGroup]);
+      layer.collides([
+        this._tankCollisionGroup, this._bulletCollisionGroup,
+        this._enemyBulletsCollisionGroup, this._enemyTankCollisionGroup
+      ]);
     });
 
     // Force all groups to collide with world bounds
@@ -77,10 +90,15 @@ export default class TankWorldFactory {
     player.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._tankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._tankCollisionGroup, [Action.NOTHING]);
+      .collidesWith(this._enemyTankCollisionGroup, [Action.NOTHING])
+      .collidesWith(this._enemyBulletsCollisionGroup, [Action.NOTHING]);
 
     this._entities.push(player);
     this._player = player;
+
+    this._player.sprite.data = {
+      tag: Guid.newGuid()
+    };
     return player;
   }
 
@@ -102,20 +120,21 @@ export default class TankWorldFactory {
       .addState(FSMStates.FIRING, new FiringState())
       .setState(FSMStates.IDLE);
 
-    console.log(enemy.getComponent<StateComponent>(ComponentType.STATE));
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics()
       .flipSprite();
 
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.DARK_ARTILLERY);
     enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
-      .setCollisionGroup(this._tankCollisionGroup)
+      .setCollisionGroup(this._enemyTankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
       .collidesWith(this._tankCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._bulletCollisionGroup, [Action.DAMAGE, Action.EXPLODE]);
+      .collidesWith(this._bulletCollisionGroup, [Action.NOTHING]);
 
     this._entities.push(enemy);
-
+    enemy.sprite.data = {
+      tag: Guid.newGuid()
+    };
     return enemy;
   }
 
@@ -123,17 +142,19 @@ export default class TankWorldFactory {
 
     let bullet = new Entity(this._game, x, y)
       .withComponent([new PhysicsComponent(this._game), new LayerComponent(),
-        new BulletComponent(this._game), new CollisionsComponent()])
-      .withOwner(owner);
+        new BulletComponent(this._game), new CollisionsComponent(),
+        new OwnerComponent()]);
 
+    bullet.getComponent<OwnerComponent>(ComponentType.OWNER).owner = owner;
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
-      .addPhysics(false)
-      .delayGravity(true);
+      .addPhysics(false);
 
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.BULLET_FIVE);
-    bullet.getComponent<BulletComponent>(ComponentType.BULLET).bulletInit();
+    bullet.getComponent<BulletComponent>(ComponentType.BULLET)
+      .bulletInit();
+
     bullet.getComponent<CollisionsComponent>(ComponentType.COLLISION)
-      .setCollisionGroup(this._bulletCollisionGroup)
+      .setCollisionGroup(this.setBulletColisionGroup(owner))
       .collidesWith(this._tankCollisionGroup, [Action.EXPLODE, Action.DAMAGE])
       .collidesWith(this._groundCollisionGroup, [Action.EXPLODE]);
 
@@ -147,4 +168,10 @@ export default class TankWorldFactory {
 
   }
 
+  private setBulletColisionGroup(owner: Entity): CollisionGroup {
+    if (owner.sprite.data.tag === this._player.sprite.data.tag) {
+      return this._bulletCollisionGroup;
+    }
+    return this._enemyBulletsCollisionGroup;
+  }
 }

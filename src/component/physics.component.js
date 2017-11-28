@@ -12,11 +12,6 @@ class PhysicsComponent extends component_1.Component {
         gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
         return this;
     }
-    setAngle(angle) {
-        this.target.sprite.body.motionState = Phaser.Physics.P2.Body.KINEMATIC;
-        this.target.sprite.body.angle = angle;
-        return this;
-    }
     delayGravity(bool = true, delay = 2000) {
         this.target.sprite.body.enableGravity = false;
         if (bool) {
