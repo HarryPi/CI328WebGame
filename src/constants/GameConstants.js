@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var States;
 (function (States) {
+    States["MAIN_MENU_STATE"] = "main_menu_state";
     States["BOOT_STATE"] = "boot_state";
     States["PRELOAD_STATE"] = "preload_state";
     States["GAME_STATE"] = "game_state";
@@ -70,6 +71,10 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents["PROGRESS_BAR"] = "progresBar";
     UIComponents["LOGO"] = "logo";
+    UIComponents["FULL_BUTTON"] = "green_button00.png";
+    UIComponents["YES_BUTTON"] = "green_tick.png";
+    UIComponents["NO_BUTTON"] = "green_cross.png";
+    UIComponents["UI_SPRITESHEET"] = "uiSpritesheet";
 })(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
 var TileLayers;
 (function (TileLayers) {

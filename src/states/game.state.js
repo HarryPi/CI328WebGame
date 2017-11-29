@@ -4,14 +4,22 @@ const state_1 = require("./state");
 const input_1 = require("../util/input");
 const TankWorldFactory_1 = require("../TankWorldFactory");
 const GameConstants_1 = require("../constants/GameConstants");
+const levelOne_1 = require("../config/levels/levelOne");
 class GameState extends state_1.default {
     constructor() {
         super();
+        this._levels = [];
         this._input = new input_1.default();
     }
     preload() {
         // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
+        this._levels.push(new levelOne_1.LevelOne(this.game));
+        this._levels.forEach((level) => {
+            level.init();
+        });
         this._factory = new TankWorldFactory_1.default(this.game);
+        this._factory.currentLevel = this._levels[0];
+        this._factory.init(); // Initialise collision groups
     }
     create() {
         // Input
@@ -24,9 +32,9 @@ class GameState extends state_1.default {
             input !== GameConstants_1.InputType.SHOOT.toString() ? player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input
                 : player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
         });
-        this._factory.newEnemy();
     }
     update() {
+        this._factory.spawnEnemiesAsCurrentLevel();
         this._input.run();
         this._factory.entities.forEach((e) => {
             e.update();

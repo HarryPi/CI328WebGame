@@ -1,24 +1,35 @@
-import {CameraComponent} from './component/camera.component';
-import {MovableComponent} from './component/movable.component';
-import {Entity} from './entities/entity';
-import {Action, ComponentType, FSMStates, Levels, TankLayout} from './constants/GameConstants';
-import {PhysicsComponent} from './component/physics.component';
+import { CameraComponent } from './component/camera.component';
+import { MovableComponent } from './component/movable.component';
+import { Entity } from './entities/entity';
+import { Action, ComponentType, FSMStates, Levels, TankLayout } from './constants/GameConstants';
+import { PhysicsComponent } from './component/physics.component';
 import TankLevel from './config/levels/tankLevel';
-import {LevelOne} from './config/levels/levelOne';
-import {ShootComponent} from './component/shoot.component';
-import {LayerComponent} from './component/layer.component';
-import {BulletComponent} from './component/bullet.component';
-import {CollisionsComponent} from './component/collisions.component';
+import { LevelOne } from './config/levels/levelOne';
+import { ShootComponent } from './component/shoot.component';
+import { LayerComponent } from './component/layer.component';
+import { BulletComponent } from './component/bullet.component';
+import { CollisionsComponent } from './component/collisions.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import {AiComponent} from './component/ai.component';
-import {StateComponent} from './component/state.component';
-import {IdleState} from './fsm/idle.state';
-import {SeekState} from './fsm/seek.state';
-import {FiringState} from './fsm/firing.state';
-import {OwnerComponent} from './component/owner.component';
-import {Guid} from './util/guid';
-import {FleeState} from './fsm/flee.state';
+import { AiComponent } from './component/ai.component';
+import { StateComponent } from './component/state.component';
+import { IdleState } from './fsm/idle.state';
+import { SeekState } from './fsm/seek.state';
+import { FiringState } from './fsm/firing.state';
+import { OwnerComponent } from './component/owner.component';
+import { Guid } from './util/guid';
+import { FleeState } from './fsm/flee.state';
+import { forEachToken } from 'tslint';
 
+/**
+ * @class TankWorldFactory
+ * @description
+ * This is the game factory and exposes functions to
+ * create a new player {@link TankWorldFactory#newPlayer}
+ * create a new bullet {@link TankWorldFactory#newBullet}
+ * create a new enemy {@link TankWorldFactory#newEnemy}
+ * start spawning enemies {@Link TankWorldFactory#spawnEnemiesAsCurrentLevel}
+ * All of the above are dependant on the information passed to the factory by what {@link TankLevel} is loaded
+ * */
 export default class TankWorldFactory {
 
   private _game: Phaser.Game;
@@ -27,7 +38,6 @@ export default class TankWorldFactory {
   private _currentLevel: TankLevel;
 
   // Arrays
-  private _levels: Array<TankLevel> = [];
   private _entities: Array<Entity> = [];
 
   // Collision Groups
@@ -41,15 +51,21 @@ export default class TankWorldFactory {
   private _tanks: Phaser.Group;
   private _bullets: Phaser.Group;
 
-  constructor(game: Phaser.Game) {
-    this._levels.push(new LevelOne(game));
-    this._levels.forEach((level: TankLevel) => {
-      level.init();
-    });
+  // keep record of spawn time in miliseconds
+  private _timer: number = 0;
+  private _enemiesCount: number = 0; // Enemies in game
+    /**
+     * @constructor
+     * @param {Phaser.Game} game
+     * */
+    constructor(game: Phaser.Game) {
 
-    this._currentLevel = this._levels[0];
     this._game = game;
 
+
+  }
+
+  public init() {
     // init collision groups
 
     this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
@@ -70,7 +86,10 @@ export default class TankWorldFactory {
     // Force all groups to collide with world bounds
     this._game.physics.p2.updateBoundsCollisionGroup();
   }
-
+  /**
+   * @description
+   * Creates a new player based on the loaded level {@link TankLevel#playerStartPos}
+   * */
   public newPlayer(): Entity {
     let player = new Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
       .withComponent(
@@ -103,6 +122,10 @@ export default class TankWorldFactory {
     return player;
   }
 
+  /**
+   * @description
+   * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
+   * */
   public newEnemy() {
     let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
       .withComponent(
@@ -131,7 +154,8 @@ export default class TankWorldFactory {
       .setCollisionGroup(this._enemyTankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
       .collidesWith(this._tankCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._bulletCollisionGroup, [Action.NOTHING]);
+      .collidesWith(this._bulletCollisionGroup, [Action.NOTHING])
+      .collidesWith(this._enemyTankCollisionGroup, [Action.NOTHING]);
 
     this._entities.push(enemy);
     enemy.sprite.data = {
@@ -164,7 +188,21 @@ export default class TankWorldFactory {
     return bullet;
 
   }
+  public spawnEnemiesAsCurrentLevel() {
+    if (this.currentLevel) {
+      if (typeof this.currentLevel.enemiesCount === 'number' && this.currentLevel.enemiesSpawnTime) {
+        // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
+        if (this.currentLevel.enemiesCount < this.currentLevel.capEnemies) {
+          if (Date.now() - this._timer > this.currentLevel.enemiesSpawnTime * 1000) {
+            this.newEnemy();
+            this.currentLevel.enemiesCount++;
+            this._timer = Date.now();
 
+          }
+        }
+      }
+    }
+  }
   get entities(): Array<Entity> {
     return this._entities;
 
@@ -175,5 +213,12 @@ export default class TankWorldFactory {
       return this._bulletCollisionGroup;
     }
     return this._enemyBulletsCollisionGroup;
+  }
+  get currentLevel(): TankLevel {
+    return this._currentLevel;
+  }
+
+  set currentLevel(value: TankLevel) {
+    this._currentLevel = value;
   }
 }

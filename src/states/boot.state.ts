@@ -1,6 +1,6 @@
 import State from './state';
 import { States } from '../constants/GameConstants';
-import AssetsLoader from '../util/Assets';
+import AssetsUtils from '../UI/Assets';
 
 export class BootState extends State {
 
@@ -9,9 +9,8 @@ export class BootState extends State {
   }
 
   preload(): void {
-    AssetsLoader.init(this.load);
-    AssetsLoader.loadBoot();
-
+    AssetsUtils.init(this.load);
+    AssetsUtils.loadBoot();
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.pageAlignVertically = true;
     this.scale.pageAlignHorizontally = true;

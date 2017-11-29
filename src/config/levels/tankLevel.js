@@ -7,6 +7,33 @@ class TankLevel {
     spawnEnemy() {
         return null;
     }
+    /**
+     * @description
+     * Gets total enemies that will ever exist on current level
+     * @return {number} this._totalEnemies
+     * */
+    get totalEnemies() {
+        return this._totalEnemies;
+    }
+    /**
+     * @description
+     * Gets how many enemies currently are alive at a level
+     * @return {number} this._enemiesCount
+     * */
+    get enemiesCount() {
+        return this._enemiesCount;
+    }
+    /**
+     * @description
+     * Sets how many enemies currently are alive at a level
+     * @param {number} value
+     * */
+    set enemiesCount(value) {
+        this._enemiesCount = value;
+    }
+    get enemiesSpawnTime() {
+        return this._enemiesSpawnTime;
+    }
     get enemies() {
         return this._enemies;
     }
@@ -18,6 +45,15 @@ class TankLevel {
     }
     get collisionLayer() {
         return this._collisionLayer;
+    }
+    /**
+     * @description
+     * Total of enemies a level can have at a time
+     * @return {number} this._capEnemies
+     *
+     * */
+    get capEnemies() {
+        return this._capEnemies;
     }
 }
 exports.default = TankLevel;

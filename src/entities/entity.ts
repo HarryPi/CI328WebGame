@@ -1,7 +1,13 @@
 import { Component } from '../component/component';
 import { ComponentType, FSMStates, TankLayout } from '../constants/GameConstants';
 import StateMachine from '../fsm/stateMachine';
-
+/**
+ * @class Entity
+ * @description
+ * Represents any object that can be added to the game world
+ * Exposes functions to load components in order to modify the actions and the abilities of the entity see {@link Entity#addComponent}
+ * Exposes a function to retrieve any component that is loaded to an entity see {@link  Entity#getComponent}
+ * */
 export class Entity {
 
   private _components: Map<string, Component> = new Map();
@@ -18,12 +24,19 @@ export class Entity {
 
   }
 
+
   private addComponent(component: Component): Component {
     this._components.set(component.name, component);
     this._components.get(component.name).target = this;
     return component;
   }
 
+  /**
+   * Retrieves a component by Component type see {@Link ComponentType}
+   * and casts it to any parameter that extends Component see {@Link Component}
+   * @param {string} componentName
+   * @return {Component} component
+   * */
   public getComponent<T extends Component>(componentName: string): T {
     return this._components.get(componentName) as T;
   }
@@ -33,6 +46,12 @@ export class Entity {
       this._components.get(componentType.name).update();
     });
   }
+  /**
+   * Loads an array of components {@Link Component} to an entity
+   * and then returns the entity
+   * @param {Array<Component>} components
+   * @return {Entity} this
+   * */
   withComponent(components: Array<Component>): this {
     if (components) {
       components.forEach((component: Component) => {

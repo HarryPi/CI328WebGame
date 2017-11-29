@@ -5,7 +5,6 @@ const movable_component_1 = require("./component/movable.component");
 const entity_1 = require("./entities/entity");
 const GameConstants_1 = require("./constants/GameConstants");
 const physics_component_1 = require("./component/physics.component");
-const levelOne_1 = require("./config/levels/levelOne");
 const shoot_component_1 = require("./component/shoot.component");
 const layer_component_1 = require("./component/layer.component");
 const bullet_component_1 = require("./component/bullet.component");
@@ -18,17 +17,30 @@ const firing_state_1 = require("./fsm/firing.state");
 const owner_component_1 = require("./component/owner.component");
 const guid_1 = require("./util/guid");
 const flee_state_1 = require("./fsm/flee.state");
+/**
+ * @class TankWorldFactory
+ * @description
+ * This is the game factory and exposes functions to
+ * create a new player {@link TankWorldFactory#newPlayer}
+ * create a new bullet {@link TankWorldFactory#newBullet}
+ * create a new enemy {@link TankWorldFactory#newEnemy}
+ * start spawning enemies {@Link TankWorldFactory#spawnEnemiesAsCurrentLevel}
+ * All of the above are dependant on the information passed to the factory by what {@link TankLevel} is loaded
+ * */
 class TankWorldFactory {
+    /**
+     * @constructor
+     * @param {Phaser.Game} game
+     * */
     constructor(game) {
         // Arrays
-        this._levels = [];
         this._entities = [];
-        this._levels.push(new levelOne_1.LevelOne(game));
-        this._levels.forEach((level) => {
-            level.init();
-        });
-        this._currentLevel = this._levels[0];
+        // keep record of spawn time in miliseconds
+        this._timer = 0;
+        this._enemiesCount = 0; // Enemies in game
         this._game = game;
+    }
+    init() {
         // init collision groups
         this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._bulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
@@ -46,6 +58,10 @@ class TankWorldFactory {
         // Force all groups to collide with world bounds
         this._game.physics.p2.updateBoundsCollisionGroup();
     }
+    /**
+     * @description
+     * Creates a new player based on the loaded level {@link TankLevel#playerStartPos}
+     * */
     newPlayer() {
         let player = new entity_1.Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
             .withComponent([new movable_component_1.MovableComponent(),
@@ -71,6 +87,10 @@ class TankWorldFactory {
         };
         return player;
     }
+    /**
+     * @description
+     * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
+     * */
     newEnemy() {
         let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
             .withComponent([
@@ -96,7 +116,8 @@ class TankWorldFactory {
             .setCollisionGroup(this._enemyTankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.NOTHING]);
+            .collidesWith(this._bulletCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.NOTHING]);
         this._entities.push(enemy);
         enemy.sprite.data = {
             tag: guid_1.Guid.newGuid()
@@ -121,6 +142,20 @@ class TankWorldFactory {
         this._entities.push(bullet);
         return bullet;
     }
+    spawnEnemiesAsCurrentLevel() {
+        if (this.currentLevel) {
+            if (typeof this.currentLevel.enemiesCount === 'number' && this.currentLevel.enemiesSpawnTime) {
+                // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
+                if (this.currentLevel.enemiesCount < this.currentLevel.capEnemies) {
+                    if (Date.now() - this._timer > this.currentLevel.enemiesSpawnTime * 1000) {
+                        this.newEnemy();
+                        this.currentLevel.enemiesCount++;
+                        this._timer = Date.now();
+                    }
+                }
+            }
+        }
+    }
     get entities() {
         return this._entities;
     }
@@ -129,6 +164,12 @@ class TankWorldFactory {
             return this._bulletCollisionGroup;
         }
         return this._enemyBulletsCollisionGroup;
+    }
+    get currentLevel() {
+        return this._currentLevel;
+    }
+    set currentLevel(value) {
+        this._currentLevel = value;
     }
 }
 exports.default = TankWorldFactory;

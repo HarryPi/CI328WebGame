@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
 const GameConstants_1 = require("../constants/GameConstants");
-const Assets_1 = require("../util/Assets");
+const Assets_1 = require("../UI/Assets");
 class BootState extends state_1.default {
     constructor() {
         super();

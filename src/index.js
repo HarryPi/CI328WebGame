@@ -1,5 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+const mainMenu_state_1 = require("./states/mainMenu.state");
 /** Imports */
 require('pixi');
 require('p2');
@@ -17,6 +18,7 @@ class App extends Phaser.Game {
         this.state.add(GameConstants_1.States.BOOT_STATE, boot_state_1.BootState);
         this.state.add(GameConstants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
         this.state.add(GameConstants_1.States.GAME_STATE, game_state_1.GameState);
+        this.state.add(GameConstants_1.States.MAIN_MENU_STATE, mainMenu_state_1.MainMenuState);
         this.state.start(GameConstants_1.States.BOOT_STATE);
     }
 }

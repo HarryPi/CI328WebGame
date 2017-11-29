@@ -19,10 +19,12 @@ export class LevelOne extends TankLevel {
     map.createLayer('GroundPrimary').resizeWorld();
 
     this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath', true);
-
+    this._enemiesCount = 0;
+    this._enemiesSpawnTime = 3;
     this._playerStartPos = new Vector(this._game.world.bounds.left, this._game.world.centerY + 100);
     this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
-
+    this._capEnemies = 3;
+    this._totalEnemies = 30;
   }
 
   public destroy(): void {

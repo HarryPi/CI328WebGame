@@ -1,4 +1,5 @@
 export enum States {
+  MAIN_MENU_STATE = 'main_menu_state',
   BOOT_STATE = 'boot_state',
   PRELOAD_STATE = 'preload_state',
   GAME_STATE = 'game_state'
@@ -39,7 +40,6 @@ export enum   TankLayout {
   EXPLOSION_TWELVE = 'tank_explosion12.png',
   TANK_SPRITESHEET  = 'tankSpritesheet'
 }
-
 export enum ComponentType {
   OWNER = 'owner_component',
   STATE = 'state_component',
@@ -55,7 +55,11 @@ export enum ComponentType {
 
 export enum UIComponents {
   PROGRESS_BAR = 'progresBar',
-  LOGO = 'logo'
+  LOGO = 'logo',
+  FULL_BUTTON = 'green_button00.png',
+  YES_BUTTON = 'green_tick.png',
+  NO_BUTTON = 'green_cross.png',
+  UI_SPRITESHEET = 'uiSpritesheet'
 }
 
 export enum TileLayers {

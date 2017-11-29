@@ -6,13 +6,15 @@ import { Entity } from '../entities/entity';
 import { MovableComponent } from '../component/movable.component';
 import { ShootComponent } from '../component/shoot.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
+import {LevelOne} from '../config/levels/levelOne';
+import TankLevel from '../config/levels/tankLevel';
 
 export class GameState extends State {
   private _input: Input;
   private _inputSubscription;
   private _direction: InputType;
   private _factory: TankWorldFactory;
-
+  private _levels = [];
 
   constructor() {
     super();
@@ -21,7 +23,13 @@ export class GameState extends State {
 
   preload() {
     // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
+    this._levels.push(new LevelOne(this.game));
+    this._levels.forEach((level: TankLevel) => {
+      level.init();
+    });
     this._factory = new TankWorldFactory(this.game);
+    this._factory.currentLevel = this._levels[0];
+    this._factory.init(); // Initialise collision groups
   }
 
   create() {
@@ -36,10 +44,11 @@ export class GameState extends State {
         input !== InputType.SHOOT.toString() ? player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input
                                              : player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
     });
-    this._factory.newEnemy();
+
   }
 
   update() {
+    this._factory.spawnEnemiesAsCurrentLevel();
     this._input.run();
     this._factory.entities.forEach((e) => {
       e.update();

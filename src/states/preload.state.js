@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
-const Assets_1 = require("../util/Assets");
 const GameConstants_1 = require("../constants/GameConstants");
+const Assets_1 = require("../UI/Assets");
 class PreloadState extends state_1.default {
     constructor() {
         super();

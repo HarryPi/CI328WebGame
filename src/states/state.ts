@@ -1,4 +1,3 @@
-'use strict';
 /** Imports */
 
 abstract class State extends Phaser.State {

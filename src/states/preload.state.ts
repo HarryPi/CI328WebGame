@@ -1,6 +1,6 @@
 import State from './state';
-import AssetsUtils from '../util/Assets';
 import { States } from '../constants/GameConstants';
+import AssetsUtils from '../UI/Assets';
 
 export class PreloadState extends State {
   constructor() {

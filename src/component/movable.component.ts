@@ -1,6 +1,5 @@
 import { Component } from './component';
 import { ComponentType, InputType } from '../constants/GameConstants';
-import Print from '../util/print';
 
 export class MovableComponent extends Component {
 

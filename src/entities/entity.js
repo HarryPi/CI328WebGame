@@ -1,6 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
+/**
+ * @class Entity
+ * @description
+ * Represents any object that can be added to the game world
+ * Exposes functions to load components in order to modify the actions and the abilities of the entity see {@link Entity#addComponent}
+ * Exposes a function to retrieve any component that is loaded to an entity see {@link  Entity#getComponent}
+ * */
 class Entity {
     constructor(game, x, y, components) {
         this._components = new Map();
@@ -16,6 +23,12 @@ class Entity {
         this._components.get(component.name).target = this;
         return component;
     }
+    /**
+     * Retrieves a component by Component type see {@Link ComponentType}
+     * and casts it to any parameter that extends Component see {@Link Component}
+     * @param {string} componentName
+     * @return {Component} component
+     * */
     getComponent(componentName) {
         return this._components.get(componentName);
     }
@@ -24,6 +37,12 @@ class Entity {
             this._components.get(componentType.name).update();
         });
     }
+    /**
+     * Loads an array of components {@Link Component} to an entity
+     * and then returns the entity
+     * @param {Array<Component>} components
+     * @return {Entity} this
+     * */
     withComponent(components) {
         if (components) {
             components.forEach((component) => {
