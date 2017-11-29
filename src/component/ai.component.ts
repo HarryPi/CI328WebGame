@@ -24,8 +24,7 @@ export class AiComponent extends Component {
     if (sComp) {
       if (distance <= -0.15) {
         sComp.setState(FSMStates.SEEK);
-      }
-      else {
+      } else {
         sComp.setState(FSMStates.FIRING);
       }
     }

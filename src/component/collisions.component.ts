@@ -45,7 +45,6 @@ export class CollisionsComponent extends Component {
   }
 
   private explode(ownerBody: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
-    debugger;
     // If layout is imported with tiled, which we do the body doesn't have a sprite therefor would throw an exception
     let impactedSprite = impacted.sprite;
     let ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);

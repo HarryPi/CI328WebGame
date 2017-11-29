@@ -2,7 +2,7 @@ import { Component } from './component';
 import { ComponentType } from '../constants/GameConstants';
 import { OwnerComponent } from './owner.component';
 import { MathUtil } from '../util/math.util';
-import {AiComponent} from './ai.component';
+import { AiComponent } from './ai.component';
 
 export class BulletComponent extends Component {
   private _game: Phaser.Game;
@@ -25,7 +25,8 @@ export class BulletComponent extends Component {
     };
 
     // Check if there is an AIComponent if yes this is not our player
-    let aiComponent = this.target.getComponent<AiComponent>(ComponentType.AI);
+    let aiComponent = this.target.owner ? this.target.owner.getComponent<AiComponent>(ComponentType.AI) : null;
+    console.log(aiComponent);
     if (aiComponent) {
       // If yes do not fire bulet according to mouse but to player; AIComponent knows where the player is
       seekObject.x = aiComponent.player.sprite.x;
@@ -39,7 +40,7 @@ export class BulletComponent extends Component {
   }
 
   private accelerateToObject(obj1, obj2, speed = 1400) {
-
+    console.log(obj2);
     let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
     obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject
     obj1.body.velocity.y = Math.sin(angle) * speed;

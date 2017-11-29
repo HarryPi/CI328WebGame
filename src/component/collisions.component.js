@@ -34,7 +34,6 @@ class CollisionsComponent extends component_1.Component {
         return this;
     }
     explode(ownerBody, impacted) {
-        debugger;
         // If layout is imported with tiled, which we do the body doesn't have a sprite therefor would throw an exception
         let impactedSprite = impacted.sprite;
         let ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
