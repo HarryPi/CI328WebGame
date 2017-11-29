@@ -17,6 +17,7 @@ const seek_state_1 = require("./fsm/seek.state");
 const firing_state_1 = require("./fsm/firing.state");
 const owner_component_1 = require("./component/owner.component");
 const guid_1 = require("./util/guid");
+const flee_state_1 = require("./fsm/flee.state");
 class TankWorldFactory {
     constructor(game) {
         // Arrays
@@ -85,6 +86,7 @@ class TankWorldFactory {
             .addState(GameConstants_1.FSMStates.SEEK, new seek_state_1.SeekState())
             .addState(GameConstants_1.FSMStates.IDLE, new idle_state_1.IdleState())
             .addState(GameConstants_1.FSMStates.FIRING, new firing_state_1.FiringState())
+            .addState(GameConstants_1.FSMStates.FLEEING, new flee_state_1.FleeState())
             .setState(GameConstants_1.FSMStates.IDLE);
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()

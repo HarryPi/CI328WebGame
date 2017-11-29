@@ -48,8 +48,5 @@ export class Entity {
   get sprite(): Phaser.Sprite {
     return this._sprite;
   }
-  get owner(): Entity{
-    return this._owner;
-  }
- 
+
 }

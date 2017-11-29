@@ -38,9 +38,6 @@ class Entity {
     get sprite() {
         return this._sprite;
     }
-    get owner() {
-        return this._owner;
-    }
 }
 exports.Entity = Entity;
 //# sourceMappingURL=entity.js.map

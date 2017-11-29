@@ -9,6 +9,7 @@ class PhysicsComponent extends component_1.Component {
     }
     addPhysics(gravity = true) {
         this._game.physics.p2.enable(this.target.sprite);
+        this.target.sprite.anchor.setTo(0.5, 0.5);
         gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
         return this;
     }

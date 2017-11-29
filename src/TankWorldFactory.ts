@@ -17,6 +17,7 @@ import {SeekState} from './fsm/seek.state';
 import {FiringState} from './fsm/firing.state';
 import {OwnerComponent} from './component/owner.component';
 import {Guid} from './util/guid';
+import {FleeState} from './fsm/flee.state';
 
 export default class TankWorldFactory {
 
@@ -118,6 +119,7 @@ export default class TankWorldFactory {
       .addState(FSMStates.SEEK, new SeekState())
       .addState(FSMStates.IDLE, new IdleState())
       .addState(FSMStates.FIRING, new FiringState())
+      .addState(FSMStates.FLEEING, new FleeState())
       .setState(FSMStates.IDLE);
 
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)

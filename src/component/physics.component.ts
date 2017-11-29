@@ -1,5 +1,5 @@
-import {Component} from './component';
-import {ComponentType} from '../constants/GameConstants';
+import { Component } from './component';
+import { ComponentType } from '../constants/GameConstants';
 import Vector from '../util/vector';
 
 export class PhysicsComponent extends Component {
@@ -12,6 +12,7 @@ export class PhysicsComponent extends Component {
 
   public addPhysics(gravity: boolean = true): PhysicsComponent {
     this._game.physics.p2.enable(this.target.sprite);
+    this.target.sprite.anchor.setTo(0.5, 0.5);
     gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
 
     return this;

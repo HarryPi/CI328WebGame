@@ -16,9 +16,13 @@ class AiComponent extends component_1.Component {
         let distance = math_util_1.MathUtil.normalize(this._player.sprite.x - this.target.sprite.x);
         // Justify this in the report say tanks can only spawn on the right of the player
         let sComp = this._target.getComponent(GameConstants_1.ComponentType.STATE);
+        console.log(Math.abs(distance));
         if (sComp) {
-            if (distance <= -0.15) {
+            if (Math.abs(distance) >= 0.15) {
                 sComp.setState(GameConstants_1.FSMStates.SEEK);
+            }
+            else if (Math.abs(distance) <= 0.08) {
+                sComp.setState(GameConstants_1.FSMStates.FLEEING);
             }
             else {
                 sComp.setState(GameConstants_1.FSMStates.FIRING);
