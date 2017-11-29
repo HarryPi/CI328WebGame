@@ -20,7 +20,7 @@ class PreloadState extends state_1.default {
     }
     create() {
         // todo: Set main menu instead of level one
-        this.game.state.start(GameConstants_1.States.GAME_STATE);
+        this.game.state.start(GameConstants_1.States.MAIN_MENU_STATE);
     }
     update() {
     }

@@ -23,7 +23,7 @@ export class PreloadState extends State {
 
   create() {
     // todo: Set main menu instead of level one
-    this.game.state.start(States.GAME_STATE);
+    this.game.state.start(States.MAIN_MENU_STATE);
   }
 
   update() {

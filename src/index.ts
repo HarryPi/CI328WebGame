@@ -1,5 +1,4 @@
 'use strict';
-import {MainMenuState} from './states/mainMenu.state';
 
 /** Imports */
 require('pixi');
@@ -11,6 +10,8 @@ import { States } from './constants/GameConstants';
 import { BootState } from './states/boot.state';
 import { PreloadState } from './states/preload.state';
 import { GameState } from './states/game.state';
+import { MainMenuState } from './states/mainMenu.state';
+
 import { DEFAULT_GAME_HEIGHT, DEFAULT_GAME_WIDTH, SCALE_MODE, ScreenMetrics, ScreenUtils } from './util/ScreenMetrics';
 
 // The main class of our application

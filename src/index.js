@@ -1,6 +1,5 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-const mainMenu_state_1 = require("./states/mainMenu.state");
 /** Imports */
 require('pixi');
 require('p2');
@@ -10,6 +9,7 @@ const GameConstants_1 = require("./constants/GameConstants");
 const boot_state_1 = require("./states/boot.state");
 const preload_state_1 = require("./states/preload.state");
 const game_state_1 = require("./states/game.state");
+const mainMenu_state_1 = require("./states/mainMenu.state");
 const ScreenMetrics_1 = require("./util/ScreenMetrics");
 // The main class of our application
 class App extends Phaser.Game {

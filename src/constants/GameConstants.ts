@@ -59,7 +59,8 @@ export enum UIComponents {
   FULL_BUTTON = 'green_button00.png',
   YES_BUTTON = 'green_tick.png',
   NO_BUTTON = 'green_cross.png',
-  UI_SPRITESHEET = 'uiSpritesheet'
+  UI_SPRITESHEET = 'uiSpritesheet',
+  LEVEL_ONE = 'leve_one_image'
 }
 
 export enum TileLayers {
@@ -72,10 +73,6 @@ export enum InputType {
   RIGHT_INPUT = 'right',
   LEFT_INPUT = 'left',
   SHOOT = 'shoot'
-}
-
-export enum TankWorldEvents {
-  SPAWN_BULLET = 'spawnBullet',
 }
 
 export enum Action {
@@ -92,4 +89,12 @@ export enum FSMStates {
   SEEK,
   FIRING,
   FLEEING
+}
+export enum MainMenuButtons {
+  NEW_GAME = 'new_game',
+  HIGH_SCORE = 'high_score',
+  PREFERENCES = 'preferences',
+  SELECT_LEVEL = 'select_level',
+  SELECT_PLAYER = 'select_player',
+  SELECT_DIFFICULTY = 'select_difficulty'
 }

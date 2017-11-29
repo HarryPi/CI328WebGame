@@ -1,4 +1,4 @@
-import { ComponentType, InputType, TankWorldEvents } from '../constants/GameConstants';
+import { ComponentType } from '../constants/GameConstants';
 import { Component } from './component';
 import TankWorldFactory from '../TankWorldFactory';
 

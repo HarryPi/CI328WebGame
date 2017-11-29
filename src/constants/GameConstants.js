@@ -75,6 +75,7 @@ var UIComponents;
     UIComponents["YES_BUTTON"] = "green_tick.png";
     UIComponents["NO_BUTTON"] = "green_cross.png";
     UIComponents["UI_SPRITESHEET"] = "uiSpritesheet";
+    UIComponents["LEVEL_ONE"] = "leve_one_image";
 })(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
 var TileLayers;
 (function (TileLayers) {
@@ -88,10 +89,6 @@ var InputType;
     InputType["LEFT_INPUT"] = "left";
     InputType["SHOOT"] = "shoot";
 })(InputType = exports.InputType || (exports.InputType = {}));
-var TankWorldEvents;
-(function (TankWorldEvents) {
-    TankWorldEvents["SPAWN_BULLET"] = "spawnBullet";
-})(TankWorldEvents = exports.TankWorldEvents || (exports.TankWorldEvents = {}));
 var Action;
 (function (Action) {
     Action["EXPLODE"] = "explode_action";
@@ -109,4 +106,13 @@ var FSMStates;
     FSMStates[FSMStates["FIRING"] = 2] = "FIRING";
     FSMStates[FSMStates["FLEEING"] = 3] = "FLEEING";
 })(FSMStates = exports.FSMStates || (exports.FSMStates = {}));
+var MainMenuButtons;
+(function (MainMenuButtons) {
+    MainMenuButtons["NEW_GAME"] = "new_game";
+    MainMenuButtons["HIGH_SCORE"] = "high_score";
+    MainMenuButtons["PREFERENCES"] = "preferences";
+    MainMenuButtons["SELECT_LEVEL"] = "select_level";
+    MainMenuButtons["SELECT_PLAYER"] = "select_player";
+    MainMenuButtons["SELECT_DIFFICULTY"] = "select_difficulty";
+})(MainMenuButtons = exports.MainMenuButtons || (exports.MainMenuButtons = {}));
 //# sourceMappingURL=GameConstants.js.map

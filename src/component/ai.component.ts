@@ -1,8 +1,8 @@
-import {Component} from './component';
-import {ComponentType, FSMStates} from '../constants/GameConstants';
-import {Entity} from '../entities/entity';
-import {StateComponent} from './state.component';
-import {MathUtil} from '../util/math.util';
+import { Component } from './component';
+import { ComponentType, FSMStates } from '../constants/GameConstants';
+import { Entity } from '../entities/entity';
+import { StateComponent } from './state.component';
+import { MathUtil } from '../util/math.util';
 
 export class AiComponent extends Component {
   private _player: Entity;
@@ -23,9 +23,10 @@ export class AiComponent extends Component {
     let sComp = this._target.getComponent<StateComponent>(ComponentType.STATE);
     console.log(Math.abs(distance));
     if (sComp) {
-      if (Math.abs(distance) >= 0.15) {
+      // Here we are adding some random params to simulate a more realistic behaviour
+      if (Math.abs(distance) >= 0.15 + MathUtil.randomIntFromInterval(0.05, 0.06)) {
         sComp.setState(FSMStates.SEEK);
-      } else if (Math.abs(distance) <= 0.08) {
+      } else if (Math.abs(distance) <= 0.08 + MathUtil.randomIntFromInterval(0.02, 0.03)) {
         sComp.setState(FSMStates.FLEEING);
       }
       else {
