@@ -74,7 +74,7 @@ class AssetLoader {
         this.loader.atlasXML(GameConstants_1.UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
         this.loader.image(GameConstants_1.TileLayers.GRASS_LAYER, this._grassLayerUrl);
         this.loader.image(GameConstants_1.TileLayers.BACKGROUND, this._backgroundUrl);
-        this.loader.image(GameConstants_1.UIComponents.LEVEL_ONE, this._levelOneImgUrl);
+        this.loader.image(GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, this._levelOneImgUrl);
     }
     /**
      * @description
@@ -82,12 +82,13 @@ class AssetLoader {
      * @param {number} noOfBoxes - How many boxes will be created
      * @param {Array<Vector>} location - An Array of vectors see {@Link Vector} the location of where the boxes will be created
      * @param {Phaser.State} state - State to draw the boxes
-     * @param {Array<string | Phaser.Image>} itemToAttach - What text to attach (Optional)
+     * @param {Array<string} itemToAttach - What text to attach (Optional)
      * @param {boolean} enableInput - Enable input on buttons defaults to true
-     * @param componentToDraw
+     * @param {UIComponents} componentToDraw - What component will be the parent
+     * @param {Vector} childRelevantPosition - Defaults to 0.5, will place the children at this position of parent object
      * @return {Array<Phaser.Sprite>} arr - Returns an array of sprites in the order passed
      * */
-    drawBoxes(noOfBoxes, location, state, itemToAttach, enableInput = true, componentToDraw = GameConstants_1.UIComponents.FULL_BUTTON) {
+    drawBoxes(noOfBoxes, location, state, itemToAttach, enableInput = true, componentToDraw = GameConstants_1.UIComponents.FULL_BUTTON, childRelevantPosition = new vector_1.default(0.5, 0.5)) {
         let arr = [];
         for (let i = 0; i < noOfBoxes; i++) {
             let sprite = state.add.sprite(location[i].x, location[i].y, GameConstants_1.UIComponents.UI_SPRITESHEET, componentToDraw);
@@ -95,20 +96,44 @@ class AssetLoader {
             let attachment;
             sprite.scale.setTo(0.0, 0.0);
             sprite.anchor.setTo(0.5, 0.5);
-            itemToAttach[i] ? attachment = itemToAttach[i] : null;
-            if (attachment) {
-                let toAttach = state.game.add.text(0, 0, attachment, style);
-                toAttach.anchor.setTo(0.5, 0.5);
-                sprite.addChild(toAttach);
+            if (itemToAttach) {
+                itemToAttach[i] ? attachment = itemToAttach[i] : null;
             }
-            else if (typeof attachment === 'object') {
-                let imageSprite = state.game.add.sprite(0, 0, attachment);
-                console.log(imageSprite);
-                sprite.addChild(imageSprite);
+            if (attachment) {
+                console.log(attachment);
+                if (attachment.includes('level')) {
+                    let imageSprite = state.game.add.sprite(0, 0, attachment);
+                    imageSprite.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
+                    sprite.addChild(imageSprite);
+                }
+                else {
+                    let toAttach = state.game.add.text(0, 0, attachment, style);
+                    toAttach.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
+                    sprite.addChild(toAttach);
+                }
             }
             sprite.inputEnabled = enableInput;
             arr.push(sprite);
         }
+        return arr;
+    }
+    /**
+     * @description
+     * Draws Tick button and Cross button at provided location
+     * @param cancelLocation
+     * @param okLocation
+     * @param state
+     * @return
+     * */
+    drawAcceptCancelButtons(okLocation, cancelLocation, state) {
+        let arr = [];
+        debugger;
+        console.log('drawing buttons');
+        arr = this.drawBoxes(1, [okLocation], state, null, true, GameConstants_1.UIComponents.YES_BUTTON);
+        arr.push(this.drawBoxes(1, [cancelLocation], state, null, true, GameConstants_1.UIComponents.NO_BUTTON)[0]);
+        arr.forEach((value, index) => {
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
+        });
         return arr;
     }
     /**
@@ -189,20 +214,22 @@ class AssetLoader {
     /**
      * @description
      * Will Generate the available levels the player can choose from
+     * @return {MenuConfig} config - see {@Link MenuConfig}
      * */
     drawLevels(state) {
         let centerX = state.game.world.centerX;
         let centerY = state.game.world.centerY;
         let config = new menu_config_1.MenuConfig();
-        let levels = [GameConstants_1.UIComponents.LEVEL_ONE, GameConstants_1.UIComponents.LEVEL_ONE];
+        let levels = [GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, GameConstants_1.UIComponents.LEVEL_ONE_IMAGE];
         let arr = this.drawBoxes(2, [
             new vector_1.default(centerX, centerY),
-            new vector_1.default(centerX + 50, centerY)
-        ], state, levels);
+            new vector_1.default(centerX + 110, centerY)
+        ], state, levels, true, GameConstants_1.UIComponents.PANEL);
         arr.forEach((value, index) => {
             state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
-            config.setSprite(GameConstants_1.MainMenuButtons[levels[index].toUpperCase().replace(' ', '_')], value);
+            config.setSprite(GameConstants_1.UIComponents[levels[index].toUpperCase().replace(' ', '_')], value);
         });
+        return config;
     }
     /**
      * @description

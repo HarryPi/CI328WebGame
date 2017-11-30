@@ -1,22 +1,32 @@
 import {MainMenuButtons, UIComponents} from '../constants/GameConstants';
 
+/**
+ * @class
+ * As the only way to create a menu in phaser is sprites we need a class to store and retrieve them
+ * */
 export class MenuConfig {
-  private _mainMenuSprites: Map<MainMenuButtons, Phaser.Sprite>;
+  private _mapSprites: Map<MainMenuButtons | UIComponents, Phaser.Sprite>;
   private _spriteGroups: Map<string, Array<Phaser.Sprite>>;
   private _fakeTileMap: Phaser.Tilemap;
 
   constructor() {
-    this._mainMenuSprites = new Map();
+    this._mapSprites = new Map();
     this._spriteGroups = new Map();
   }
 
-  public getSprite(name: MainMenuButtons): Phaser.Sprite {
-    return this._mainMenuSprites.get(name);
+  /**
+   * @description
+   * returns the matching sprite
+   * @param {MainMenuButtons | UIComponents} name
+   * @return {Phaser.Sprite} sprite
+   * */
+  public getSprite(name: MainMenuButtons | UIComponents): Phaser.Sprite {
+    return this._mapSprites.get(name);
   }
 
   public setSprite(name: MainMenuButtons, sprite: Phaser.Sprite) {
-    if (!this._mainMenuSprites.has(name)) {
-      this._mainMenuSprites.set(name, sprite);
+    if (!this._mapSprites.has(name)) {
+      this._mapSprites.set(name, sprite);
     }
   }
 
@@ -32,7 +42,7 @@ export class MenuConfig {
 
   get allSprites() {
     let arr: Phaser.Sprite[] = [];
-    this._mainMenuSprites.forEach((value: Phaser.Sprite) => {
+    this._mapSprites.forEach((value: Phaser.Sprite) => {
       arr.push(value);
     });
     return arr;

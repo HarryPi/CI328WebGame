@@ -99,7 +99,7 @@ class AssetLoader {
     this.loader.atlasXML(UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
     this.loader.image(TileLayers.GRASS_LAYER, this._grassLayerUrl);
     this.loader.image(TileLayers.BACKGROUND, this._backgroundUrl);
-    this.loader.image(UIComponents.LEVEL_ONE, this._levelOneImgUrl);
+    this.loader.image(UIComponents.LEVEL_ONE_IMAGE, this._levelOneImgUrl);
   }
 
   /**
@@ -108,12 +108,19 @@ class AssetLoader {
    * @param {number} noOfBoxes - How many boxes will be created
    * @param {Array<Vector>} location - An Array of vectors see {@Link Vector} the location of where the boxes will be created
    * @param {Phaser.State} state - State to draw the boxes
-   * @param {Array<string | Phaser.Image>} itemToAttach - What text to attach (Optional)
+   * @param {Array<string} itemToAttach - What text to attach (Optional)
    * @param {boolean} enableInput - Enable input on buttons defaults to true
-   * @param componentToDraw
+   * @param {UIComponents} componentToDraw - What component will be the parent
+   * @param {Vector} childRelevantPosition - Defaults to 0.5, will place the children at this position of parent object
    * @return {Array<Phaser.Sprite>} arr - Returns an array of sprites in the order passed
    * */
-  private drawBoxes(noOfBoxes: number, location: Array<Vector>, state: Phaser.State, itemToAttach?: Array<string>, enableInput: boolean = true, componentToDraw: UIComponents = UIComponents.FULL_BUTTON): Array<Phaser.Sprite> {
+  private drawBoxes(noOfBoxes: number, location: Array<Vector>,
+                    state: Phaser.State, itemToAttach?: Array<string>,
+                    enableInput: boolean = true,
+                    componentToDraw: UIComponents = UIComponents.FULL_BUTTON,
+                    childRelevantPosition: Vector = new Vector(0.5, 0.5)
+  )
+  : Array<Phaser.Sprite> {
     let arr = [];
 
     for (let i = 0; i < noOfBoxes; i++) {
@@ -125,21 +132,58 @@ class AssetLoader {
       sprite.scale.setTo(0.0, 0.0);
       sprite.anchor.setTo(0.5, 0.5);
 
-
-      itemToAttach[i] ? attachment = itemToAttach[i] : null;
-
+      if (itemToAttach) {
+        itemToAttach[i] ? attachment = itemToAttach[i] : null;
+      }
       if (attachment) {
-        let toAttach = state.game.add.text(0, 0, attachment, style);
-        toAttach.anchor.setTo(0.5, 0.5);
-        sprite.addChild(toAttach);
-      } else if (typeof attachment === 'object') {
-        let imageSprite = state.game.add.sprite(0, 0, attachment);
-        console.log(imageSprite);
-        sprite.addChild(imageSprite);
+        console.log(attachment);
+        if (attachment.includes('level')) {
+          let imageSprite = state.game.add.sprite(0, 0, attachment);
+          imageSprite.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
+          sprite.addChild(imageSprite);
+
+        } else {
+          let toAttach = state.game.add.text(0, 0, attachment, style);
+          toAttach.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
+          sprite.addChild(toAttach);
+        }
       }
       sprite.inputEnabled = enableInput;
       arr.push(sprite);
     }
+    return arr;
+  }
+  /**
+   * @description
+   * Draws Tick button and Cross button at provided location
+   * @param cancelLocation
+   * @param okLocation
+   * @param state
+   * @return
+   * */
+  public drawAcceptCancelButtons(okLocation: Vector, cancelLocation: Vector, state: Phaser.State): Phaser.Sprite[] {
+    let arr = [];
+    debugger;
+    console.log('drawing buttons');
+    arr = this.drawBoxes(
+      1,
+      [okLocation],
+      state,
+      null,
+      true,
+      UIComponents.YES_BUTTON
+    );
+    arr.push(this.drawBoxes(
+      1,
+      [cancelLocation],
+      state,
+      null,
+      true,
+      UIComponents.NO_BUTTON
+    )[0]);
+    arr.forEach( (value, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
+    });
     return arr;
   }
   /**
@@ -233,24 +277,27 @@ class AssetLoader {
   /**
    * @description
    * Will Generate the available levels the player can choose from
+   * @return {MenuConfig} config - see {@Link MenuConfig}
    * */
-  public drawLevels(state: Phaser.State) {
+  public drawLevels(state: Phaser.State): MenuConfig {
     let centerX = state.game.world.centerX;
     let centerY = state.game.world.centerY;
     let config: MenuConfig = new MenuConfig();
-    let levels = [UIComponents.LEVEL_ONE, UIComponents.LEVEL_ONE];
+    let levels = [UIComponents.LEVEL_ONE_IMAGE, UIComponents.LEVEL_ONE_IMAGE];
 
     let arr = this.drawBoxes(2,
       [
         new Vector(centerX, centerY),
-        new Vector(centerX + 50, centerY)],
+        new Vector(centerX + 110, centerY)],
       state,
-      levels);
+      levels, true,
+      UIComponents.PANEL);
 
     arr.forEach((value, index) => {
       state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
-      config.setSprite(MainMenuButtons[levels[index].toUpperCase().replace(' ', '_')], value);
+      config.setSprite(UIComponents[levels[index].toUpperCase().replace(' ', '_')], value);
     });
+    return config;
   }
   /**
    * @description

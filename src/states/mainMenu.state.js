@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
 const Assets_1 = require("../UI/Assets");
 const GameConstants_1 = require("../constants/GameConstants");
+const data_config_1 = require("../config/data.config");
+const vector_1 = require("../util/vector");
 class MainMenuState extends state_1.default {
     preload() {
     }
@@ -28,9 +30,17 @@ class MainMenuState extends state_1.default {
                     Assets_1.default.fadeoutSprites(this, config.getSpriteGroup(preferences)).then(() => {
                         // Preference menu has faded out
                         let levConfig = Assets_1.default.drawLevels(this);
-                        // Know levels menu is being displayed
-                    });
-                });
+                        // Get x,y of last sprite created
+                        let lastSprite = levConfig.allSprites[levConfig.allSprites.length - 1];
+                        let vec = new vector_1.default(lastSprite.x, lastSprite.y);
+                        Assets_1.default.drawAcceptCancelButtons(new vector_1.default(vec.x, vec.y + 100), new vector_1.default(vec.x + 46, vec.y + 100), this);
+                        // Now levels menu is being displayed
+                        config.setSpriteGroup(levels, levConfig.allSprites);
+                        levConfig.getSprite(GameConstants_1.UIComponents.LEVEL_ONE_IMAGE).events.onInputDown.add(() => {
+                            data_config_1.DataConfig.level = GameConstants_1.Levels.LEVEL_ONE; // Store selected level
+                        });
+                    }); // End Fadeout Promise;
+                }); // End Event;
             });
         });
     }

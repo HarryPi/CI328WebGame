@@ -1,7 +1,9 @@
 import State from './state';
 import AssetsUtils from '../UI/Assets';
 import { MenuConfig } from '../config/menu.config';
-import { MainMenuButtons, States } from '../constants/GameConstants';
+import { Levels, MainMenuButtons, States, UIComponents } from '../constants/GameConstants';
+import { DataConfig } from '../config/data.config';
+import Vector from '../util/vector';
 
 export class MainMenuState extends State {
   preload(){
@@ -35,9 +37,20 @@ export class MainMenuState extends State {
           AssetsUtils.fadeoutSprites(this, config.getSpriteGroup(preferences)).then( () => {
             // Preference menu has faded out
             let levConfig = AssetsUtils.drawLevels(this);
-            // Know levels menu is being displayed
-          });
-        });
+            // Get x,y of last sprite created
+            let lastSprite = levConfig.allSprites[levConfig.allSprites.length - 1];
+            let vec = new Vector(lastSprite.x, lastSprite.y);
+
+            AssetsUtils.drawAcceptCancelButtons(new Vector(vec.x, vec.y + 100), new Vector(vec.x + 46, vec.y + 100), this);
+
+            // Now levels menu is being displayed
+            config.setSpriteGroup(levels, levConfig.allSprites);
+            levConfig.getSprite(UIComponents.LEVEL_ONE_IMAGE).events.onInputDown.add( () => {
+              DataConfig.level = Levels.LEVEL_ONE; // Store selected level
+            });
+
+          }); // End Fadeout Promise;
+        }); // End Event;
 
       });
     });

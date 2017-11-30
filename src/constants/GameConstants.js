@@ -71,11 +71,12 @@ var UIComponents;
 (function (UIComponents) {
     UIComponents["PROGRESS_BAR"] = "progresBar";
     UIComponents["LOGO"] = "logo";
+    UIComponents["PANEL"] = "green_panel.png";
     UIComponents["FULL_BUTTON"] = "green_button00.png";
-    UIComponents["YES_BUTTON"] = "green_tick.png";
-    UIComponents["NO_BUTTON"] = "green_cross.png";
+    UIComponents["YES_BUTTON"] = "green_boxCheckmark.png";
+    UIComponents["NO_BUTTON"] = "green_boxCross.png";
     UIComponents["UI_SPRITESHEET"] = "uiSpritesheet";
-    UIComponents["LEVEL_ONE"] = "leve_one_image";
+    UIComponents["LEVEL_ONE_IMAGE"] = "level_one_image";
 })(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
 var TileLayers;
 (function (TileLayers) {

@@ -56,11 +56,12 @@ export enum ComponentType {
 export enum UIComponents {
   PROGRESS_BAR = 'progresBar',
   LOGO = 'logo',
+  PANEL = 'green_panel.png',
   FULL_BUTTON = 'green_button00.png',
-  YES_BUTTON = 'green_tick.png',
-  NO_BUTTON = 'green_cross.png',
+  YES_BUTTON = 'green_boxCheckmark.png',
+  NO_BUTTON = 'green_boxCross.png',
   UI_SPRITESHEET = 'uiSpritesheet',
-  LEVEL_ONE = 'leve_one_image'
+  LEVEL_ONE_IMAGE = 'level_one_image'
 }
 
 export enum TileLayers {

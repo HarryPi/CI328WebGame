@@ -1,16 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @class
+ * As the only way to create a menu in phaser is sprites we need a class to store and retrieve them
+ * */
 class MenuConfig {
     constructor() {
-        this._mainMenuSprites = new Map();
+        this._mapSprites = new Map();
         this._spriteGroups = new Map();
     }
+    /**
+     * @description
+     * returns the matching sprite
+     * @param {MainMenuButtons | UIComponents} name
+     * @return {Phaser.Sprite} sprite
+     * */
     getSprite(name) {
-        return this._mainMenuSprites.get(name);
+        return this._mapSprites.get(name);
     }
     setSprite(name, sprite) {
-        if (!this._mainMenuSprites.has(name)) {
-            this._mainMenuSprites.set(name, sprite);
+        if (!this._mapSprites.has(name)) {
+            this._mapSprites.set(name, sprite);
         }
     }
     setSpriteGroup(name, spriteArr) {
@@ -23,7 +33,7 @@ class MenuConfig {
     }
     get allSprites() {
         let arr = [];
-        this._mainMenuSprites.forEach((value) => {
+        this._mapSprites.forEach((value) => {
             arr.push(value);
         });
         return arr;
