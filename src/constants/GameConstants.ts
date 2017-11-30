@@ -41,6 +41,7 @@ export enum   TankLayout {
   TANK_SPRITESHEET  = 'tankSpritesheet'
 }
 export enum ComponentType {
+  TANK = 'tank_component',
   OWNER = 'owner_component',
   STATE = 'state_component',
   AI = 'ai_component',

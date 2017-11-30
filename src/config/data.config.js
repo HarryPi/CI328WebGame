@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const GameConstants_1 = require("../constants/GameConstants");
 /**
  * @class
  * Will hold the options selected by the player
@@ -47,5 +48,8 @@ class DataConfig {
         this._shadowLevel = null;
     }
 }
+DataConfig._level = GameConstants_1.Levels.LEVEL_TWO;
+DataConfig.tankParams = new Map()
+    .set(GameConstants_1.TankLayout.CANDY_RECON, {});
 exports.DataConfig = DataConfig;
 //# sourceMappingURL=data.config.js.map

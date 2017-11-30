@@ -1,4 +1,5 @@
-import { Levels } from '../constants/GameConstants';
+import {Levels, TankLayout} from '../constants/GameConstants';
+import TankLevel from './levels/tankLevel';
 
 /**
  * @class
@@ -10,8 +11,9 @@ export class DataConfig {
    * Represents the level selected by the player
    * */
   private static _shadowLevel: Levels;
-  private static _level: Levels;
-
+  private static _level: Levels = Levels.LEVEL_TWO;
+  public static readonly tankParams = new Map<TankLayout, object>()
+    .set(TankLayout.CANDY_RECON, {});
   /**
    * @static
    * Returns the selected level
