@@ -120,7 +120,7 @@ class AssetLoader {
 
       let sprite = state.add.sprite(location[i].x, location[i].y, UIComponents.UI_SPRITESHEET, componentToDraw);
       let style = {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: sprite.width, align: 'center'};
-      let attachment: string | Phaser.Image;
+      let attachment: string;
 
       sprite.scale.setTo(0.0, 0.0);
       sprite.anchor.setTo(0.5, 0.5);
