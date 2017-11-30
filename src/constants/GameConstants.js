@@ -77,11 +77,18 @@ var UIComponents;
     UIComponents["NO_BUTTON"] = "green_boxCross.png";
     UIComponents["UI_SPRITESHEET"] = "uiSpritesheet";
     UIComponents["LEVEL_ONE_IMAGE"] = "level_one_image";
+    UIComponents["LEVEL_TWO_IMAGE"] = "level_two_image";
+    UIComponents["CANDY_FORTRESS_IMG"] = "candy_fortress_img";
+    UIComponents["CANDY_ARTILLERY_IMG"] = "candy_artillery_img";
+    UIComponents["CANDY_HUNTER_IMG"] = "candy_hunter_img";
+    UIComponents["CANDY_RECON_IMG"] = "candy_recon_img";
+    UIComponents["CANDY_LIGHT_IMG"] = "candy_light_img";
 })(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
 var TileLayers;
 (function (TileLayers) {
     TileLayers["GRASS_LAYER"] = "grassLayer";
     TileLayers["BACKGROUND"] = "background";
+    TileLayers["CANDY_LAYER"] = "candyLayer";
 })(TileLayers = exports.TileLayers || (exports.TileLayers = {}));
 var InputType;
 (function (InputType) {
@@ -115,5 +122,6 @@ var MainMenuButtons;
     MainMenuButtons["SELECT_LEVEL"] = "select_level";
     MainMenuButtons["SELECT_PLAYER"] = "select_player";
     MainMenuButtons["SELECT_DIFFICULTY"] = "select_difficulty";
+    MainMenuButtons["BACK"] = "back";
 })(MainMenuButtons = exports.MainMenuButtons || (exports.MainMenuButtons = {}));
 //# sourceMappingURL=GameConstants.js.map

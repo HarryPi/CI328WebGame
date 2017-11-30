@@ -5,20 +5,20 @@ const input_1 = require("../util/input");
 const TankWorldFactory_1 = require("../TankWorldFactory");
 const GameConstants_1 = require("../constants/GameConstants");
 const levelOne_1 = require("../config/levels/levelOne");
+const levelTwo_1 = require("../config/levels/levelTwo");
+const data_config_1 = require("../config/data.config");
 class GameState extends state_1.default {
     constructor() {
         super();
-        this._levels = [];
         this._input = new input_1.default();
+        this._levels = new Map();
     }
     preload() {
         // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
-        this._levels.push(new levelOne_1.LevelOne(this.game));
-        this._levels.forEach((level) => {
-            level.init();
-        });
+        this._levels.set(GameConstants_1.Levels.LEVEL_ONE, new levelOne_1.LevelOne(this.game));
+        this._levels.set(GameConstants_1.Levels.LEVEL_TWO, new levelTwo_1.LevelTwo(this.game));
         this._factory = new TankWorldFactory_1.default(this.game);
-        this._factory.currentLevel = this._levels[0];
+        this._factory.currentLevel = this._levels.get(data_config_1.DataConfig.level);
         this._factory.init(); // Initialise collision groups
     }
     create() {

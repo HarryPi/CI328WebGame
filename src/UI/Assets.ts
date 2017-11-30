@@ -1,6 +1,7 @@
-import { Levels, MainMenuButtons, TankLayout, TileLayers, UIComponents } from '../constants/GameConstants';
-import { MenuConfig } from '../config/menu.config';
+import {Levels, MainMenuButtons, States, TankLayout, TileLayers, UIComponents} from '../constants/GameConstants';
+import {MenuConfig} from '../config/menu.config';
 import Vector from '../util/vector';
+import {DataConfig} from '../config/data.config';
 
 /**
  * @class
@@ -9,23 +10,40 @@ import Vector from '../util/vector';
 class AssetLoader {
 
   // Asset URL;
-
+  // levels
   private _levelOneUrl: string;
+  private _levelTwoUrl: string;
+
+  // Spritesheet
   private _tankSpritesheetUrl: string;
   private _tankSpritesheetUrlXLM: string;
+
+  // loading screen
   private _progressBarUrl: string;
   private _logoUrl: string;
+
+  // Layers
   private _grassLayerUrl: string;
   private _backgroundUrl: string;
+  private _candyLayerUrl: string;
   private _uiBackgroundUrl: string;
   private uiBackgroundUrlXML: string;
+
+  // Images
   private _levelOneImgUrl: string;
-  // Phaser.Loader
+  private _levelTwoImgUrl: string;
+  private _tank1Url: string;
+  private _tank2Url: string;
+  private _tank3Url: string;
+  private _tank4Url: string;
+  private _tank5Url: string;
+
+  // loader
   private _loader: Phaser.Loader;
 
-
-  // Animations
-  private _animations: Map<string, Phaser.Animation> = new Map();
+  // Class Global vars
+  private _fakeMapExists: boolean = false;
+  private _fakeMap: Phaser.Tilemap;
 
   /**
    * @constructor
@@ -37,9 +55,17 @@ class AssetLoader {
     this._progressBarUrl = require('assets/images/progressBar.png');
     this._logoUrl = require('assets/images/logo.png');
     this._levelOneImgUrl = require('assets/images/levelOneImage.png');
+    this._levelTwoImgUrl = require('assets/images/levelTwoImage.png');
+
+    this._tank1Url = require('assets/images/tanks_tankDesert1.png');
+    this._tank2Url = require('assets/images/tanks_tankDesert2.png');
+    this._tank3Url = require('assets/images/tanks_tankDesert3.png');
+    this._tank4Url = require('assets/images/tanks_tankDesert4.png');
+    this._tank5Url = require('assets/images/tanks_tankDesert5.png');
 
     // Levels
     this._levelOneUrl = require('assets/levels/level1.json');
+    this._levelTwoUrl = require('assets/levels/level2.json');
 
     // Atlas
     this._tankSpritesheetUrlXLM = require('assets/spritesheet/tanks_xml.xml');
@@ -47,6 +73,7 @@ class AssetLoader {
 
     // Spritesheet
     this._grassLayerUrl = require('assets/spritesheet/grassLayer.png');
+    this._candyLayerUrl = require('assets/spritesheet/candyLayer.png');
     this._backgroundUrl = require('assets/spritesheet/backgroundElements.png');
     this._uiBackgroundUrl = require('assets/spritesheet/UISpritesheet.png');
     this.uiBackgroundUrlXML = require('assets/spritesheet/UISpritesheet_xml.xml');
@@ -95,11 +122,22 @@ class AssetLoader {
    * */
   loadAll(): void {
     this.loader.tilemap(Levels.LEVEL_ONE, this._levelOneUrl, null, Phaser.Tilemap.TILED_JSON);
+    this.loader.tilemap(Levels.LEVEL_TWO, this._levelTwoUrl, null, Phaser.Tilemap.TILED_JSON);
+
     this.loader.atlasXML(TankLayout.TANK_SPRITESHEET, this._tankSpritesheetUrl, this._tankSpritesheetUrlXLM);
     this.loader.atlasXML(UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
+
     this.loader.image(TileLayers.GRASS_LAYER, this._grassLayerUrl);
     this.loader.image(TileLayers.BACKGROUND, this._backgroundUrl);
     this.loader.image(UIComponents.LEVEL_ONE_IMAGE, this._levelOneImgUrl);
+    this.loader.image(UIComponents.LEVEL_TWO_IMAGE, this._levelTwoImgUrl);
+    this.loader.image(TileLayers.CANDY_LAYER, this._candyLayerUrl);
+
+    this.loader.image(UIComponents.CANDY_ARTILLERY_IMG, this._tank1Url);
+    this.loader.image(UIComponents.CANDY_HUNTER_IMG, this._tank2Url);
+    this.loader.image(UIComponents.CANDY_LIGHT_IMG, this._tank4Url);
+    this.loader.image(UIComponents.CANDY_FORTRESS_IMG, this._tank3Url);
+    this.loader.image(UIComponents.CANDY_RECON_IMG, this._tank5Url);
   }
 
   /**
@@ -118,9 +156,7 @@ class AssetLoader {
                     state: Phaser.State, itemToAttach?: Array<string>,
                     enableInput: boolean = true,
                     componentToDraw: UIComponents = UIComponents.FULL_BUTTON,
-                    childRelevantPosition: Vector = new Vector(0.5, 0.5)
-  )
-  : Array<Phaser.Sprite> {
+                    childRelevantPosition: Vector = new Vector(0.5, 0.5)): Array<Phaser.Sprite> {
     let arr = [];
 
     for (let i = 0; i < noOfBoxes; i++) {
@@ -137,7 +173,7 @@ class AssetLoader {
       }
       if (attachment) {
         console.log(attachment);
-        if (attachment.includes('level')) {
+        if (attachment.includes('level') || attachment.includes('img')) {
           let imageSprite = state.game.add.sprite(0, 0, attachment);
           imageSprite.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
           sprite.addChild(imageSprite);
@@ -153,6 +189,7 @@ class AssetLoader {
     }
     return arr;
   }
+
   /**
    * @description
    * Draws Tick button and Cross button at provided location
@@ -163,7 +200,6 @@ class AssetLoader {
    * */
   public drawAcceptCancelButtons(okLocation: Vector, cancelLocation: Vector, state: Phaser.State): Phaser.Sprite[] {
     let arr = [];
-    debugger;
     console.log('drawing buttons');
     arr = this.drawBoxes(
       1,
@@ -181,11 +217,12 @@ class AssetLoader {
       true,
       UIComponents.NO_BUTTON
     )[0]);
-    arr.forEach( (value, index) => {
-      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
+    arr.forEach((value, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
     });
     return arr;
   }
+
   /**
    * @description
    * Use to draw the main menu at selected state
@@ -193,35 +230,53 @@ class AssetLoader {
    * returns the config file with the sprites
    * */
   public drawMainMenu(state: Phaser.State): MenuConfig {
-
     let textArr = ['New Game', 'High Score', 'Preferences'];
     let config = new MenuConfig();
 
-   let arr = this.drawBoxes(3,
-     [
-       new Vector(state.game.world.centerX, state.game.world.centerY - 110),
-       new Vector(state.game.world.centerX, state.game.world.centerY - 50),
-       new Vector(state.game.world.centerX, state.game.world.centerY + 10)],
-     state,
-     textArr);
+    let arr = this.drawBoxes(3,
+      [
+        new Vector(state.game.world.centerX, state.game.world.centerY - 110),
+        new Vector(state.game.world.centerX, state.game.world.centerY - 50),
+        new Vector(state.game.world.centerX, state.game.world.centerY + 10)],
+      state,
+      textArr);
 
-   arr.forEach( (value, index) => {
-     state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
-     config.setSprite(MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
-   });
+    arr.forEach((value, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      config.setSprite(MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
+      state.game.camera.focusOn(value);
+      value.bringToTop();
+    });
     let map: Phaser.Tilemap;
 
-    map = config.fakeTileMap = state.game.add.tilemap(Levels.LEVEL_ONE);
-    map.addTilesetImage(TileLayers.GRASS_LAYER, TileLayers.GRASS_LAYER);
-    map.addTilesetImage(TileLayers.BACKGROUND, TileLayers.BACKGROUND);
+    if (!this._fakeMapExists) {
+      map = config.fakeTileMap = state.game.add.tilemap(Levels.LEVEL_ONE);
+      map.addTilesetImage(TileLayers.GRASS_LAYER, TileLayers.GRASS_LAYER);
+      map.addTilesetImage(TileLayers.BACKGROUND, TileLayers.BACKGROUND);
 
-    map.createLayer('SkyPrimary').resizeWorld();
-    map.createLayer('GroundSecondary').resizeWorld();
-    map.createLayer('GroundPrimary').resizeWorld();
+      map.createLayer('SkyPrimary').resizeWorld();
+      map.createLayer('GroundSecondary').resizeWorld();
+      map.createLayer('GroundPrimary').resizeWorld();
+      this._fakeMapExists = true;
+      this._fakeMap = map;
+    }
+
+    config.getSprite(MainMenuButtons.NEW_GAME).events.onInputDown.add(() => {
+      this._fakeMapExists ? this._fakeMap.destroy() : null;
+      console.log(DataConfig.level);
+      state.game.state.start(States.GAME_STATE); // Phaser cant detect start on first state???
+    });
+
+    config.getSprite(MainMenuButtons.PREFERENCES).events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
 
     return config;
 
   }
+
   /**
    * @description
    * Fades out passed sprites and then destroys them
@@ -230,13 +285,13 @@ class AssetLoader {
    * @return {Promise} promise - The returned promise will be completed when all sprites have fadedout
    * */
   public fadeoutSprites(state: Phaser.State, fadeoutSprites: Array<Phaser.Sprite>): Promise<void> {
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (fadeoutSprites) {
         fadeoutSprites.forEach((sprite: Phaser.Sprite) => {
           state.game.add.tween(sprite.scale).to({
             x: 0.0,
             y: 0.0
-          }, 2400, Phaser.Easing.Linear.None, true).onComplete.add(() => {
+          }, 1000, Phaser.Easing.Linear.None, true).onComplete.add(() => {
             sprite.destroy();
             resolve();
           });
@@ -246,6 +301,7 @@ class AssetLoader {
       }
     });
   }
+
   /**
    * @description
    * Function to draw preferences options on current state
@@ -255,23 +311,107 @@ class AssetLoader {
    * */
   public drawPreferences(state: Phaser.State): MenuConfig {
     let config = new MenuConfig();
-      let textArr = ['Select Level', 'Select Player', 'Select Difficulty'];
+    let textArr = ['Select Level', 'Select Player', 'Select Difficulty', 'Back'];
 
-      let arr = this.drawBoxes(3,
-        [
-          new Vector(state.game.world.centerX, state.game.world.centerY - 110),
-          new Vector(state.game.world.centerX, state.game.world.centerY - 50),
-          new Vector(state.game.world.centerX, state.game.world.centerY + 10)],
-        state,
-        textArr);
+    let arr = this.drawBoxes(4,
+      [
+        new Vector(state.game.world.centerX, state.game.world.centerY - 110),
+        new Vector(state.game.world.centerX, state.game.world.centerY - 50),
+        new Vector(state.game.world.centerX, state.game.world.centerY + 10),
+        new Vector(state.game.world.centerX, state.game.world.centerY + 70)],
+      state,
+      textArr);
 
-      arr.forEach((value, index) =>  {
-        state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
-        config.setSprite(MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
-        // Gives the change of scenery effect
-        state.game.camera.focusOn(value);
+    arr.forEach((value, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      config.setSprite(MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
+      // Gives the change of scenery effect
+      state.game.camera.focusOn(value);
+    });
+
+    // Back Button
+    config.getSprite(MainMenuButtons.BACK).events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawMainMenu(state);
       });
-      return config;
+    });
+
+    // Select level Button
+    config.getSprite(MainMenuButtons.SELECT_LEVEL).events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, arr);
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        // Preference menu has faded out
+        AssetsUtils.drawLevels(state);
+      });
+    });
+
+    config.getSprite(MainMenuButtons.SELECT_PLAYER).events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, arr);
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        // Preference menu has faded out
+        AssetsUtils.drawPlayerChoice(state);
+      });
+    });
+    return config;
+  }
+
+  /**
+   * @description
+   * Function to draw the player options of tank choices
+   * @param {Phaser.State} state
+   * @return config
+   * */
+  public drawPlayerChoice(state: Phaser.State): MenuConfig {
+    let centerX = state.game.world.centerX;
+    let centerY = state.game.world.centerY;
+    let config: MenuConfig = new MenuConfig();
+    let tanks = [
+      UIComponents.CANDY_RECON_IMG,
+      UIComponents.CANDY_LIGHT_IMG,
+      UIComponents.CANDY_HUNTER_IMG,
+      UIComponents.CANDY_ARTILLERY_IMG,
+      UIComponents.CANDY_FORTRESS_IMG
+    ];
+    let vecs: Vector[] = [
+      new Vector(centerX, centerY),
+      new Vector(centerX + 110, centerY),
+      new Vector(centerX + 220, centerY),
+      new Vector(centerX , centerY + 110),
+      new Vector(centerX + 110, centerY + 110)
+    ];
+
+    let arr = AssetsUtils.drawBoxes(
+      tanks.length,
+      vecs,
+      state,
+      tanks,
+      true,
+      UIComponents.PANEL
+    );
+    arr.forEach((value, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      config.setSprite(UIComponents[tanks[index].toUpperCase().replace(' ', '_')], value);
+      // Gives the change of scenery effect
+    });
+
+    let lastSprite = arr[arr.length - 2];
+    let bArr = AssetsUtils.drawAcceptCancelButtons(new Vector(lastSprite.x - 30, lastSprite.y + 100), new Vector(lastSprite.x + 10, lastSprite.y + 100), state);
+    bArr[0].events.onInputDown.add(() => {
+      DataConfig.applyCahnges();
+      AssetsUtils.fadeoutSprites(state, bArr);
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
+    bArr[1].events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, bArr);
+      DataConfig.revertChanges();
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
+
+    return config;
   }
 
   /**
@@ -283,7 +423,7 @@ class AssetLoader {
     let centerX = state.game.world.centerX;
     let centerY = state.game.world.centerY;
     let config: MenuConfig = new MenuConfig();
-    let levels = [UIComponents.LEVEL_ONE_IMAGE, UIComponents.LEVEL_ONE_IMAGE];
+    let levels = [UIComponents.LEVEL_ONE_IMAGE, UIComponents.LEVEL_TWO_IMAGE];
 
     let arr = this.drawBoxes(2,
       [
@@ -294,11 +434,40 @@ class AssetLoader {
       UIComponents.PANEL);
 
     arr.forEach((value, index) => {
-      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 2400, Phaser.Easing.Bounce.Out, true);
-      config.setSprite(UIComponents[levels[index].toUpperCase().replace(' ', '_')], value);
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      let name = UIComponents[levels[index].toUpperCase().replace(' ', '_')];
+      config.setSprite(name, value);
+      value.events.onInputDown.add(() => {
+        let lName = name.toString();
+        if (lName.includes('one')) {
+          DataConfig.level = Levels.LEVEL_ONE;
+        } else if (lName.includes('two')) {
+          DataConfig.level = Levels.LEVEL_TWO;
+        }
+      });
     });
+
+    // Setup ok/no buttons
+    let lastSprite = arr[arr.length - 1];
+    let bArr = AssetsUtils.drawAcceptCancelButtons(new Vector(lastSprite.x - arr.length * 50, lastSprite.y + 100), new Vector(lastSprite.x - (arr.length - 1) * 50, lastSprite.y + 100), state);
+    bArr[0].events.onInputDown.add(() => {
+      DataConfig.applyCahnges();
+      AssetsUtils.fadeoutSprites(state, bArr);
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
+    bArr[1].events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, bArr);
+      DataConfig.revertChanges();
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
+
     return config;
   }
+
   /**
    * @description
    * Returns the cached memory object see {@link Phaser.Loader}

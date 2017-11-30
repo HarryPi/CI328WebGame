@@ -1,34 +1,36 @@
 import State from './state';
 import Input from '../util/input';
 import TankWorldFactory from '../TankWorldFactory';
-import { ComponentType, InputType } from '../constants/GameConstants';
+import {ComponentType, InputType, Levels} from '../constants/GameConstants';
 import { Entity } from '../entities/entity';
 import { MovableComponent } from '../component/movable.component';
 import { ShootComponent } from '../component/shoot.component';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import {LevelOne} from '../config/levels/levelOne';
 import TankLevel from '../config/levels/tankLevel';
+import {LevelTwo} from '../config/levels/levelTwo';
+import {DataConfig} from '../config/data.config';
 
 export class GameState extends State {
   private _input: Input;
   private _inputSubscription;
   private _direction: InputType;
   private _factory: TankWorldFactory;
-  private _levels = [];
+  private _levels: Map<Levels, TankLevel>;
 
   constructor() {
     super();
     this._input = new Input();
+    this._levels = new Map();
   }
 
   preload() {
     // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
-    this._levels.push(new LevelOne(this.game));
-    this._levels.forEach((level: TankLevel) => {
-      level.init();
-    });
+    this._levels.set(Levels.LEVEL_ONE, new LevelOne(this.game));
+    this._levels.set(Levels.LEVEL_TWO, new LevelTwo(this.game));
+
     this._factory = new TankWorldFactory(this.game);
-    this._factory.currentLevel = this._levels[0];
+    this._factory.currentLevel = this._levels.get(DataConfig.level);
     this._factory.init(); // Initialise collision groups
   }
 

@@ -61,12 +61,17 @@ export enum UIComponents {
   YES_BUTTON = 'green_boxCheckmark.png',
   NO_BUTTON = 'green_boxCross.png',
   UI_SPRITESHEET = 'uiSpritesheet',
-  LEVEL_ONE_IMAGE = 'level_one_image'
+  LEVEL_ONE_IMAGE = 'level_one_image',
+  LEVEL_TWO_IMAGE = 'level_two_image',
+  CANDY_FORTRESS_IMG = 'candy_fortress_img', CANDY_ARTILLERY_IMG = 'candy_artillery_img',
+  CANDY_HUNTER_IMG = 'candy_hunter_img', CANDY_RECON_IMG = 'candy_recon_img',
+  CANDY_LIGHT_IMG = 'candy_light_img'
 }
 
 export enum TileLayers {
   GRASS_LAYER = 'grassLayer',
-  BACKGROUND = 'background'
+  BACKGROUND = 'background',
+  CANDY_LAYER = 'candyLayer'
 }
 
 export enum InputType {
@@ -97,5 +102,6 @@ export enum MainMenuButtons {
   PREFERENCES = 'preferences',
   SELECT_LEVEL = 'select_level',
   SELECT_PLAYER = 'select_player',
-  SELECT_DIFFICULTY = 'select_difficulty'
+  SELECT_DIFFICULTY = 'select_difficulty',
+  BACK = 'back'
 }

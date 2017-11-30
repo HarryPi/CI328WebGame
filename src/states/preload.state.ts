@@ -17,7 +17,7 @@ export class PreloadState extends State {
     this.game.physics.startSystem(Phaser.Physics.P2JS);
     this.game.physics.p2.gravity.y = 1400;
     this.game.physics.p2.setImpactEvents(true);
-    this.game.physics.p2.setBoundsToWorld(true, true, true, true);
+    this.game.physics.p2.setBoundsToWorld(true, true, false, true);
 
   }
 

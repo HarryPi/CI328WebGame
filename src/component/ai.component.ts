@@ -21,7 +21,6 @@ export class AiComponent extends Component {
     let distance: number = MathUtil.normalize(this._player.sprite.x - this.target.sprite.x);
     // Justify this in the report say tanks can only spawn on the right of the player
     let sComp = this._target.getComponent<StateComponent>(ComponentType.STATE);
-    console.log(Math.abs(distance));
     if (sComp) {
       // Here we are adding some random params to simulate a more realistic behaviour
       if (Math.abs(distance) >= 0.15 + MathUtil.randomIntFromInterval(0.05, 0.06)) {

@@ -4,9 +4,6 @@ class TankLevel {
     constructor(game) {
         this._game = game;
     }
-    spawnEnemy() {
-        return null;
-    }
     /**
      * @description
      * Gets total enemies that will ever exist on current level
@@ -43,6 +40,11 @@ class TankLevel {
     get enemyStartPos() {
         return this._enemyStartPos;
     }
+    /**
+     * @description
+     * Return the bodies of the ground layer
+     * @return {Phaser.Physics.P2.Body[]} this._collisionLayer
+     * */
     get collisionLayer() {
         return this._collisionLayer;
     }

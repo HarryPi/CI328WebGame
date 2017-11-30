@@ -11,6 +11,7 @@ class BulletComponent extends component_1.Component {
     }
     bulletInit() {
         let cOwner = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
+        // Not a bullet?
         if (!cOwner) {
             return;
         }
@@ -26,15 +27,21 @@ class BulletComponent extends component_1.Component {
             seekObject.x = aiComponent.player.sprite.x;
             seekObject.y = aiComponent.player.sprite.y;
         }
+        else {
+        }
         this.accelerateToObject(this.target.sprite, seekObject);
     }
-    degToRad(degrees) {
-        return degrees * Math.PI / 180;
-    }
-    accelerateToObject(obj1, obj2, speed = 1400) {
+    accelerateToObject(obj1, obj2, velocity = 500) {
         let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
-        obj1.body.velocity.x = Math.cos(angle) * speed; // accelerateToObject
-        obj1.body.velocity.y = Math.sin(angle) * speed;
+        this.target.getComponent(GameConstants_1.ComponentType.OWNER).owner.getComponent(GameConstants_1.ComponentType.AI)
+            ? obj1.body.velocity.x = Math.cos(angle - Math.PI / 180) * velocity
+            : obj1.body.velocity.x = Math.abs(Math.cos(angle - Math.PI / 180) * velocity); // accelerateToObject
+        obj1.body.velocity.y = (Math.sin(angle - Math.PI / 180) * velocity - 1400);
+        /*
+      
+          let angle = MathUtil.calculateAngle2ToHitCoordinate(obj2.x, obj2.y, velocity, 1400);
+          obj1.body.angle = angle;
+          obj1.body.velocity.x = velocity;*/
     }
 }
 exports.BulletComponent = BulletComponent;

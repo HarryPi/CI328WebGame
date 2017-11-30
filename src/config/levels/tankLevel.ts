@@ -8,7 +8,7 @@ export default abstract class TankLevel {
   protected _enemyStartPos: Vector;
   protected _game: Phaser.Game;
   protected _collisionLayer: Array<Phaser.Physics.P2.Body>;
-
+  protected _map: Phaser.Tilemap;
 
   protected _capEnemies: number;
   protected _enemiesCount: number; // total of enemies the level will have
@@ -21,10 +21,11 @@ export default abstract class TankLevel {
 
   // functions
   public abstract init(): void;
+  /**
+   * @description
+   * Use to clear any variables that should not exist globally once a level has finished e.g. tilemap
+   * */
   public abstract destroy(): void;
-  protected spawnEnemy(): Entity {
-    return null;
-  }
 
   /**
    * @description
@@ -65,6 +66,12 @@ export default abstract class TankLevel {
   get enemyStartPos(): Vector {
     return this._enemyStartPos;
   }
+
+  /**
+   * @description
+   * Return the bodies of the ground layer
+   * @return {Phaser.Physics.P2.Body[]} this._collisionLayer
+   * */
   get collisionLayer(): Array<Phaser.Physics.P2.Body>{
     return this._collisionLayer;
   }

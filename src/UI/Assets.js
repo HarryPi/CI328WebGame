@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 const menu_config_1 = require("../config/menu.config");
 const vector_1 = require("../util/vector");
+const data_config_1 = require("../config/data.config");
 /**
  * @class
  * Class to load assets into the cached memory
@@ -13,19 +14,27 @@ class AssetLoader {
      * Will generate all required paths for the assets
      * */
     constructor() {
-        // Animations
-        this._animations = new Map();
+        // Class Global vars
+        this._fakeMapExists = false;
         // Images
         this._progressBarUrl = require('assets/images/progressBar.png');
         this._logoUrl = require('assets/images/logo.png');
         this._levelOneImgUrl = require('assets/images/levelOneImage.png');
+        this._levelTwoImgUrl = require('assets/images/levelTwoImage.png');
+        this._tank1Url = require('assets/images/tanks_tankDesert1.png');
+        this._tank2Url = require('assets/images/tanks_tankDesert2.png');
+        this._tank3Url = require('assets/images/tanks_tankDesert3.png');
+        this._tank4Url = require('assets/images/tanks_tankDesert4.png');
+        this._tank5Url = require('assets/images/tanks_tankDesert5.png');
         // Levels
         this._levelOneUrl = require('assets/levels/level1.json');
+        this._levelTwoUrl = require('assets/levels/level2.json');
         // Atlas
         this._tankSpritesheetUrlXLM = require('assets/spritesheet/tanks_xml.xml');
         this._tankSpritesheetUrl = require('assets/spritesheet/tanks.png');
         // Spritesheet
         this._grassLayerUrl = require('assets/spritesheet/grassLayer.png');
+        this._candyLayerUrl = require('assets/spritesheet/candyLayer.png');
         this._backgroundUrl = require('assets/spritesheet/backgroundElements.png');
         this._uiBackgroundUrl = require('assets/spritesheet/UISpritesheet.png');
         this.uiBackgroundUrlXML = require('assets/spritesheet/UISpritesheet_xml.xml');
@@ -70,11 +79,19 @@ class AssetLoader {
      * */
     loadAll() {
         this.loader.tilemap(GameConstants_1.Levels.LEVEL_ONE, this._levelOneUrl, null, Phaser.Tilemap.TILED_JSON);
+        this.loader.tilemap(GameConstants_1.Levels.LEVEL_TWO, this._levelTwoUrl, null, Phaser.Tilemap.TILED_JSON);
         this.loader.atlasXML(GameConstants_1.TankLayout.TANK_SPRITESHEET, this._tankSpritesheetUrl, this._tankSpritesheetUrlXLM);
         this.loader.atlasXML(GameConstants_1.UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
         this.loader.image(GameConstants_1.TileLayers.GRASS_LAYER, this._grassLayerUrl);
         this.loader.image(GameConstants_1.TileLayers.BACKGROUND, this._backgroundUrl);
         this.loader.image(GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, this._levelOneImgUrl);
+        this.loader.image(GameConstants_1.UIComponents.LEVEL_TWO_IMAGE, this._levelTwoImgUrl);
+        this.loader.image(GameConstants_1.TileLayers.CANDY_LAYER, this._candyLayerUrl);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_ARTILLERY_IMG, this._tank1Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_HUNTER_IMG, this._tank2Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_LIGHT_IMG, this._tank4Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_FORTRESS_IMG, this._tank3Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_RECON_IMG, this._tank5Url);
     }
     /**
      * @description
@@ -101,7 +118,7 @@ class AssetLoader {
             }
             if (attachment) {
                 console.log(attachment);
-                if (attachment.includes('level')) {
+                if (attachment.includes('level') || attachment.includes('img')) {
                     let imageSprite = state.game.add.sprite(0, 0, attachment);
                     imageSprite.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
                     sprite.addChild(imageSprite);
@@ -127,12 +144,11 @@ class AssetLoader {
      * */
     drawAcceptCancelButtons(okLocation, cancelLocation, state) {
         let arr = [];
-        debugger;
         console.log('drawing buttons');
         arr = this.drawBoxes(1, [okLocation], state, null, true, GameConstants_1.UIComponents.YES_BUTTON);
         arr.push(this.drawBoxes(1, [cancelLocation], state, null, true, GameConstants_1.UIComponents.NO_BUTTON)[0]);
         arr.forEach((value, index) => {
-            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
         });
         return arr;
     }
@@ -151,16 +167,32 @@ class AssetLoader {
             new vector_1.default(state.game.world.centerX, state.game.world.centerY + 10)
         ], state, textArr);
         arr.forEach((value, index) => {
-            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
             config.setSprite(GameConstants_1.MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
+            state.game.camera.focusOn(value);
+            value.bringToTop();
         });
         let map;
-        map = config.fakeTileMap = state.game.add.tilemap(GameConstants_1.Levels.LEVEL_ONE);
-        map.addTilesetImage(GameConstants_1.TileLayers.GRASS_LAYER, GameConstants_1.TileLayers.GRASS_LAYER);
-        map.addTilesetImage(GameConstants_1.TileLayers.BACKGROUND, GameConstants_1.TileLayers.BACKGROUND);
-        map.createLayer('SkyPrimary').resizeWorld();
-        map.createLayer('GroundSecondary').resizeWorld();
-        map.createLayer('GroundPrimary').resizeWorld();
+        if (!this._fakeMapExists) {
+            map = config.fakeTileMap = state.game.add.tilemap(GameConstants_1.Levels.LEVEL_ONE);
+            map.addTilesetImage(GameConstants_1.TileLayers.GRASS_LAYER, GameConstants_1.TileLayers.GRASS_LAYER);
+            map.addTilesetImage(GameConstants_1.TileLayers.BACKGROUND, GameConstants_1.TileLayers.BACKGROUND);
+            map.createLayer('SkyPrimary').resizeWorld();
+            map.createLayer('GroundSecondary').resizeWorld();
+            map.createLayer('GroundPrimary').resizeWorld();
+            this._fakeMapExists = true;
+            this._fakeMap = map;
+        }
+        config.getSprite(GameConstants_1.MainMenuButtons.NEW_GAME).events.onInputDown.add(() => {
+            this._fakeMapExists ? this._fakeMap.destroy() : null;
+            console.log(data_config_1.DataConfig.level);
+            state.game.state.start(GameConstants_1.States.GAME_STATE); // Phaser cant detect start on first state???
+        });
+        config.getSprite(GameConstants_1.MainMenuButtons.PREFERENCES).events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
+        });
         return config;
     }
     /**
@@ -177,7 +209,7 @@ class AssetLoader {
                     state.game.add.tween(sprite.scale).to({
                         x: 0.0,
                         y: 0.0
-                    }, 2400, Phaser.Easing.Linear.None, true).onComplete.add(() => {
+                    }, 1000, Phaser.Easing.Linear.None, true).onComplete.add(() => {
                         sprite.destroy();
                         resolve();
                     });
@@ -197,17 +229,87 @@ class AssetLoader {
      * */
     drawPreferences(state) {
         let config = new menu_config_1.MenuConfig();
-        let textArr = ['Select Level', 'Select Player', 'Select Difficulty'];
-        let arr = this.drawBoxes(3, [
+        let textArr = ['Select Level', 'Select Player', 'Select Difficulty', 'Back'];
+        let arr = this.drawBoxes(4, [
             new vector_1.default(state.game.world.centerX, state.game.world.centerY - 110),
             new vector_1.default(state.game.world.centerX, state.game.world.centerY - 50),
-            new vector_1.default(state.game.world.centerX, state.game.world.centerY + 10)
+            new vector_1.default(state.game.world.centerX, state.game.world.centerY + 10),
+            new vector_1.default(state.game.world.centerX, state.game.world.centerY + 70)
         ], state, textArr);
         arr.forEach((value, index) => {
-            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
             config.setSprite(GameConstants_1.MainMenuButtons[textArr[index].toUpperCase().replace(' ', '_')], value);
             // Gives the change of scenery effect
             state.game.camera.focusOn(value);
+        });
+        // Back Button
+        config.getSprite(GameConstants_1.MainMenuButtons.BACK).events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawMainMenu(state);
+            });
+        });
+        // Select level Button
+        config.getSprite(GameConstants_1.MainMenuButtons.SELECT_LEVEL).events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, arr);
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                // Preference menu has faded out
+                AssetsUtils.drawLevels(state);
+            });
+        });
+        config.getSprite(GameConstants_1.MainMenuButtons.SELECT_PLAYER).events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, arr);
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                // Preference menu has faded out
+                AssetsUtils.drawPlayerChoice(state);
+            });
+        });
+        return config;
+    }
+    /**
+     * @description
+     * Function to draw the player options of tank choices
+     * @param {Phaser.State} state
+     * @return config
+     * */
+    drawPlayerChoice(state) {
+        let centerX = state.game.world.centerX;
+        let centerY = state.game.world.centerY;
+        let config = new menu_config_1.MenuConfig();
+        let tanks = [
+            GameConstants_1.UIComponents.CANDY_RECON_IMG,
+            GameConstants_1.UIComponents.CANDY_LIGHT_IMG,
+            GameConstants_1.UIComponents.CANDY_HUNTER_IMG,
+            GameConstants_1.UIComponents.CANDY_ARTILLERY_IMG,
+            GameConstants_1.UIComponents.CANDY_FORTRESS_IMG
+        ];
+        let vecs = [
+            new vector_1.default(centerX, centerY),
+            new vector_1.default(centerX + 110, centerY),
+            new vector_1.default(centerX + 220, centerY),
+            new vector_1.default(centerX, centerY + 110),
+            new vector_1.default(centerX + 110, centerY + 110)
+        ];
+        let arr = AssetsUtils.drawBoxes(tanks.length, vecs, state, tanks, true, GameConstants_1.UIComponents.PANEL);
+        arr.forEach((value, index) => {
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
+            config.setSprite(GameConstants_1.UIComponents[tanks[index].toUpperCase().replace(' ', '_')], value);
+            // Gives the change of scenery effect
+        });
+        let lastSprite = arr[arr.length - 2];
+        let bArr = AssetsUtils.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - 30, lastSprite.y + 100), new vector_1.default(lastSprite.x + 10, lastSprite.y + 100), state);
+        bArr[0].events.onInputDown.add(() => {
+            data_config_1.DataConfig.applyCahnges();
+            AssetsUtils.fadeoutSprites(state, bArr);
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
+        });
+        bArr[1].events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, bArr);
+            data_config_1.DataConfig.revertChanges();
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
         });
         return config;
     }
@@ -220,14 +322,41 @@ class AssetLoader {
         let centerX = state.game.world.centerX;
         let centerY = state.game.world.centerY;
         let config = new menu_config_1.MenuConfig();
-        let levels = [GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, GameConstants_1.UIComponents.LEVEL_ONE_IMAGE];
+        let levels = [GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, GameConstants_1.UIComponents.LEVEL_TWO_IMAGE];
         let arr = this.drawBoxes(2, [
             new vector_1.default(centerX, centerY),
             new vector_1.default(centerX + 110, centerY)
         ], state, levels, true, GameConstants_1.UIComponents.PANEL);
         arr.forEach((value, index) => {
-            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 2400, Phaser.Easing.Bounce.Out, true);
-            config.setSprite(GameConstants_1.UIComponents[levels[index].toUpperCase().replace(' ', '_')], value);
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
+            let name = GameConstants_1.UIComponents[levels[index].toUpperCase().replace(' ', '_')];
+            config.setSprite(name, value);
+            value.events.onInputDown.add(() => {
+                let lName = name.toString();
+                if (lName.includes('one')) {
+                    data_config_1.DataConfig.level = GameConstants_1.Levels.LEVEL_ONE;
+                }
+                else if (lName.includes('two')) {
+                    data_config_1.DataConfig.level = GameConstants_1.Levels.LEVEL_TWO;
+                }
+            });
+        });
+        // Setup ok/no buttons
+        let lastSprite = arr[arr.length - 1];
+        let bArr = AssetsUtils.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - arr.length * 50, lastSprite.y + 100), new vector_1.default(lastSprite.x - (arr.length - 1) * 50, lastSprite.y + 100), state);
+        bArr[0].events.onInputDown.add(() => {
+            data_config_1.DataConfig.applyCahnges();
+            AssetsUtils.fadeoutSprites(state, bArr);
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
+        });
+        bArr[1].events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, bArr);
+            data_config_1.DataConfig.revertChanges();
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
         });
         return config;
     }

@@ -42,6 +42,7 @@ class TankWorldFactory {
     }
     init() {
         // init collision groups
+        this._currentLevel.init();
         this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._bulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
@@ -72,8 +73,7 @@ class TankWorldFactory {
             new collisions_component_1.CollisionsComponent()]);
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
-            .addPhysics()
-            .delayGravity(false);
+            .addPhysics();
         player.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.CANDY_HUNTER);
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)

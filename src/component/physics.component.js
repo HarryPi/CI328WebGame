@@ -7,19 +7,11 @@ class PhysicsComponent extends component_1.Component {
         super(GameConstants_1.ComponentType.PHYSICS);
         this._game = game;
     }
-    addPhysics(gravity = true) {
+    addPhysics(drag = true) {
         this._game.physics.p2.enable(this.target.sprite);
         this.target.sprite.anchor.setTo(0.5, 0.5);
-        gravity ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
+        drag ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
         return this;
-    }
-    delayGravity(bool = true, delay = 2000) {
-        this.target.sprite.body.enableGravity = false;
-        if (bool) {
-            setInterval(() => {
-                this.target.sprite.body.enableGravity = true;
-            }, delay);
-        }
     }
     flipSprite() {
         this.target.sprite.scale.x = -1;
