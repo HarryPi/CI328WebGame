@@ -12,8 +12,13 @@ export class DataConfig {
    * */
   private static _shadowLevel: Levels;
   private static _level: Levels = Levels.LEVEL_TWO;
-  public static readonly tankParams = new Map<TankLayout, object>()
-    .set(TankLayout.CANDY_RECON, {});
+  private static _tank: TankLayout.CANDY_RECON
+    | TankLayout.CANDY_ARTILLERY
+    | TankLayout.CANDY_FORTRESS
+    | TankLayout.CANDY_HUNTER
+    | TankLayout.CANDY_LIGHT
+    = TankLayout.CANDY_HUNTER;
+
   /**
    * @static
    * Returns the selected level
@@ -21,6 +26,7 @@ export class DataConfig {
   static get level(): Levels {
     return this._level;
   }
+
   /**
    * @static
    * Sets the playable level
@@ -29,6 +35,14 @@ export class DataConfig {
   static set level(value: Levels) {
     this._shadowLevel = this._level;
     this._level = value;
+  }
+
+  static set tank(value: TankLayout.CANDY_RECON | TankLayout.CANDY_ARTILLERY | TankLayout.CANDY_FORTRESS | TankLayout.CANDY_HUNTER | TankLayout.CANDY_LIGHT) {
+    this._tank = value;
+  }
+
+  static get tank(): TankLayout.CANDY_RECON | TankLayout.CANDY_ARTILLERY | TankLayout.CANDY_FORTRESS | TankLayout.CANDY_HUNTER | TankLayout.CANDY_LIGHT {
+    return this._tank;
   }
 
   /**
@@ -60,4 +74,5 @@ export class DataConfig {
   static applyCahnges(): void {
     this._shadowLevel = null;
   }
+
 }

@@ -17,6 +17,8 @@ const firing_state_1 = require("./fsm/firing.state");
 const owner_component_1 = require("./component/owner.component");
 const guid_1 = require("./util/guid");
 const flee_state_1 = require("./fsm/flee.state");
+const tank_component_1 = require("./component/tank.component");
+const data_config_1 = require("./config/data.config");
 /**
  * @class TankWorldFactory
  * @description
@@ -70,7 +72,9 @@ class TankWorldFactory {
             new physics_component_1.PhysicsComponent(this._game),
             new shoot_component_1.ShootComponent(this._game, this),
             new layer_component_1.LayerComponent(),
-            new collisions_component_1.CollisionsComponent()]);
+            new collisions_component_1.CollisionsComponent(),
+            new tank_component_1.TankComponent(data_config_1.DataConfig.tank)]);
+        //todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics();

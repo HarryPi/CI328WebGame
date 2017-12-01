@@ -18,7 +18,8 @@ import { FiringState } from './fsm/firing.state';
 import { OwnerComponent } from './component/owner.component';
 import { Guid } from './util/guid';
 import { FleeState } from './fsm/flee.state';
-import { forEachToken } from 'tslint';
+import {TankComponent} from './component/tank.component';
+import {DataConfig} from './config/data.config';
 
 /**
  * @class TankWorldFactory
@@ -98,7 +99,9 @@ export default class TankWorldFactory {
           new PhysicsComponent(this._game),
           new ShootComponent(this._game, this),
           new LayerComponent(),
-          new CollisionsComponent()]);
+          new CollisionsComponent(),
+          new TankComponent(DataConfig.tank)]);
+    //todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
 
     player.getComponent<CameraComponent>(ComponentType.CAMERA).setFocus(player.sprite);
     player.getComponent<PhysicsComponent>(ComponentType.PHYSICS)

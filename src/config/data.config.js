@@ -22,6 +22,12 @@ class DataConfig {
         this._shadowLevel = this._level;
         this._level = value;
     }
+    static set tank(value) {
+        this._tank = value;
+    }
+    static get tank() {
+        return this._tank;
+    }
     /**
      * @description
      * Checks if the any of the data has been changed see {@link DataConfig}
@@ -49,7 +55,6 @@ class DataConfig {
     }
 }
 DataConfig._level = GameConstants_1.Levels.LEVEL_TWO;
-DataConfig.tankParams = new Map()
-    .set(GameConstants_1.TankLayout.CANDY_RECON, {});
+DataConfig._tank = GameConstants_1.TankLayout.CANDY_HUNTER;
 exports.DataConfig = DataConfig;
 //# sourceMappingURL=data.config.js.map

@@ -1,5 +1,6 @@
 import { Component } from './component';
 import { ComponentType, InputType } from '../constants/GameConstants';
+import {TankComponent} from './tank.component';
 
 export class MovableComponent extends Component {
 
@@ -21,10 +22,10 @@ export class MovableComponent extends Component {
   }
 
   private moveRight(): void {
-    this.target.sprite.body.moveRight(this._speed);
+    this.target.sprite.body.moveRight(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
   }
   private moveLeft(): void {
-    this.target.sprite.body.moveLeft(this._speed);
+    this.target.sprite.body.moveLeft(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
   }
   public update(){
     switch (this._direction) {

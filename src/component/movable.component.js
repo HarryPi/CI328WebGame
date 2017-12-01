@@ -17,10 +17,10 @@ class MovableComponent extends component_1.Component {
         }
     }
     moveRight() {
-        this.target.sprite.body.moveRight(this._speed);
+        this.target.sprite.body.moveRight(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
     }
     moveLeft() {
-        this.target.sprite.body.moveLeft(this._speed);
+        this.target.sprite.body.moveLeft(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
     }
     update() {
         switch (this._direction) {
