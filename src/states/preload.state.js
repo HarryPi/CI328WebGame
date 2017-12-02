@@ -6,7 +6,6 @@ const Assets_1 = require("../UI/Assets");
 class PreloadState extends state_1.default {
     constructor() {
         super();
-        console.log(this.load);
     }
     preload() {
         Assets_1.default.setLoadingScreen(this);

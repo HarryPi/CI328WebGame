@@ -11,7 +11,7 @@ export class DataConfig {
    * Represents the level selected by the player
    * */
   private static _shadowLevel: Levels;
-  private static _level: Levels = Levels.LEVEL_TWO;
+  private static _level: Levels = Levels.LEVEL_ONE;
   private static _tank: TankLayout.CANDY_RECON
     | TankLayout.CANDY_ARTILLERY
     | TankLayout.CANDY_FORTRESS

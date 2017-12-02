@@ -54,7 +54,7 @@ class DataConfig {
         this._shadowLevel = null;
     }
 }
-DataConfig._level = GameConstants_1.Levels.LEVEL_TWO;
+DataConfig._level = GameConstants_1.Levels.LEVEL_ONE;
 DataConfig._tank = GameConstants_1.TankLayout.CANDY_HUNTER;
 exports.DataConfig = DataConfig;
 //# sourceMappingURL=data.config.js.map

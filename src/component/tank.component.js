@@ -2,57 +2,70 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 const component_1 = require("./component");
+const tank_util_1 = require("../UI/tank.util");
 class TankComponent extends component_1.Component {
     constructor(tankKind) {
         super(GameConstants_1.ComponentType.TANK);
         this._tankKind = tankKind;
     }
     get bulletSpeed() {
-        switch (this._tankKind) {
-            case GameConstants_1.TankLayout.CANDY_LIGHT:
-                return 1000;
-            case GameConstants_1.TankLayout.CANDY_HUNTER:
-                return 1250;
-            case GameConstants_1.TankLayout.CANDY_FORTRESS:
-                return 2000;
-            case GameConstants_1.TankLayout.CANDY_ARTILLERY:
-                return 2500;
-            case GameConstants_1.TankLayout.CANDY_RECON:
-                return 1250;
-            default:
-                break;
+        if (tank_util_1.TankUtil.isLightTank(this._tankKind)) {
+            return 250;
+        }
+        else if (tank_util_1.TankUtil.isHunterTank(this._tankKind)) {
+            return 375;
+        }
+        else if (tank_util_1.TankUtil.isFortressTank(this._tankKind)) {
+            return 500;
+        }
+        else if (tank_util_1.TankUtil.isArtilleryTank(this._tankKind)) {
+            return 500;
+        }
+        else if (tank_util_1.TankUtil.isReconTank(this._tankKind)) {
+            return 375;
+        }
+        else {
+            throw new Error('NO TANK FOUND TO SET BULLET SPEED');
         }
     }
     get bulletKind() {
-        switch (this._tankKind) {
-            case GameConstants_1.TankLayout.CANDY_LIGHT:
-                return GameConstants_1.TankLayout.BULLET_ONE;
-            case GameConstants_1.TankLayout.CANDY_HUNTER:
-                return GameConstants_1.TankLayout.BULLET_THREE;
-            case GameConstants_1.TankLayout.CANDY_FORTRESS:
-                return GameConstants_1.TankLayout.BULLET_SIX;
-            case GameConstants_1.TankLayout.CANDY_ARTILLERY:
-                return GameConstants_1.TankLayout.BULLET_FOUR;
-            case GameConstants_1.TankLayout.CANDY_RECON:
-                return GameConstants_1.TankLayout.BULLET_FIVE;
-            default:
-                break;
+        if (tank_util_1.TankUtil.isLightTank(this._tankKind)) {
+            return GameConstants_1.TankLayout.BULLET_ONE;
+        }
+        else if (tank_util_1.TankUtil.isHunterTank(this._tankKind)) {
+            return GameConstants_1.TankLayout.BULLET_THREE;
+        }
+        else if (tank_util_1.TankUtil.isFortressTank(this._tankKind)) {
+            return GameConstants_1.TankLayout.BULLET_SIX;
+        }
+        else if (tank_util_1.TankUtil.isArtilleryTank(this._tankKind)) {
+            return GameConstants_1.TankLayout.BULLET_FOUR;
+        }
+        else if (tank_util_1.TankUtil.isReconTank(this._tankKind)) {
+            return GameConstants_1.TankLayout.BULLET_FIVE;
+        }
+        else {
+            throw new Error('NO TANK FOUND TO SET BULLET KIND');
         }
     }
     get speed() {
-        switch (this._tankKind) {
-            case GameConstants_1.TankLayout.CANDY_LIGHT:
-                return 200;
-            case GameConstants_1.TankLayout.CANDY_HUNTER:
-                return 200;
-            case GameConstants_1.TankLayout.CANDY_FORTRESS:
-                return 100;
-            case GameConstants_1.TankLayout.CANDY_ARTILLERY:
-                return 100;
-            case GameConstants_1.TankLayout.CANDY_RECON:
-                return 250;
-            default:
-                break;
+        if (tank_util_1.TankUtil.isLightTank(this._tankKind)) {
+            return 200;
+        }
+        else if (tank_util_1.TankUtil.isHunterTank(this._tankKind)) {
+            return 200;
+        }
+        else if (tank_util_1.TankUtil.isFortressTank(this._tankKind)) {
+            return 100;
+        }
+        else if (tank_util_1.TankUtil.isArtilleryTank(this._tankKind)) {
+            return 100;
+        }
+        else if (tank_util_1.TankUtil.isReconTank(this._tankKind)) {
+            return 250;
+        }
+        else {
+            throw new Error('NO TANK FOUND TO SET BULLET KIND');
         }
     }
 }

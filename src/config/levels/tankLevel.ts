@@ -1,5 +1,7 @@
 import { Entity } from '../../entities/entity';
 import Vector from '../../util/vector';
+import { TankLayout } from '../../constants/GameConstants';
+import { MathUtil } from '../../util/math.util';
 
 export default abstract class TankLevel {
   // vars
@@ -14,6 +16,7 @@ export default abstract class TankLevel {
   protected _enemiesCount: number; // total of enemies the level will have
   protected _enemiesSpawnTime: number;
   protected _totalEnemies: number;
+  protected _enemyTankKind: Array<TankLayout>;
 
   constructor(game: Phaser.Game){
     this._game = game;
@@ -84,5 +87,11 @@ export default abstract class TankLevel {
    * */
   get capEnemies(): number {
     return this._capEnemies;
+  }
+
+  getRandomEnemy(): TankLayout {
+    let toREturn = this._enemyTankKind[MathUtil.randomIntFromInterval(0, 4)];
+    console.log(toREturn);
+    return toREturn;
   }
 }

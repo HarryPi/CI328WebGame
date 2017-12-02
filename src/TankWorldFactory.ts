@@ -20,6 +20,7 @@ import { Guid } from './util/guid';
 import { FleeState } from './fsm/flee.state';
 import {TankComponent} from './component/tank.component';
 import {DataConfig} from './config/data.config';
+import game = PIXI.game;
 
 /**
  * @class TankWorldFactory
@@ -101,13 +102,14 @@ export default class TankWorldFactory {
           new LayerComponent(),
           new CollisionsComponent(),
           new TankComponent(DataConfig.tank)]);
-    //todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
+
+    // todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
 
     player.getComponent<CameraComponent>(ComponentType.CAMERA).setFocus(player.sprite);
     player.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics();
 
-    player.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.CANDY_HUNTER);
+    player.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(DataConfig.tank);
 
     player.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._tankCollisionGroup)
@@ -129,6 +131,8 @@ export default class TankWorldFactory {
    * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
    * */
   public newEnemy() {
+    let kindOfTank: TankLayout = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
+                                                                    // Get one store it and use it where appropriate
     let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
       .withComponent(
         [
@@ -138,7 +142,9 @@ export default class TankWorldFactory {
           new LayerComponent(),
           new CollisionsComponent(),
           new StateComponent(),
-          new AiComponent(this._player)]);
+          new AiComponent(this._player),
+          new TankComponent(kindOfTank)
+  ]);
 
     enemy.getComponent<StateComponent>(ComponentType.STATE)
       .addState(FSMStates.SEEK, new SeekState())
@@ -151,7 +157,8 @@ export default class TankWorldFactory {
       .addPhysics()
       .flipSprite();
 
-    enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(TankLayout.DARK_ARTILLERY);
+    enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(kindOfTank);
+
     enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._enemyTankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])

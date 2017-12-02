@@ -5,7 +5,6 @@ const GameConstants_1 = require("../constants/GameConstants");
 class MovableComponent extends component_1.Component {
     constructor() {
         super(GameConstants_1.ComponentType.MOVABLE);
-        this._speed = 300;
         this._isMoving = false;
     }
     _correctRotation() {

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const math_util_1 = require("../../util/math.util");
 class TankLevel {
     constructor(game) {
         this._game = game;
@@ -56,6 +57,11 @@ class TankLevel {
      * */
     get capEnemies() {
         return this._capEnemies;
+    }
+    getRandomEnemy() {
+        let toREturn = this._enemyTankKind[math_util_1.MathUtil.randomIntFromInterval(0, 4)];
+        console.log(toREturn);
+        return toREturn;
     }
 }
 exports.default = TankLevel;

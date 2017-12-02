@@ -74,11 +74,11 @@ class TankWorldFactory {
             new layer_component_1.LayerComponent(),
             new collisions_component_1.CollisionsComponent(),
             new tank_component_1.TankComponent(data_config_1.DataConfig.tank)]);
-        //todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
+        // todo: 01/12/2017 Task 1 | Make sure Dataconfig gets the selection - Task 2 | Make sure each level defines what tank layouts it will use - Task 3 | Make sure each enemy spawn is a random selectio of that layout
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics();
-        player.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.CANDY_HUNTER);
+        player.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(data_config_1.DataConfig.tank);
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
@@ -96,6 +96,8 @@ class TankWorldFactory {
      * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
      * */
     newEnemy() {
+        let kindOfTank = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
+        // Get one store it and use it where appropriate
         let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
             .withComponent([
             new movable_component_1.MovableComponent(),
@@ -104,7 +106,8 @@ class TankWorldFactory {
             new layer_component_1.LayerComponent(),
             new collisions_component_1.CollisionsComponent(),
             new state_component_1.StateComponent(),
-            new ai_component_1.AiComponent(this._player)
+            new ai_component_1.AiComponent(this._player),
+            new tank_component_1.TankComponent(kindOfTank)
         ]);
         enemy.getComponent(GameConstants_1.ComponentType.STATE)
             .addState(GameConstants_1.FSMStates.SEEK, new seek_state_1.SeekState())
@@ -115,7 +118,7 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
             .flipSprite();
-        enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(GameConstants_1.TankLayout.DARK_ARTILLERY);
+        enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(kindOfTank);
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._enemyTankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])

@@ -5,7 +5,6 @@ import AssetsUtils from '../UI/Assets';
 export class PreloadState extends State {
   constructor() {
     super();
-    console.log(this.load);
   }
 
   preload() {
