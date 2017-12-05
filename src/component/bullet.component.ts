@@ -3,7 +3,8 @@ import { ComponentType } from '../constants/GameConstants';
 import { OwnerComponent } from './owner.component';
 import { AiComponent } from './ai.component';
 import { TankComponent } from './tank.component';
-import {MathUtil} from '../util/math.util';
+import { MathUtil } from '../util/math.util';
+import { DataConfig } from '../config/data.config';
 
 export class BulletComponent extends Component {
   private _game: Phaser.Game;
@@ -13,6 +14,7 @@ export class BulletComponent extends Component {
     super(ComponentType.BULLET);
     this._game = game;
     this._requiredComponents.push(ComponentType.OWNER);
+    this._requiredComponents.push(ComponentType.LAYER);
   }
 
   /**
@@ -35,7 +37,7 @@ export class BulletComponent extends Component {
     }
 
     let seekObject = {
-      x: this._game.input.activePointer.x,
+      x: this._game.input.activePointer.x + this._game.camera.x,
       y: this._game.input.activePointer.y
     };
 
@@ -54,21 +56,18 @@ export class BulletComponent extends Component {
 
   private accelerateToObject(obj1, obj2, velocity = 500) {
     let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
-    /*let canHit = MathUtil.canHitCoordinate(obj2.x, obj2.y, velocity, 1400);*/
-    let aiComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER).owner.getComponent<AiComponent>(ComponentType.AI);
+/*
+    let angle = -45;
+    velocity = (obj2.x) - obj1.x  + velocity;*/
 
-   /* while (!canHit) {
-      velocity += 50;
-      canHit = MathUtil.canHitCoordinate(obj2.x, obj2.y, velocity, 1400);
-      console.log(velocity);
-    }
-    console.log(canHit);*/
-
-
+    let aiComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER)
+      .owner.getComponent<AiComponent>(ComponentType.AI);
     aiComponent
-      ? obj1.body.velocity.x = Math.cos(angle - Math.PI / 180) * velocity
+      ? obj1.body.velocity.x = Math.cos(angle - Math.PI / 180) * velocity + 200 * DataConfig.difficulty
       : obj1.body.velocity.x = Math.abs(Math.cos(angle - Math.PI / 180) * velocity);
-    obj1.body.velocity.y = (Math.sin(angle - Math.PI / 180) * velocity - 700);
+    aiComponent
+      ? obj1.body.velocity.y = Math.sin(angle - Math.PI / 180) * velocity
+      : obj1.body.velocity.y = (Math.sin(angle - Math.PI / 180) * velocity) - 100 * DataConfig.difficulty;
   }
 
 }

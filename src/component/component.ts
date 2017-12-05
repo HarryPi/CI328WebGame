@@ -22,6 +22,16 @@ export abstract class Component {
     this._target = target;
   }
 
-
+  public validateComponentRequirments(){
+    let errorString: string = '';
+    this._requiredComponents.forEach((comp: ComponentType) => {
+      if (!this._target.getComponent(comp)) {
+        errorString += `Missing component: ${comp.toString()} from component: ${this._name}}`;
+      }
+    });
+    if (errorString) {
+      throw new Error(errorString);
+    }
+  }
   public update(params?: any): void {}
 }

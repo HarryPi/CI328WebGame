@@ -3,10 +3,13 @@ import { States } from '../constants/GameConstants';
 import AssetsUtils from '../UI/Assets';
 
 export class PreloadState extends State {
+  private _args = {};
   constructor() {
     super();
   }
-
+  init(args){
+    this._args = args;
+  }
   preload() {
 
     AssetsUtils.setLoadingScreen(this);
@@ -22,7 +25,7 @@ export class PreloadState extends State {
 
   create() {
     // todo: Set main menu instead of level one
-    this.game.state.start(States.MAIN_MENU_STATE);
+    this.game.state.start(States.MAIN_MENU_STATE, true, false, this._args);
   }
 
   update() {

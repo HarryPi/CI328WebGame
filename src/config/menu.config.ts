@@ -1,11 +1,11 @@
-import {MainMenuButtons, UIComponents} from '../constants/GameConstants';
+import {Difficulty, MainMenuButtons, UIComponents} from '../constants/GameConstants';
 
 /**
  * @class
  * As the only way to create a menu in phaser is sprites we need a class to store and retrieve them
  * */
 export class MenuConfig {
-  private _mapSprites: Map<MainMenuButtons | UIComponents, Phaser.Sprite>;
+  private _mapSprites: Map<MainMenuButtons | UIComponents | Difficulty, Phaser.Sprite>;
   private _spriteGroups: Map<string, Array<Phaser.Sprite>>;
   private _fakeTileMap: Phaser.Tilemap;
 
@@ -20,11 +20,11 @@ export class MenuConfig {
    * @param {MainMenuButtons | UIComponents} name
    * @return {Phaser.Sprite} sprite
    * */
-  public getSprite(name: MainMenuButtons | UIComponents): Phaser.Sprite {
+  public getSprite(name: MainMenuButtons | UIComponents | Difficulty): Phaser.Sprite {
     return this._mapSprites.get(name);
   }
 
-  public setSprite(name: MainMenuButtons, sprite: Phaser.Sprite) {
+  public setSprite(name: MainMenuButtons | UIComponents | Difficulty, sprite: Phaser.Sprite) {
     if (!this._mapSprites.has(name)) {
       this._mapSprites.set(name, sprite);
     }

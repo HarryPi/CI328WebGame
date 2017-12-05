@@ -17,7 +17,7 @@ class GameState extends state_1.default {
         // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
         this._levels.set(GameConstants_1.Levels.LEVEL_ONE, new levelOne_1.LevelOne(this.game));
         this._levels.set(GameConstants_1.Levels.LEVEL_TWO, new levelTwo_1.LevelTwo(this.game));
-        this._factory = new TankWorldFactory_1.default(this.game);
+        this._factory = new TankWorldFactory_1.default(this.game, this);
         this._factory.currentLevel = this._levels.get(data_config_1.DataConfig.level);
         this._factory.init(); // Initialise collision groups
     }
@@ -43,6 +43,7 @@ class GameState extends state_1.default {
     shutdown() {
         // Ensure no memory leaks
         this._inputSubscription.unsubscribe();
+        this._factory.cleanUp();
     }
 }
 exports.GameState = GameState;

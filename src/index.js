@@ -11,6 +11,7 @@ const preload_state_1 = require("./states/preload.state");
 const game_state_1 = require("./states/game.state");
 const mainMenu_state_1 = require("./states/mainMenu.state");
 const ScreenMetrics_1 = require("./util/ScreenMetrics");
+const gameover_state_1 = require("./states/gameover.state");
 // The main class of our application
 class App extends Phaser.Game {
     constructor(config) {
@@ -19,6 +20,7 @@ class App extends Phaser.Game {
         this.state.add(GameConstants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
         this.state.add(GameConstants_1.States.GAME_STATE, game_state_1.GameState);
         this.state.add(GameConstants_1.States.MAIN_MENU_STATE, mainMenu_state_1.MainMenuState);
+        this.state.add(GameConstants_1.States.GAMEOVER_SATE, gameover_state_1.GameoverState);
         this.state.start(GameConstants_1.States.BOOT_STATE);
     }
 }

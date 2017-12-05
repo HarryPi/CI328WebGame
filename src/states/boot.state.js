@@ -7,6 +7,9 @@ class BootState extends state_1.default {
     constructor() {
         super();
     }
+    init(args) {
+        this._args = args;
+    }
     preload() {
         Assets_1.default.init(this.load);
         Assets_1.default.loadBoot();
@@ -17,7 +20,7 @@ class BootState extends state_1.default {
     }
     create() {
         this.game.stage.backgroundColor = '#FFF';
-        this.game.state.start(GameConstants_1.States.PRELOAD_STATE);
+        this.game.state.start(GameConstants_1.States.PRELOAD_STATE, true, false, this._args);
     }
 }
 exports.BootState = BootState;

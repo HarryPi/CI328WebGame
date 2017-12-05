@@ -23,6 +23,7 @@ class PhysicsComponent extends component_1.Component {
         this.target.sprite.body.velocity.x = 0;
         this.target.sprite.body.velocity.y = 0;
         this.target.sprite.body.allowGravity = false;
+        this.target.sprite.body.data.gravityScale = 0;
         this.target.sprite.body.angularDumping = 1;
     }
 }

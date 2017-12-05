@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
+const Subject_1 = require("rxjs/Subject");
 /**
  * @class Entity
  * @description
@@ -11,12 +12,16 @@ const GameConstants_1 = require("../constants/GameConstants");
 class Entity {
     constructor(game, x, y, components) {
         this._components = new Map();
+        this._whenDestroyed = new Subject_1.Subject();
         if (components) {
             components.forEach((component) => {
                 this.addComponent(component);
             });
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
+        this._components.forEach((comp) => {
+            comp.validateComponentRequirments();
+        });
     }
     addComponent(component) {
         this._components.set(component.name, component);
@@ -51,8 +56,18 @@ class Entity {
             return this;
         }
     }
-    get components() {
-        return this._components;
+    destroy() {
+        try {
+            this._components.clear();
+            this._sprite.destroy();
+            this._whenDestroyed.next();
+        }
+        catch (e) {
+            this._whenDestroyed.error(e);
+        }
+    }
+    get whenDestroyed() {
+        return this._whenDestroyed;
     }
     get sprite() {
         return this._sprite;

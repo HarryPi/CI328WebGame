@@ -37,15 +37,15 @@ export class TankComponent extends Component {
 
   get bulletSpeed(): number {
     if (TankUtil.isLightTank(this._tankKind)) {
-      return 250;
+      return 700;
     } else if (TankUtil.isHunterTank(this._tankKind)) {
-      return 375;
+      return 1000;
     } else if (TankUtil.isFortressTank(this._tankKind)) {
-      return 500;
+      return 850;
     } else if (TankUtil.isArtilleryTank(this._tankKind)) {
-      return 500;
+      return 1200;
     } else if (TankUtil.isReconTank(this._tankKind)) {
-      return 375;
+      return 800;
     } else {
       throw new Error('NO TANK FOUND TO SET BULLET SPEED');
     }

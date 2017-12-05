@@ -1,4 +1,4 @@
-import {Levels, TankLayout} from '../constants/GameConstants';
+import { Difficulty, Levels, TankLayout } from '../constants/GameConstants';
 import TankLevel from './levels/tankLevel';
 
 /**
@@ -18,7 +18,9 @@ export class DataConfig {
     | TankLayout.CANDY_HUNTER
     | TankLayout.CANDY_LIGHT
     = TankLayout.CANDY_HUNTER;
-
+  private static _difficulty: Difficulty = Difficulty.NORMAL;
+  private static _shadowTank: TankLayout.CANDY_RECON | TankLayout.CANDY_ARTILLERY | TankLayout.CANDY_FORTRESS | TankLayout.CANDY_HUNTER | TankLayout.CANDY_LIGHT;
+  private static _shadowDifficulty: Difficulty;
   /**
    * @static
    * Returns the selected level
@@ -38,6 +40,7 @@ export class DataConfig {
   }
 
   static set tank(value: TankLayout.CANDY_RECON | TankLayout.CANDY_ARTILLERY | TankLayout.CANDY_FORTRESS | TankLayout.CANDY_HUNTER | TankLayout.CANDY_LIGHT) {
+    this._shadowTank = this._tank;
     this._tank = value;
   }
 
@@ -64,6 +67,8 @@ export class DataConfig {
    * */
   static revertChanges(): void {
     this._shadowLevel ? this._level = this._shadowLevel : this._level = this._level;
+    this._shadowTank ? this._tank = this._shadowTank : this._tank = this._tank;
+    this._shadowDifficulty ? this._difficulty = this._shadowDifficulty : this._difficulty = this._difficulty;
     DataConfig.applyCahnges();
   }
 
@@ -73,6 +78,74 @@ export class DataConfig {
    * */
   static applyCahnges(): void {
     this._shadowLevel = null;
+    this._shadowTank = null;
+    this._shadowDifficulty = null;
   }
 
+
+  static get health(): number {
+    switch (this._difficulty) {
+      case Difficulty.EASY:
+        return 7;
+      case Difficulty.NORMAL:
+        return 5;
+      case Difficulty.HARD:
+        return 3;
+      case Difficulty.INSANE:
+        return 1;
+      default:
+        break;
+    }
+  }
+
+  static get enemyHealth(): number {
+    switch (this._difficulty) {
+      case Difficulty.EASY:
+      case Difficulty.NORMAL:
+        return 3;
+      case Difficulty.HARD:
+        return 4;
+      case Difficulty.INSANE:
+        return 5;
+      default:
+        break;
+    }
+  }
+  static get playerDamage(): number {
+    switch (this._difficulty) {
+      case Difficulty.EASY:
+        return 3;
+      case Difficulty.NORMAL:
+        return 2;
+      case Difficulty.HARD:
+        return 1;
+      case Difficulty.INSANE:
+        return 1;
+      default:
+        break;
+    }
+  }
+
+  static get enemyDamage(): number {
+    switch (this._difficulty) {
+      case Difficulty.EASY:
+      case Difficulty.NORMAL:
+        return 1;
+      case Difficulty.HARD:
+        return 2;
+      case Difficulty.INSANE:
+        return 3;
+      default:
+        break;
+    }
+  }
+
+  static get difficulty(): Difficulty {
+    return this._difficulty;
+  }
+
+  static set difficulty(value: Difficulty) {
+    this._shadowDifficulty = this._difficulty;
+    this._difficulty = value;
+  }
 }

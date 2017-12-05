@@ -10,19 +10,19 @@ class TankComponent extends component_1.Component {
     }
     get bulletSpeed() {
         if (tank_util_1.TankUtil.isLightTank(this._tankKind)) {
-            return 250;
+            return 700;
         }
         else if (tank_util_1.TankUtil.isHunterTank(this._tankKind)) {
-            return 375;
+            return 1000;
         }
         else if (tank_util_1.TankUtil.isFortressTank(this._tankKind)) {
-            return 500;
+            return 850;
         }
         else if (tank_util_1.TankUtil.isArtilleryTank(this._tankKind)) {
-            return 500;
+            return 1200;
         }
         else if (tank_util_1.TankUtil.isReconTank(this._tankKind)) {
-            return 375;
+            return 800;
         }
         else {
             throw new Error('NO TANK FOUND TO SET BULLET SPEED');

@@ -14,6 +14,17 @@ class Component {
     set target(target) {
         this._target = target;
     }
+    validateComponentRequirments() {
+        let errorString = '';
+        this._requiredComponents.forEach((comp) => {
+            if (!this._target.getComponent(comp)) {
+                errorString += `Missing component: ${comp.toString()} from component: ${this._name}}`;
+            }
+        });
+        if (errorString) {
+            throw new Error(errorString);
+        }
+    }
     update(params) { }
 }
 exports.Component = Component;

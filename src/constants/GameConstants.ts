@@ -1,4 +1,5 @@
 export enum States {
+  GAMEOVER_SATE = 'gameover_state',
   MAIN_MENU_STATE = 'main_menu_state',
   BOOT_STATE = 'boot_state',
   PRELOAD_STATE = 'preload_state',
@@ -10,7 +11,14 @@ export enum Levels {
   LEVEL_TWO = 'level_two'
 }
 
-export enum   TankLayout {
+export enum Difficulty {
+  INSANE,
+  HARD,
+  NORMAL,
+  EASY
+}
+
+export enum TankLayout {
   GREEN_FORTRESS = 'tanks_tankGreen1.png', GREEN_ARTILERY = 'tanks_tankGreen2.png',
   GREEN_HUNTER = 'tanks_tankGreen3.png', GREEN_RECON = 'tanks_tankGreen4.png',
   GREEN_LIGHT = 'tanks_tankGreen5.png',
@@ -38,9 +46,11 @@ export enum   TankLayout {
   EXPLOSION_TEN = 'tank_explosion10.png',
   EXPLOSION_ELEVEN = 'tank_explosion11.png',
   EXPLOSION_TWELVE = 'tank_explosion12.png',
-  TANK_SPRITESHEET  = 'tankSpritesheet'
+  TANK_SPRITESHEET = 'tankSpritesheet'
 }
+
 export enum ComponentType {
+  HEALTH = 'health_component',
   TANK = 'tank_component',
   OWNER = 'owner_component',
   STATE = 'state_component',
@@ -67,6 +77,7 @@ export enum UIComponents {
   CANDY_FORTRESS_IMG = 'candy_fortress_img', CANDY_ARTILLERY_IMG = 'candy_artillery_img',
   CANDY_HUNTER_IMG = 'candy_hunter_img', CANDY_RECON_IMG = 'candy_recon_img',
   CANDY_LIGHT_IMG = 'candy_light_img'
+
 }
 
 export enum TileLayers {
@@ -91,12 +102,14 @@ export enum Action {
 export enum AnimationTypes {
   EXPLOSION = 'explosion_animation'
 }
+
 export enum FSMStates {
   IDLE,
   SEEK,
   FIRING,
   FLEEING
 }
+
 export enum MainMenuButtons {
   NEW_GAME = 'new_game',
   HIGH_SCORE = 'high_score',

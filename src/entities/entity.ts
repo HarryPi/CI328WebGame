@@ -1,6 +1,8 @@
 import { Component } from '../component/component';
 import { ComponentType, FSMStates, TankLayout } from '../constants/GameConstants';
-import StateMachine from '../fsm/stateMachine';
+import { Notification } from 'rxjs/Notification';
+import { Subject } from 'rxjs/Subject';
+
 /**
  * @class Entity
  * @description
@@ -9,10 +11,9 @@ import StateMachine from '../fsm/stateMachine';
  * Exposes a function to retrieve any component that is loaded to an entity see {@link  Entity#getComponent}
  * */
 export class Entity {
-
   private _components: Map<string, Component> = new Map();
   private _sprite: Phaser.Sprite;
-  private _owner: Entity;
+  private _whenDestroyed: Subject<void> = new Subject();
 
   constructor(game: Phaser.Game, x: number, y: number, components?: Array<Component>) {
     if (components) {
@@ -21,6 +22,9 @@ export class Entity {
         });
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
+    this._components.forEach((comp: Component) => {
+      comp.validateComponentRequirments();
+    });
 
   }
 
@@ -60,12 +64,19 @@ export class Entity {
       return this;
     }
   }
-
-  get components(): Map<string, Component> {
-    return this._components;
+  public destroy(): void {
+    try {
+      this._components.clear();
+      this._sprite.destroy();
+      this._whenDestroyed.next();
+    } catch (e) {
+      this._whenDestroyed.error(e);
+    }
+  }
+  public get whenDestroyed(): Subject<void> {
+    return this._whenDestroyed;
   }
   get sprite(): Phaser.Sprite {
     return this._sprite;
   }
-
 }

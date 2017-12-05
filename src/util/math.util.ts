@@ -59,7 +59,9 @@ export class MathUtil {
    * @return angle in radians
    */
   public static  calculateAngle2ToHitCoordinate(x: number, y: number, velocity: number, gravity: number): number {
-    if (x === 0) { return -Math.PI * 0.5; }
+    if (x === 0) {
+      return -Math.PI * 0.5;
+    }
     let delta: number = MathUtil.calculateDelta(x, y, velocity, gravity);
     let sqrtDelta: number = Math.sqrt(delta);
     return Math.atan((velocity * velocity + sqrtDelta) / (gravity * x));

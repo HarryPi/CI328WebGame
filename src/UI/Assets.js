@@ -159,6 +159,12 @@ class AssetLoader {
      * returns the config file with the sprites
      * */
     drawMainMenu(state) {
+        if (state.key === GameConstants_1.States.GAMEOVER_SATE) {
+            state.game.state.start(GameConstants_1.States.BOOT_STATE, true, true);
+            this._fakeMapExists = false;
+            this._fakeMap = null;
+            return;
+        }
         let textArr = ['New Game', 'High Score', 'Preferences'];
         let config = new menu_config_1.MenuConfig();
         let arr = this.drawBoxes(3, [
@@ -248,6 +254,11 @@ class AssetLoader {
                 AssetsUtils.drawMainMenu(state);
             });
         });
+        config.getSprite(GameConstants_1.MainMenuButtons.SELECT_DIFFICULTY).events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawDifficulty(state);
+            });
+        });
         // Select level Button
         config.getSprite(GameConstants_1.MainMenuButtons.SELECT_LEVEL).events.onInputDown.add(() => {
             AssetsUtils.fadeoutSprites(state, arr);
@@ -295,6 +306,21 @@ class AssetLoader {
             config.setSprite(GameConstants_1.UIComponents[tanks[index].toUpperCase().replace(' ', '_')], value);
             // Gives the change of scenery effect
         });
+        config.getSprite(GameConstants_1.UIComponents.CANDY_ARTILLERY_IMG).events.onInputDown.add(() => {
+            data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_ARTILLERY;
+        });
+        config.getSprite(GameConstants_1.UIComponents.CANDY_FORTRESS_IMG).events.onInputDown.add(() => {
+            data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_FORTRESS;
+        });
+        config.getSprite(GameConstants_1.UIComponents.CANDY_HUNTER_IMG).events.onInputDown.add(() => {
+            data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_HUNTER;
+        });
+        config.getSprite(GameConstants_1.UIComponents.CANDY_LIGHT_IMG).events.onInputDown.add(() => {
+            data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_LIGHT;
+        });
+        config.getSprite(GameConstants_1.UIComponents.CANDY_RECON_IMG).events.onInputDown.add(() => {
+            data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_RECON;
+        });
         let lastSprite = arr[arr.length - 2];
         let bArr = AssetsUtils.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - 30, lastSprite.y + 100), new vector_1.default(lastSprite.x + 10, lastSprite.y + 100), state);
         bArr[0].events.onInputDown.add(() => {
@@ -302,6 +328,68 @@ class AssetLoader {
             AssetsUtils.fadeoutSprites(state, bArr);
             AssetsUtils.fadeoutSprites(state, arr).then(() => {
                 AssetsUtils.drawPreferences(state);
+            });
+        });
+        bArr[1].events.onInputDown.add(() => {
+            AssetsUtils.fadeoutSprites(state, bArr);
+            data_config_1.DataConfig.revertChanges();
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+            });
+        });
+        return config;
+    }
+    drawDifficulty(state) {
+        let centerX = state.game.world.centerX;
+        let centerY = state.game.world.centerY;
+        let config = new menu_config_1.MenuConfig();
+        let difficulties = ['Easy', 'Normal', 'Hard', 'Insane'];
+        let loc = [
+            new vector_1.default(centerX, centerY - 110),
+            new vector_1.default(centerX, centerY - 50),
+            new vector_1.default(centerX, centerY + 10),
+            new vector_1.default(centerX, centerY + 70)
+        ];
+        let arr = AssetsUtils.drawBoxes(4, loc, state, difficulties);
+        arr.forEach((sprite, index) => {
+            state.game.add.tween(sprite.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
+            switch (index) {
+                case 3:
+                    config.setSprite(GameConstants_1.Difficulty.EASY, sprite);
+                    break;
+                case 2:
+                    config.setSprite(GameConstants_1.Difficulty.NORMAL, sprite);
+                    break;
+                case 1:
+                    config.setSprite(GameConstants_1.Difficulty.HARD, sprite);
+                    break;
+                case 0:
+                    config.setSprite(GameConstants_1.Difficulty.INSANE, sprite);
+                    break;
+                default:
+                    break;
+            }
+        });
+        config.getSprite(GameConstants_1.Difficulty.EASY).events.onInputDown.add(() => {
+            data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.EASY;
+        });
+        config.getSprite(GameConstants_1.Difficulty.NORMAL).events.onInputDown.add(() => {
+            data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.NORMAL;
+        });
+        config.getSprite(GameConstants_1.Difficulty.HARD).events.onInputDown.add(() => {
+            data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.HARD;
+        });
+        config.getSprite(GameConstants_1.Difficulty.INSANE).events.onInputDown.add(() => {
+            data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.INSANE;
+        });
+        let lastSprite = arr[arr.length - 1];
+        let bArr = AssetsUtils.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - 30, lastSprite.y + 100), new vector_1.default(lastSprite.x + 10, lastSprite.y + 100), state);
+        bArr[0].events.onInputDown.add(() => {
+            data_config_1.DataConfig.applyCahnges();
+            AssetsUtils.fadeoutSprites(state, bArr);
+            AssetsUtils.fadeoutSprites(state, arr).then(() => {
+                AssetsUtils.drawPreferences(state);
+                console.log(data_config_1.DataConfig.difficulty);
             });
         });
         bArr[1].events.onInputDown.add(() => {
@@ -359,6 +447,35 @@ class AssetLoader {
             });
         });
         return config;
+    }
+    drawGameOver(state) {
+        let map;
+        if (this._fakeMapExists) {
+            this._fakeMapExists = false;
+            this._fakeMap.destroy();
+        }
+        map = state.game.add.tilemap(GameConstants_1.Levels.LEVEL_ONE);
+        map.addTilesetImage(GameConstants_1.TileLayers.GRASS_LAYER, GameConstants_1.TileLayers.GRASS_LAYER);
+        map.addTilesetImage(GameConstants_1.TileLayers.BACKGROUND, GameConstants_1.TileLayers.BACKGROUND);
+        map.createLayer('SkyPrimary').resizeWorld();
+        map.createLayer('GroundSecondary').resizeWorld();
+        map.createLayer('GroundPrimary').resizeWorld();
+        this._fakeMapExists = true;
+        this._fakeMap = map;
+        state.game.camera.unfollow();
+        let centerX = state.game.world.centerX;
+        let centerY = state.game.world.centerY;
+        let loc = [new vector_1.default(centerX, centerY)];
+        this.drawBoxes(1, loc, state, ['Main Menu']).forEach((value, index) => {
+            state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
+            state.game.camera.focusOn(value);
+            value.events.onInputDown.add(() => {
+                AssetsUtils.drawMainMenu(state);
+            });
+        });
+        let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', { font: '22px Arial', fill: '#ff0044' });
+        gameOver.scale.setTo(0.0, 0.0);
+        state.game.add.tween(gameOver.scale).to({ x: 1.0, y: 1.0 }, 1000, Phaser.Easing.Bounce.Out, true);
     }
     /**
      * @description

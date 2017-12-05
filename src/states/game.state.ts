@@ -29,7 +29,7 @@ export class GameState extends State {
     this._levels.set(Levels.LEVEL_ONE, new LevelOne(this.game));
     this._levels.set(Levels.LEVEL_TWO, new LevelTwo(this.game));
 
-    this._factory = new TankWorldFactory(this.game);
+    this._factory = new TankWorldFactory(this.game, this);
     this._factory.currentLevel = this._levels.get(DataConfig.level);
     this._factory.init(); // Initialise collision groups
   }
@@ -59,5 +59,7 @@ export class GameState extends State {
   shutdown(){
     // Ensure no memory leaks
     this._inputSubscription.unsubscribe();
+    this._factory.cleanUp();
+
   }
 }

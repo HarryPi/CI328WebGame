@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var States;
 (function (States) {
+    States["GAMEOVER_SATE"] = "gameover_state";
     States["MAIN_MENU_STATE"] = "main_menu_state";
     States["BOOT_STATE"] = "boot_state";
     States["PRELOAD_STATE"] = "preload_state";
@@ -12,6 +13,13 @@ var Levels;
     Levels["LEVEL_ONE"] = "level_one";
     Levels["LEVEL_TWO"] = "level_two";
 })(Levels = exports.Levels || (exports.Levels = {}));
+var Difficulty;
+(function (Difficulty) {
+    Difficulty[Difficulty["INSANE"] = 0] = "INSANE";
+    Difficulty[Difficulty["HARD"] = 1] = "HARD";
+    Difficulty[Difficulty["NORMAL"] = 2] = "NORMAL";
+    Difficulty[Difficulty["EASY"] = 3] = "EASY";
+})(Difficulty = exports.Difficulty || (exports.Difficulty = {}));
 var TankLayout;
 (function (TankLayout) {
     TankLayout["GREEN_FORTRESS"] = "tanks_tankGreen1.png";
@@ -56,6 +64,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["HEALTH"] = "health_component";
     ComponentType["TANK"] = "tank_component";
     ComponentType["OWNER"] = "owner_component";
     ComponentType["STATE"] = "state_component";

@@ -1,7 +1,11 @@
-import {Levels, MainMenuButtons, States, TankLayout, TileLayers, UIComponents} from '../constants/GameConstants';
-import {MenuConfig} from '../config/menu.config';
+import {
+  Difficulty, Levels, MainMenuButtons, States, TankLayout, TileLayers,
+  UIComponents
+} from '../constants/GameConstants';
+import { MenuConfig } from '../config/menu.config';
 import Vector from '../util/vector';
-import {DataConfig} from '../config/data.config';
+import { DataConfig } from '../config/data.config';
+import {Extras, IStateMessanger} from '../util/IStateMessanger';
 
 /**
  * @class
@@ -230,6 +234,12 @@ class AssetLoader {
    * returns the config file with the sprites
    * */
   public drawMainMenu(state: Phaser.State): MenuConfig {
+    if (state.key === States.GAMEOVER_SATE) {
+      state.game.state.start(States.BOOT_STATE, true, true);
+      this._fakeMapExists = false;
+      this._fakeMap = null;
+      return;
+    }
     let textArr = ['New Game', 'High Score', 'Preferences'];
     let config = new MenuConfig();
 
@@ -335,7 +345,11 @@ class AssetLoader {
         AssetsUtils.drawMainMenu(state);
       });
     });
-
+    config.getSprite(MainMenuButtons.SELECT_DIFFICULTY).events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawDifficulty(state);
+      });
+    });
     // Select level Button
     config.getSprite(MainMenuButtons.SELECT_LEVEL).events.onInputDown.add(() => {
       AssetsUtils.fadeoutSprites(state, arr);
@@ -394,6 +408,22 @@ class AssetLoader {
       // Gives the change of scenery effect
     });
 
+    config.getSprite(UIComponents.CANDY_ARTILLERY_IMG).events.onInputDown.add(() => {
+      DataConfig.tank = TankLayout.CANDY_ARTILLERY;
+    });
+    config.getSprite(UIComponents.CANDY_FORTRESS_IMG).events.onInputDown.add(() => {
+      DataConfig.tank = TankLayout.CANDY_FORTRESS;
+    });
+    config.getSprite(UIComponents.CANDY_HUNTER_IMG).events.onInputDown.add(() => {
+      DataConfig.tank = TankLayout.CANDY_HUNTER;
+    });
+    config.getSprite(UIComponents.CANDY_LIGHT_IMG).events.onInputDown.add(() => {
+      DataConfig.tank = TankLayout.CANDY_LIGHT;
+    });
+    config.getSprite(UIComponents.CANDY_RECON_IMG).events.onInputDown.add(() => {
+      DataConfig.tank = TankLayout.CANDY_RECON;
+    });
+
     let lastSprite = arr[arr.length - 2];
     let bArr = AssetsUtils.drawAcceptCancelButtons(new Vector(lastSprite.x - 30, lastSprite.y + 100), new Vector(lastSprite.x + 10, lastSprite.y + 100), state);
     bArr[0].events.onInputDown.add(() => {
@@ -401,6 +431,77 @@ class AssetLoader {
       AssetsUtils.fadeoutSprites(state, bArr);
       AssetsUtils.fadeoutSprites(state, arr).then(() => {
         AssetsUtils.drawPreferences(state);
+      });
+    });
+    bArr[1].events.onInputDown.add(() => {
+      AssetsUtils.fadeoutSprites(state, bArr);
+      DataConfig.revertChanges();
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+      });
+    });
+
+    return config;
+  }
+
+  public drawDifficulty(state: Phaser.State) {
+    let centerX = state.game.world.centerX;
+    let centerY = state.game.world.centerY;
+    let config: MenuConfig = new MenuConfig();
+    let difficulties = ['Easy', 'Normal', 'Hard', 'Insane'];
+    let loc = [
+      new Vector(centerX, centerY - 110),
+      new Vector(centerX, centerY - 50),
+      new Vector(centerX, centerY + 10),
+      new Vector(centerX, centerY + 70)
+    ];
+
+    let arr = AssetsUtils.drawBoxes(4,
+      loc,
+      state,
+      difficulties);
+
+    arr.forEach( (sprite: Phaser.Sprite, index: number) => {
+      state.game.add.tween(sprite.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      switch (index) {
+        case 3:
+          config.setSprite(Difficulty.EASY, sprite);
+          break;
+        case 2:
+          config.setSprite(Difficulty.NORMAL, sprite);
+          break;
+        case 1:
+          config.setSprite(Difficulty.HARD, sprite);
+              break;
+        case 0:
+          config.setSprite(Difficulty.INSANE, sprite);
+          break;
+        default:
+          break;
+      }
+    });
+
+    config.getSprite(Difficulty.EASY).events.onInputDown.add(() => {
+      DataConfig.difficulty = Difficulty.EASY;
+    });
+    config.getSprite(Difficulty.NORMAL).events.onInputDown.add(() => {
+      DataConfig.difficulty = Difficulty.NORMAL;
+    });
+    config.getSprite(Difficulty.HARD).events.onInputDown.add(() => {
+      DataConfig.difficulty = Difficulty.HARD;
+    });
+    config.getSprite(Difficulty.INSANE).events.onInputDown.add(() => {
+      DataConfig.difficulty = Difficulty.INSANE;
+    });
+
+    let lastSprite = arr[arr.length - 1];
+    let bArr = AssetsUtils.drawAcceptCancelButtons(new Vector(lastSprite.x - 30, lastSprite.y + 100), new Vector(lastSprite.x + 10, lastSprite.y + 100), state);
+    bArr[0].events.onInputDown.add(() => {
+      DataConfig.applyCahnges();
+      AssetsUtils.fadeoutSprites(state, bArr);
+      AssetsUtils.fadeoutSprites(state, arr).then(() => {
+        AssetsUtils.drawPreferences(state);
+        console.log(DataConfig.difficulty);
       });
     });
     bArr[1].events.onInputDown.add(() => {
@@ -468,6 +569,38 @@ class AssetLoader {
     return config;
   }
 
+  public drawGameOver(state: Phaser.State) {
+    let map: Phaser.Tilemap;
+    if (this._fakeMapExists) {
+      this._fakeMapExists = false;
+      this._fakeMap.destroy();
+    }
+    map = state.game.add.tilemap(Levels.LEVEL_ONE);
+    map.addTilesetImage(TileLayers.GRASS_LAYER, TileLayers.GRASS_LAYER);
+    map.addTilesetImage(TileLayers.BACKGROUND, TileLayers.BACKGROUND);
+
+    map.createLayer('SkyPrimary').resizeWorld();
+    map.createLayer('GroundSecondary').resizeWorld();
+    map.createLayer('GroundPrimary').resizeWorld();
+    this._fakeMapExists = true;
+    this._fakeMap = map;
+
+    state.game.camera.unfollow();
+    let centerX = state.game.world.centerX;
+    let centerY = state.game.world.centerY;
+    let loc = [new Vector(centerX, centerY)];
+
+    this.drawBoxes(1, loc, state, ['Main Menu']).forEach((value: Phaser.Sprite, index) => {
+      state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+      state.game.camera.focusOn(value);
+      value.events.onInputDown.add( () => {
+        AssetsUtils.drawMainMenu(state);
+      });
+    });
+    let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', {font: '22px Arial', fill: '#ff0044'});
+    gameOver.scale.setTo(0.0, 0.0);
+    state.game.add.tween(gameOver.scale).to({x: 1.0, y: 1.0}, 1000, Phaser.Easing.Bounce.Out, true);
+  }
   /**
    * @description
    * Returns the cached memory object see {@link Phaser.Loader}
@@ -488,7 +621,6 @@ class AssetLoader {
   set loader(value: Phaser.Loader) {
     this._loader = value;
   }
-
 }
 
 // Imitate all methods as static as this class needs to be initiated

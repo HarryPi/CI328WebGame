@@ -2,30 +2,54 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
+const data_config_1 = require("../config/data.config");
 class CollisionsComponent extends component_1.Component {
     constructor() {
         super(GameConstants_1.ComponentType.COLLISION);
         this._ignoreCollision = true;
-        this._requiredComponents = [GameConstants_1.ComponentType.PHYSICS];
+        this._requiredComponents = [
+            GameConstants_1.ComponentType.PHYSICS
+        ];
     }
     setCollisionGroup(ownerCollisionGroup) {
         this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
         return this;
     }
+    cleanCollisions() {
+        this.target.sprite.body.data.shapes[0].sensor = true;
+    }
     collidesWith(collidesWith, actions) {
         let body = this.target.sprite.body;
-        if (body.collidesWith.includes(collidesWith)) {
-            return; // In case we attempt to set the same collision group twice
-        }
+        /*
+            if (body.collidesWith.includes(collidesWith)) {
+              return; // In case we attempt to set the same collision group twice
+            }
+        */
         actions.forEach((action) => {
             switch (action) {
                 case GameConstants_1.Action.NOTHING:
                     body.collides(collidesWith);
                     break;
-                case GameConstants_1.Action.EXPLODE:
-                    body.collides(collidesWith, this.explode, this);
-                    break;
+                /*
+                        case Action.EXPLODE:
+                          body.collides(collidesWith, this.explode, this);
+                          break;
+                */
                 case GameConstants_1.Action.DAMAGE:
+                    // Each bullet does the same damage regardless of type
+                    // Bullet damage depends on difficulty level
+                    let aiComp = this.target.getComponent(GameConstants_1.ComponentType.AI);
+                    let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+                    if (aiComp) {
+                        body.collides(collidesWith, () => {
+                            healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
+                        }, this);
+                    }
+                    else {
+                        body.collides(collidesWith, () => {
+                            healthComp.dealDamage(data_config_1.DataConfig.enemyDamage);
+                        });
+                    }
                     break;
                 default:
                     break;
@@ -34,23 +58,12 @@ class CollisionsComponent extends component_1.Component {
         return this;
     }
     explode(ownerBody, impacted) {
-        // If layout is imported with tiled, which we do the body doesn't have a sprite therefor would throw an exception
-        let impactedSprite = impacted.sprite;
-        let ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
-        if (impactedSprite) {
-            // not all entities have an owner
-            if (ownerComponent) {
-                if (ownerComponent.owner.sprite.data.tag === impactedSprite.data.tag) {
-                    return; // do nothing
-                }
-            }
+        let ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER); // Here we check if this Entity is a bullet as only bullets have owners
+        // Thus if this is bullet
+        if (ownerComponent) {
+            this.target.getComponent(GameConstants_1.ComponentType.PHYSICS).stopSprite(); // This should be true only if bullet
+            this.target.getComponent(GameConstants_1.ComponentType.LAYER).playAnimation(GameConstants_1.Action.EXPLODE, null, null, true);
         }
-        this.target.getComponent(GameConstants_1.ComponentType.PHYSICS).stopSprite();
-        ownerBody.sprite.animations.add(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-        ownerBody.sprite.animations.play(GameConstants_1.Action.EXPLODE).onComplete.add(() => {
-            ownerBody.sprite.kill();
-            ownerBody.sprite.destroy();
-        });
     }
 }
 exports.CollisionsComponent = CollisionsComponent;
