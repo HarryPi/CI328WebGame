@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
 const GameConstants_1 = require("../constants/GameConstants");
 const Assets_1 = require("../UI/Assets");
+const MenuManager_1 = require("../UI/MenuManager");
 class PreloadState extends state_1.default {
     constructor() {
         super();
@@ -12,7 +13,7 @@ class PreloadState extends state_1.default {
         this._args = args;
     }
     preload() {
-        Assets_1.default.setLoadingScreen(this);
+        MenuManager_1.MenuManager.setLoadingScreen(this);
         // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
         Assets_1.default.loadAll();
         // Set World variables

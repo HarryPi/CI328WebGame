@@ -10,6 +10,9 @@ const data_config_1 = require("../config/data.config");
 class GameState extends state_1.default {
     constructor() {
         super();
+        this._score = 0;
+        // keep record of spawn time in miliseconds
+        this._timer = 0;
         this._input = new input_1.default();
         this._levels = new Map();
     }
@@ -32,9 +35,12 @@ class GameState extends state_1.default {
             input !== GameConstants_1.InputType.SHOOT.toString() ? player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input
                 : player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
         });
+        this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, { font: '22px Arial', fill: '#ff0044' });
+        this._scoreText.fixedToCamera = true;
+        this.game.time.events.add(Phaser.Timer.SECOND * 5, this.generateRandomEventFromCurrentLevel, this);
     }
     update() {
-        this._factory.spawnEnemiesAsCurrentLevel();
+        this.spawnEnemiesAsCurrentLevel();
         this._input.run();
         this._factory.entities.forEach((e) => {
             e.update();
@@ -44,6 +50,31 @@ class GameState extends state_1.default {
         // Ensure no memory leaks
         this._inputSubscription.unsubscribe();
         this._factory.cleanUp();
+    }
+    generateRandomEventFromCurrentLevel() {
+        console.log('random disaster');
+        if (this._factory.currentLevel) {
+            for (let i = 0; i < 6; i++) {
+                this._factory.newDisaster();
+            }
+        }
+    }
+    spawnEnemiesAsCurrentLevel() {
+        if (this._factory.currentLevel) {
+            if (typeof this._factory.currentLevel.enemiesCount === 'number' && this._factory.currentLevel.enemiesSpawnTime) {
+                // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
+                if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
+                    if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
+                        this._factory.newEnemy(() => {
+                            this._score += 100;
+                            this._scoreText.setText(`Score: ${this._score}`);
+                        });
+                        this._factory.currentLevel.enemiesCount++;
+                        this._timer = Date.now();
+                    }
+                }
+            }
+        }
     }
 }
 exports.GameState = GameState;

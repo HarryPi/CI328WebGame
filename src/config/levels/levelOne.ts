@@ -11,7 +11,7 @@ export class LevelOne extends TankLevel {
     this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
     this._capEnemies = 3;
     this._totalEnemies = 30;
-
+    this._randomDisasterSpawnTime = 5000;
     this._enemyTankKind = [TankLayout.DARK_RECON, TankLayout.DARK_ARTILLERY, TankLayout.DARK_FORTRESS, TankLayout.DARK_LIGHT, TankLayout.DARK_HUNTER];
   }
 

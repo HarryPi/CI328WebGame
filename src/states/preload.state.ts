@@ -1,6 +1,7 @@
 import State from './state';
 import { States } from '../constants/GameConstants';
 import AssetsUtils from '../UI/Assets';
+import {MenuManager} from '../UI/MenuManager';
 
 export class PreloadState extends State {
   private _args = {};
@@ -12,7 +13,7 @@ export class PreloadState extends State {
   }
   preload() {
 
-    AssetsUtils.setLoadingScreen(this);
+    MenuManager.setLoadingScreen(this);
     // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
     AssetsUtils.loadAll();
     // Set World variables

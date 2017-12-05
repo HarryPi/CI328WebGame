@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
-const Assets_1 = require("../UI/Assets");
+const MenuManager_1 = require("../UI/MenuManager");
 class GameoverState extends state_1.default {
     init(args) {
         this._args = args;
@@ -9,7 +9,7 @@ class GameoverState extends state_1.default {
     preload() {
     }
     create() {
-        Assets_1.default.drawGameOver(this);
+        MenuManager_1.MenuManager.drawGameOver(this);
     }
     update() {
     }

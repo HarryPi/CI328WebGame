@@ -1,7 +1,51 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
+const component_1 = require("./component");
+const stateMachine_1 = require("../fsm/stateMachine");
+class ShootComponent extends component_1.Component {
+    constructor(game, factory) {
+        super(GameConstants_1.ComponentType.SHOOT);
+        this._canShoot = false;
+        this._timer = 0;
+        this._factory = factory;
+    }
+    update() {
+        if (this._canShoot) {
+            this._canShoot = false;
+            if (Date.now() - this._timer > 1500) {
+                this.shootBullet();
+            }
+        }
+    }
+    set canShoot(value) {
+        this._canShoot = value;
+    }
+    shootBullet() {
+        this._factory.newBullet(this.target.sprite.x + 50, this.target.sprite.y - 20, this.target);
+        this._timer = Date.now();
+    }
+}
+exports.ShootComponent = ShootComponent;
+class StateComponent extends component_1.Component {
+    constructor() {
+        super(GameConstants_1.ComponentType.STATE);
+        this._fsm = new stateMachine_1.default();
+    }
+    addState(name, state) {
+        this._fsm.add(name, state);
+        state.entity = this.target;
+        return this;
+    }
+    setState(name) {
+        this._fsm.enter(name);
+        return this;
+    }
+    update() {
+        this._fsm.update();
+    }
+}
+exports.StateComponent = StateComponent;
 class MovableComponent extends component_1.Component {
     constructor() {
         super(GameConstants_1.ComponentType.MOVABLE);
@@ -45,4 +89,4 @@ class MovableComponent extends component_1.Component {
     }
 }
 exports.MovableComponent = MovableComponent;
-//# sourceMappingURL=movable.component.js.map
+//# sourceMappingURL=event.components.js.map

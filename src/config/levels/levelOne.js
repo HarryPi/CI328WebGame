@@ -12,6 +12,7 @@ class LevelOne extends tankLevel_1.default {
         this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
         this._capEnemies = 3;
         this._totalEnemies = 30;
+        this._randomDisasterSpawnTime = 5000;
         this._enemyTankKind = [GameConstants_1.TankLayout.DARK_RECON, GameConstants_1.TankLayout.DARK_ARTILLERY, GameConstants_1.TankLayout.DARK_FORTRESS, GameConstants_1.TankLayout.DARK_LIGHT, GameConstants_1.TankLayout.DARK_HUNTER];
     }
     init() {

@@ -5,6 +5,7 @@ import { Levels, MainMenuButtons, States, UIComponents } from '../constants/Game
 import { DataConfig } from '../config/data.config';
 import Vector from '../util/vector';
 import {Extras, IStateMessanger} from '../util/IStateMessanger';
+import {MenuManager} from '../UI/MenuManager';
 
 export class MainMenuState extends State {
   private _args;
@@ -15,7 +16,7 @@ export class MainMenuState extends State {
 
   }
   create(){
-    let config: MenuConfig = AssetsUtils.drawMainMenu(this);
+    let config: MenuConfig = MenuManager.drawMainMenu(this);
     this.game.camera.unfollow();
     config.allSprites.forEach((sprite: Phaser.Sprite) => {
       // This is when the game restars

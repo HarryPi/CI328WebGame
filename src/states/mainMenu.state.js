@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_1 = require("./state");
-const Assets_1 = require("../UI/Assets");
+const MenuManager_1 = require("../UI/MenuManager");
 class MainMenuState extends state_1.default {
     init(args) {
         this._args = args;
@@ -9,7 +9,7 @@ class MainMenuState extends state_1.default {
     preload() {
     }
     create() {
-        let config = Assets_1.default.drawMainMenu(this);
+        let config = MenuManager_1.MenuManager.drawMainMenu(this);
         this.game.camera.unfollow();
         config.allSprites.forEach((sprite) => {
             // This is when the game restars

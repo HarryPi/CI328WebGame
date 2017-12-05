@@ -1,6 +1,5 @@
 import State from './state';
-import AssetsUtils from '../UI/Assets';
-import { MenuConfig } from '../config/menu.config';
+import {MenuManager} from '../UI/MenuManager';
 
 
 export class GameoverState extends State {
@@ -12,7 +11,7 @@ export class GameoverState extends State {
 
   }
   create(){
-    AssetsUtils.drawGameOver(this);
+    MenuManager.drawGameOver(this);
   }
   update(){
 

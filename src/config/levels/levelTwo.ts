@@ -12,7 +12,7 @@ export class LevelTwo extends  TankLevel {
     this._capEnemies = 3;
     this._totalEnemies = 30;
     this._enemyTankKind = [TankLayout.GREY_LIGHT, TankLayout.GREY_RECON, TankLayout.GREY_HUNTER, TankLayout.GREY_FORTRESS, TankLayout.GREY_ARTILERY];
-
+    this._randomDisasterSpawnTime = 5000;
   }
 
   init(): void {

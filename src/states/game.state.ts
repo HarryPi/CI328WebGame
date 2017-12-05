@@ -1,15 +1,14 @@
 import State from './state';
 import Input from '../util/input';
 import TankWorldFactory from '../TankWorldFactory';
-import {ComponentType, InputType, Levels} from '../constants/GameConstants';
+import { ComponentType, InputType, Levels } from '../constants/GameConstants';
 import { Entity } from '../entities/entity';
-import { MovableComponent } from '../component/movable.component';
-import { ShootComponent } from '../component/shoot.component';
-import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import {LevelOne} from '../config/levels/levelOne';
+import { LevelOne } from '../config/levels/levelOne';
 import TankLevel from '../config/levels/tankLevel';
-import {LevelTwo} from '../config/levels/levelTwo';
-import {DataConfig} from '../config/data.config';
+import { LevelTwo } from '../config/levels/levelTwo';
+import { DataConfig } from '../config/data.config';
+import { Subscription } from 'rxjs/Subscription';
+import {MovableComponent, ShootComponent} from '../component/event.components';
 
 export class GameState extends State {
   private _input: Input;
@@ -17,6 +16,11 @@ export class GameState extends State {
   private _direction: InputType;
   private _factory: TankWorldFactory;
   private _levels: Map<Levels, TankLevel>;
+  private _score: number = 0;
+  private _subs: Subscription[];
+  // keep record of spawn time in miliseconds
+  private _timer: number = 0;
+  private _scoreText: Phaser.Text;
 
   constructor() {
     super();
@@ -47,10 +51,14 @@ export class GameState extends State {
                                              : player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
     });
 
+    this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {font: '22px Arial', fill: '#ff0044'});
+    this._scoreText.fixedToCamera = true;
+    this.game.time.events.add(Phaser.Timer.SECOND * 5, this.generateRandomEventFromCurrentLevel, this);
+
   }
 
   update() {
-    this._factory.spawnEnemiesAsCurrentLevel();
+    this.spawnEnemiesAsCurrentLevel();
     this._input.run();
     this._factory.entities.forEach((e) => {
       e.update();
@@ -61,5 +69,33 @@ export class GameState extends State {
     this._inputSubscription.unsubscribe();
     this._factory.cleanUp();
 
+
+  }
+  private generateRandomEventFromCurrentLevel() {
+    console.log('random disaster');
+    if (this._factory.currentLevel) {
+      for (let i = 0; i < 6; i++) {
+        this._factory.newDisaster();
+      }
+    }
+  }
+  private spawnEnemiesAsCurrentLevel() {
+    if (this._factory.currentLevel) {
+      if (typeof this._factory.currentLevel.enemiesCount === 'number' && this._factory.currentLevel.enemiesSpawnTime) {
+        // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
+        if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
+          if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
+            this._factory.newEnemy( () => {
+              this._score += 100;
+              this._scoreText.setText(`Score: ${this._score}`);
+            });
+            this._factory.currentLevel.enemiesCount++;
+            this._timer = Date.now();
+
+          }
+        }
+      }
+    }
   }
 }
+

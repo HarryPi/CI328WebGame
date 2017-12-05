@@ -1,6 +1,6 @@
 import {ComponentType, InputType} from '../constants/GameConstants';
-import {MovableComponent} from '../component/movable.component';
 import {State} from './state';
+import {MovableComponent} from '../component/event.components';
 
 export class FleeState extends State {
 

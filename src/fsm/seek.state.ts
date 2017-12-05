@@ -1,6 +1,6 @@
 import { State } from './state';
-import { MovableComponent } from '../component/movable.component';
 import { ComponentType, InputType } from '../constants/GameConstants';
+import {MovableComponent} from '../component/event.components';
 
 export class SeekState extends State {
 

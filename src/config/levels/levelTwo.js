@@ -13,6 +13,7 @@ class LevelTwo extends tankLevel_1.default {
         this._capEnemies = 3;
         this._totalEnemies = 30;
         this._enemyTankKind = [GameConstants_1.TankLayout.GREY_LIGHT, GameConstants_1.TankLayout.GREY_RECON, GameConstants_1.TankLayout.GREY_HUNTER, GameConstants_1.TankLayout.GREY_FORTRESS, GameConstants_1.TankLayout.GREY_ARTILERY];
+        this._randomDisasterSpawnTime = 5000;
     }
     init() {
         let map = this._game.add.tilemap(GameConstants_1.Levels.LEVEL_TWO);

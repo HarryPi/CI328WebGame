@@ -15,6 +15,7 @@ export default abstract class TankLevel {
   protected _capEnemies: number;
   protected _enemiesCount: number; // total of enemies the level will have
   protected _enemiesSpawnTime: number;
+  protected _randomDisasterSpawnTime: number; // time in ms
   protected _totalEnemies: number;
   protected _enemyTankKind: Array<TankLayout>;
 
@@ -90,8 +91,7 @@ export default abstract class TankLevel {
   }
 
   getRandomEnemy(): TankLayout {
-    let toREturn = this._enemyTankKind[MathUtil.randomIntFromInterval(0, 4)];
-    console.log(toREturn);
-    return toREturn;
+    let toReturn = this._enemyTankKind[MathUtil.randomIntFromInterval(0, 4)];
+    return toReturn;
   }
 }

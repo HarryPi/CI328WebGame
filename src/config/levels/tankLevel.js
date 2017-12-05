@@ -59,9 +59,8 @@ class TankLevel {
         return this._capEnemies;
     }
     getRandomEnemy() {
-        let toREturn = this._enemyTankKind[math_util_1.MathUtil.randomIntFromInterval(0, 4)];
-        console.log(toREturn);
-        return toREturn;
+        let toReturn = this._enemyTankKind[math_util_1.MathUtil.randomIntFromInterval(0, 4)];
+        return toReturn;
     }
 }
 exports.default = TankLevel;
