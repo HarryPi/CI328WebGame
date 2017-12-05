@@ -1,6 +1,5 @@
 import { Component } from '../component/component';
-import { ComponentType, FSMStates, TankLayout } from '../constants/GameConstants';
-import { Notification } from 'rxjs/Notification';
+import {  TankLayout } from '../constants/GameConstants';
 import { Subject } from 'rxjs/Subject';
 
 /**

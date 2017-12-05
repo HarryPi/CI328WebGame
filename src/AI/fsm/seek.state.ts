@@ -1,12 +1,12 @@
-import {ComponentType, InputType} from '../constants/GameConstants';
-import {State} from './state';
-import {MovableComponent} from '../component/event.components';
+import { State } from './state';
+import { ComponentType, InputType } from '../../constants/GameConstants';
+import {MovableComponent} from '../../component/event.components';
 
-export class FleeState extends State {
+export class SeekState extends State {
 
   enter(): void {
     // We know any component implementing SeekState will have an AI component
-    this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
+    this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
   }
 
   leave(): void {

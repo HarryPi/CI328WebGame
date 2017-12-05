@@ -78,6 +78,9 @@ class PhysicsComponent extends component_1.Component {
         drag ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
         return this;
     }
+    get gravity() {
+        return this._game.physics.p2.gravity.y;
+    }
     flipSprite() {
         this.target.sprite.scale.x = -1;
         return this;

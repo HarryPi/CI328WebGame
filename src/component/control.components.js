@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
-const data_config_1 = require("../config/data.config");
 const math_util_1 = require("../util/math.util");
 class BulletComponent extends component_1.Component {
     // todo: Should this be on the PhysicsComponent?
@@ -27,10 +26,6 @@ class BulletComponent extends component_1.Component {
      * */
     bulletInit() {
         let cOwner = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
-        // Not a bullet?
-        if (!cOwner) {
-            return;
-        }
         let seekObject = {
             x: this._game.input.activePointer.x + this._game.camera.x,
             y: this._game.input.activePointer.y
@@ -47,32 +42,27 @@ class BulletComponent extends component_1.Component {
             : Math.abs(cOwner.owner.getComponent(GameConstants_1.ComponentType.TANK).bulletSpeed));
     }
     accelerateToObject(obj1, obj2, velocity = 500) {
-        const angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
-        /*
-            let angle = -45;
-            velocity = (obj2.x) - obj1.x  + velocity;*/
-        let aiComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER)
-            .owner.getComponent(GameConstants_1.ComponentType.AI);
+        let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
+        const ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
+        let tankComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.TANK);
+        let aiComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.AI);
         aiComponent
-            ? obj1.body.velocity.x = calculateVelocityX(true, velocity, angle)
+            ? obj1.body.velocity.x = calculateVelocityX(true, velocity, tankComponent.angle)
             : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
         aiComponent
-            ? obj1.body.velocity.y = calculateVelocityY(true, velocity, angle)
+            ? obj1.body.velocity.y = calculateVelocityY(true, velocity, tankComponent.angle)
             : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
         function calculateVelocityX(isAi = true, tankSpeed, angle) {
-            const aiVelocityXCorrectionVal = 200;
             if (isAi) {
-                return Math.cos(angle - Math.PI / 180) * tankSpeed - (aiVelocityXCorrectionVal * data_config_1.DataConfig.difficulty);
+                return velocity * Math.cos(angle);
             }
-            return Math.abs(Math.cos(angle - Math.PI / 180) * tankSpeed);
+            return velocity * Math.cos(angle);
         }
         function calculateVelocityY(isAi = true, tankSpeed, angle) {
-            const velocityYCorrectionValue = 100;
-            const antiGravityValue = 700;
             if (isAi) {
-                return Math.sin(angle - Math.PI / 180) * velocity - antiGravityValue;
+                return velocity * Math.sin(angle);
             }
-            return (Math.sin(angle - Math.PI / 180) * velocity) - (velocityYCorrectionValue * data_config_1.DataConfig.difficulty);
+            return velocity * Math.sin(angle);
         }
     }
 }
@@ -80,28 +70,45 @@ exports.BulletComponent = BulletComponent;
 class AiComponent extends component_1.Component {
     constructor(player) {
         super(GameConstants_1.ComponentType.AI);
-        this._requiredComponents = [GameConstants_1.ComponentType.MOVABLE, GameConstants_1.ComponentType.PHYSICS, GameConstants_1.ComponentType.SHOOT];
+        this._requiredComponents = [GameConstants_1.ComponentType.MOVABLE, GameConstants_1.ComponentType.PHYSICS, GameConstants_1.ComponentType.SHOOT, GameConstants_1.ComponentType.TANK];
         this._player = player;
     }
     update() {
         this.decide();
     }
     decide() {
-        let distance = math_util_1.MathUtil.normalize(this._player.sprite.x - this.target.sprite.x);
         // Justify this in the report say tanks can only spawn on the right of the player
         let sComp = this._target.getComponent(GameConstants_1.ComponentType.STATE);
-        let tankComp = this._target.getComponent(GameConstants_1.ComponentType.TANK);
-        if (sComp) {
-            // Here we are adding some random params to simulate a more realistic behaviour
-            if (Math.abs(distance) >= 0.15 + math_util_1.MathUtil.randomIntFromInterval(0.05, 0.06)) {
-                sComp.setState(GameConstants_1.FSMStates.SEEK);
-            }
-            else if (Math.abs(distance) <= 0.08 + math_util_1.MathUtil.randomIntFromInterval(0.02, 0.03)) {
-                sComp.setState(GameConstants_1.FSMStates.FLEEING);
-            }
-            else {
+        // Here we are adding some random params to simulate a more realistic behaviour
+        switch (this.canHitPlayer()) {
+            case GameConstants_1.AIConstant.CAN_HIT_ENEMY:
                 sComp.setState(GameConstants_1.FSMStates.FIRING);
-            }
+                break;
+            case GameConstants_1.AIConstant.CLOSE:
+                sComp.setState(GameConstants_1.FSMStates.FLEEING);
+                break;
+            case GameConstants_1.AIConstant.FAR_AWAY:
+                sComp.setState(GameConstants_1.FSMStates.SEEK);
+                break;
+            default:
+                break;
+        }
+    }
+    canHitPlayer() {
+        const tankComponent = this.target.getComponent(GameConstants_1.ComponentType.TANK);
+        const physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
+        const distance = Math.abs(this._player.sprite.x - this.target.sprite.x);
+        const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+        const rangeOfProjectile = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
+        const approximateError = 10;
+        if (math_util_1.MathUtil.isBetween(rangeOfProjectile, distance + approximateError, distance - approximateError)) {
+            return GameConstants_1.AIConstant.CAN_HIT_ENEMY;
+        }
+        else if (rangeOfProjectile > distance) {
+            return GameConstants_1.AIConstant.CLOSE;
+        }
+        else {
+            return GameConstants_1.AIConstant.FAR_AWAY;
         }
     }
     get player() {

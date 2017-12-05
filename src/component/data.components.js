@@ -123,6 +123,9 @@ class TankComponent extends component_1.Component {
             throw new Error('NO TANK FOUND TO SET BULLET KIND');
         }
     }
+    get angle() {
+        return 180;
+    }
 }
 exports.TankComponent = TankComponent;
 class OwnerComponent extends component_1.Component {

@@ -1,4 +1,4 @@
-import {Entity} from '../entities/entity';
+import {Entity} from '../../entities/entity';
 
 export abstract class State {
   protected _entity: Entity;

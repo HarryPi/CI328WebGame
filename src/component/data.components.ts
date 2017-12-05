@@ -5,12 +5,13 @@ import {CollisionsComponent, PhysicsComponent} from './collision.components';
 import {Entity} from '../entities/entity';
 
 
-export class HealthComponent extends Component{
-  constructor(){
+export class HealthComponent extends Component {
+  constructor() {
     super(ComponentType.HEALTH);
     this._requiredComponents.push(ComponentType.LAYER);
     this._requiredComponents.push(ComponentType.PHYSICS);
   }
+
   /**
    * @description
    * Deals damage to target returns true if target is still alive after damage
@@ -47,15 +48,18 @@ export class LayerComponent extends Component {
     }
     return this;
   }
-  public addAnimation(name: string, frames?: number[] | string[], frameRate?: number, loop?: boolean, useNumericIndex?: boolean ) {
+
+  public addAnimation(name: string, frames?: number[] | string[], frameRate?: number, loop?: boolean, useNumericIndex?: boolean) {
     this.target.sprite.animations.add(name, frames, frameRate, loop, useNumericIndex);
   }
+
   public getAnimation(name: string): Phaser.Animation {
     return this.target.sprite.animations.getAnimation(name);
   }
+
   public playAnimation(name: string, frameRate?: number, loop?: boolean, killOnComplete?: boolean): Promise<void> {
     return new Promise(((resolve, reject) => {
-      this.target.sprite.animations.play(name, frameRate, loop).onComplete.add( () => {
+      this.target.sprite.animations.play(name, frameRate, loop).onComplete.add(() => {
         resolve();
       });
     }));
@@ -143,15 +147,23 @@ export class TankComponent extends Component {
       throw new Error('NO TANK FOUND TO SET BULLET KIND');
     }
   }
+
+  get angle(): number {
+    return 180;
+  }
 }
-export class OwnerComponent extends Component{
+
+export class OwnerComponent extends Component {
   private _owner: Entity;
-  constructor(){
+
+  constructor() {
     super(ComponentType.OWNER);
   }
-  set owner(owner: Entity){
+
+  set owner(owner: Entity) {
     this._owner = owner;
   }
+
   get owner(): Entity {
     return this._owner;
   }

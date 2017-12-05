@@ -1,10 +1,11 @@
-import { Component } from './component';
-import { ComponentType, FSMStates, InputType } from '../constants/GameConstants';
+import {Component} from './component';
+import {AIConstant, ComponentType, FSMStates, InputType} from '../constants/GameConstants';
 import {OwnerComponent, TankComponent} from './data.components';
-import { DataConfig } from '../config/data.config';
-import { Entity } from '../entities/entity';
-import { MathUtil } from '../util/math.util';
+import {Entity} from '../entities/entity';
+import {MathUtil} from '../util/math.util';
 import {StateComponent} from './event.components';
+import {PhysicsComponent} from './collision.components';
+import {Goap} from '../AI/fsm/goap';
 
 export class BulletComponent extends Component {
   private _game: Phaser.Game;
@@ -33,11 +34,6 @@ export class BulletComponent extends Component {
    * */
   bulletInit() {
     let cOwner = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);
-    // Not a bullet?
-    if (!cOwner) {
-      return;
-    }
-
     let seekObject = {
       x: this._game.input.activePointer.x + this._game.camera.x,
       y: this._game.input.activePointer.y
@@ -57,51 +53,42 @@ export class BulletComponent extends Component {
   }
 
   private accelerateToObject(obj1, obj2, velocity = 500) {
-    const angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
-
-
-    /*
-        let angle = -45;
-        velocity = (obj2.x) - obj1.x  + velocity;*/
-
-    let aiComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER)
-      .owner.getComponent<AiComponent>(ComponentType.AI);
+    let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
+    const ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);
+    let tankComponent = ownerComponent.owner.getComponent<TankComponent>(ComponentType.TANK);
+    let aiComponent = ownerComponent.owner.getComponent<AiComponent>(ComponentType.AI);
 
     aiComponent
-      ? obj1.body.velocity.x = calculateVelocityX(true, velocity, angle)
+      ? obj1.body.velocity.x = calculateVelocityX(true, velocity, tankComponent.angle)
       : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
     aiComponent
-      ? obj1.body.velocity.y = calculateVelocityY(true, velocity, angle)
+      ? obj1.body.velocity.y = calculateVelocityY(true, velocity, tankComponent.angle)
       : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
 
     function calculateVelocityX(isAi: boolean = true, tankSpeed: number, angle: number): number {
-      const aiVelocityXCorrectionVal = 200;
-
       if (isAi) {
-        return Math.cos(angle - Math.PI / 180) * tankSpeed - (aiVelocityXCorrectionVal * DataConfig.difficulty);
+        return velocity * Math.cos(angle);
       }
-      return Math.abs(Math.cos(angle - Math.PI / 180) * tankSpeed);
+      return velocity * Math.cos(angle);
     }
+
     function calculateVelocityY(isAi: boolean = true, tankSpeed: number, angle: number): number {
-      const velocityYCorrectionValue = 100;
-      const antiGravityValue = 700;
 
       if (isAi) {
-        return Math.sin(angle - Math.PI / 180) * velocity - antiGravityValue;
+        return velocity * Math.sin(angle);
       }
-      return (Math.sin(angle - Math.PI / 180) * velocity) - (velocityYCorrectionValue * DataConfig.difficulty);
+      return velocity * Math.sin(angle);
     }
   }
 
 }
 
-
-export class AiComponent extends Component {
+export class AiComponent extends Component implements Goap.IAgent{
   private _player: Entity;
 
   constructor(player: Entity) {
     super(ComponentType.AI);
-    this._requiredComponents = [ComponentType.MOVABLE, ComponentType.PHYSICS, ComponentType.SHOOT];
+    this._requiredComponents = [ComponentType.MOVABLE, ComponentType.PHYSICS, ComponentType.SHOOT, ComponentType.TANK];
     this._player = player;
   }
 
@@ -110,35 +97,58 @@ export class AiComponent extends Component {
   }
 
   private decide() {
-    let distance: number = MathUtil.normalize(this._player.sprite.x - this.target.sprite.x);
+
+
     // Justify this in the report say tanks can only spawn on the right of the player
     let sComp = this._target.getComponent<StateComponent>(ComponentType.STATE);
-    let tankComp = this._target.getComponent<TankComponent>(ComponentType.TANK);
-    if (sComp) {
-      // Here we are adding some random params to simulate a more realistic behaviour
-      if (Math.abs(distance) >= 0.15 + MathUtil.randomIntFromInterval(0.05, 0.06)) {
-        sComp.setState(FSMStates.SEEK);
-      } else if (Math.abs(distance) <= 0.08 + MathUtil.randomIntFromInterval(0.02, 0.03)) {
-        sComp.setState(FSMStates.FLEEING);
-      }
-      else {
+    // Here we are adding some random params to simulate a more realistic behaviour
+    switch (this.canHitPlayer()) {
+      case AIConstant.CAN_HIT_ENEMY:
         sComp.setState(FSMStates.FIRING);
-      }
+        break;
+      case AIConstant.CLOSE:
+        sComp.setState(FSMStates.FLEEING);
+        break;
+      case AIConstant.FAR_AWAY:
+        sComp.setState(FSMStates.SEEK);
+        break;
+      default:
+        break;
+
     }
+  }
+
+  private canHitPlayer(): AIConstant {
+    const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
+    const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+    const distance: number = Math.abs(this._player.sprite.x - this.target.sprite.x);
+    const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+    const rangeOfProjectile: number = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
+    const approximateError = 10;
+
+    if (MathUtil.isBetween(rangeOfProjectile, distance + approximateError, distance - approximateError)) {
+      return AIConstant.CAN_HIT_ENEMY;
+    } else if (rangeOfProjectile > distance) {
+      return AIConstant.CLOSE;
+    } else {
+      return AIConstant.FAR_AWAY;
+    }
+
   }
 
   get player(): Entity {
     return this._player;
   }
-
 }
-export class CameraComponent extends Component{
+
+export class CameraComponent extends Component {
   private _game: Phaser.Game;
 
   constructor(game: Phaser.Game) {
     super(ComponentType.CAMERA);
     this._game = game;
   }
+
   setFocus(entity: Phaser.Sprite) {
     this._game.camera.follow(entity);
   }

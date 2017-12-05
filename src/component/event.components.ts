@@ -1,8 +1,8 @@
 import {ComponentType, FSMStates, InputType} from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
 import {Component} from './component';
-import {State} from '../fsm/state';
-import StateMachine from '../fsm/stateMachine';
+import {State} from '../AI/fsm/state';
+import StateMachine from '../AI/fsm/stateMachine';
 import {TankComponent} from './data.components';
 
 export class ShootComponent extends Component{
@@ -46,6 +46,9 @@ export class StateComponent extends Component{
   public setState(name: FSMStates): StateComponent {
     this._fsm.enter(name);
     return this;
+  }
+  public get currentState(): State {
+    return this._fsm.current;
   }
   update(): void {
     this._fsm.update();

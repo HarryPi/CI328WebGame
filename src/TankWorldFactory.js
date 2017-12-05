@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const entity_1 = require("./entities/entity");
 const GameConstants_1 = require("./constants/GameConstants");
-const idle_state_1 = require("./fsm/idle.state");
-const seek_state_1 = require("./fsm/seek.state");
-const firing_state_1 = require("./fsm/firing.state");
+const idle_state_1 = require("./AI/fsm/idle.state");
+const seek_state_1 = require("./AI/fsm/seek.state");
+const firing_state_1 = require("./AI/fsm/firing.state");
 const guid_1 = require("./util/guid");
-const flee_state_1 = require("./fsm/flee.state");
+const flee_state_1 = require("./AI/fsm/flee.state");
 const data_config_1 = require("./config/data.config");
 const data_components_1 = require("./component/data.components");
 const control_components_1 = require("./component/control.components");

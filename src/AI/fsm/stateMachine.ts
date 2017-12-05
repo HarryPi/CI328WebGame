@@ -1,4 +1,4 @@
-import {FSMStates} from '../constants/GameConstants';
+import {FSMStates} from '../../constants/GameConstants';
 import {State} from './state';
 
 export default class StateMachine {

@@ -119,3 +119,8 @@ export enum MainMenuButtons {
   SELECT_DIFFICULTY = 'select_difficulty',
   BACK = 'back'
 }
+export enum AIConstant {
+  FAR_AWAY,
+  CLOSE,
+  CAN_HIT_ENEMY
+}

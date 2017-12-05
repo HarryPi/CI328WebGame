@@ -93,7 +93,9 @@ export class PhysicsComponent extends Component {
     return this;
   }
 
-
+  public get gravity(): number {
+    return this._game.physics.p2.gravity.y;
+  }
   public flipSprite(): PhysicsComponent{
     this.target.sprite.scale.x = -1;
     return this;

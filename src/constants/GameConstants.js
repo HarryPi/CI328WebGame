@@ -134,4 +134,10 @@ var MainMenuButtons;
     MainMenuButtons["SELECT_DIFFICULTY"] = "select_difficulty";
     MainMenuButtons["BACK"] = "back";
 })(MainMenuButtons = exports.MainMenuButtons || (exports.MainMenuButtons = {}));
+var AIConstant;
+(function (AIConstant) {
+    AIConstant[AIConstant["FAR_AWAY"] = 0] = "FAR_AWAY";
+    AIConstant[AIConstant["CLOSE"] = 1] = "CLOSE";
+    AIConstant[AIConstant["CAN_HIT_ENEMY"] = 2] = "CAN_HIT_ENEMY";
+})(AIConstant = exports.AIConstant || (exports.AIConstant = {}));
 //# sourceMappingURL=GameConstants.js.map
