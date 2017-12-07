@@ -34,6 +34,7 @@ var CollisionComponents;
                         if (aiComp) {
                             body.collides(collidesWith, () => {
                                 healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
+                                console.log(healthComp.getCurrentHealth());
                             }, this);
                         }
                         else {
@@ -64,8 +65,8 @@ var CollisionComponents;
         get gravity() {
             return this._game.physics.p2.gravity.y;
         }
-        flipSprite() {
-            this.target.sprite.scale.x = -1;
+        scaleSprite(scale) {
+            this.target.sprite.scale.x = scale;
             return this;
         }
         stopSprite() {

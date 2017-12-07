@@ -20,7 +20,7 @@ import LevelTwo = TankGameLevels.LevelTwo;
 
 export namespace GameStates {
 
-  export abstract class GameState extends Phaser.State {
+  export abstract class   GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class // todo: Comment: game is exported globally is this needed now?
   }
 
@@ -160,7 +160,6 @@ export namespace GameStates {
         // The sprites must be set to top and visible otherwise will be hidden
         sprite.bringToTop();
         sprite.visible = true;
-        console.log(sprite);
       });
 
     }

@@ -27,6 +27,7 @@ import MovableComponent = EventComponents.MovableComponent;
 import ShootComponent = EventComponents.ShootComponent;
 import StateComponent = EventComponents.StateComponent;
 import TankLevel = TankGameLevels.TankLevel;
+import SuicideState = FsmStates.SuicideState;
 
 /**
  * @class TankWorldFactory
@@ -159,7 +160,9 @@ export default class TankWorldFactory {
           new LayerComponent(),
           new CollisionsComponent(),
           new StateComponent(),
-          new AiComponent(this._player),
+          new AiComponent(this._player, this._entities.filter( (entity: Entity) => {
+           return entity.hasComponent(ComponentType.AI);
+          })),
           new HealthComponent(),
           new TankComponent(kindOfTank)
   ]);
@@ -175,11 +178,11 @@ export default class TankWorldFactory {
       .addState(FsmStateName.IDLE, new IdleState())
       .addState(FsmStateName.FIRING, new FiringState())
       .addState(FsmStateName.FLEEING, new FleeState())
+      .addState(FsmStateName.SUICIDE, new SuicideState())
       .setState(FsmStateName.IDLE);
 
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
-      .addPhysics()
-      .flipSprite();
+      .addPhysics();
 
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(kindOfTank);
 
@@ -197,7 +200,6 @@ export default class TankWorldFactory {
     };
     let sub = enemy.whenDestroyed.subscribe(() => {
       subFunction();
-      console.log('I am here');
       const index = this._entities.indexOf(enemy);
       this._entities.splice(index, 1);
       this._currentLevel.enemiesCount--;

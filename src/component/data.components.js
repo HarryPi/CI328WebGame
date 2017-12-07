@@ -26,12 +26,18 @@ var DataComponents;
                 });
             }
             else {
-                console.log(this.target.sprite.health);
                 this.target.sprite.damage(damage);
             }
         }
         setHealth(health) {
             this.target.sprite.health = health;
+            this._maxHealth = health;
+        }
+        getCurrentHealth() {
+            return this.target.sprite.health;
+        }
+        getMaxHealth() {
+            return this._maxHealth;
         }
     }
     DataComponents.HealthComponent = HealthComponent;
@@ -127,6 +133,9 @@ var DataComponents;
         }
         get angle() {
             return 180;
+        }
+        get tankKind() {
+            return this._tankKind;
         }
     }
     DataComponents.TankComponent = TankComponent;

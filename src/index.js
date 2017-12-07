@@ -10,7 +10,7 @@ const ScreenMetrics_1 = require("./util/ScreenMetrics");
 const gameStates_1 = require("./states/gameStates");
 var BootState = gameStates_1.GameStates.BootState;
 var PreloadState = gameStates_1.GameStates.PreloadState;
-var GameState = gameStates_1.GameStates.GameState;
+var GameState = gameStates_1.GameStates.MainGameState;
 var MainMenuState = gameStates_1.GameStates.MainMenuState;
 var GameoverState = gameStates_1.GameStates.GameoverState;
 // The main class of our application

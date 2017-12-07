@@ -40,8 +40,13 @@ var EventComponents;
             return this;
         }
         setState(name) {
-            this._fsm.enter(name);
-            return this;
+            try {
+                this._fsm.enter(name);
+                return this;
+            }
+            catch (e) {
+                console.log(e);
+            }
         }
         get currentState() {
             return this._fsm.current;
@@ -54,7 +59,6 @@ var EventComponents;
     class MovableComponent extends component_1.Component {
         constructor() {
             super(GameConstants_1.ComponentType.MOVABLE);
-            this._isMoving = false;
         }
         _correctRotation() {
             if (this.target.sprite.body.velocity.x > 0 && this.target.sprite.body.velocity.y < 0) {
@@ -65,10 +69,10 @@ var EventComponents;
             }
         }
         moveRight() {
-            this.target.sprite.body.moveRight(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.velocity.x = (this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         moveLeft() {
-            this.target.sprite.body.moveLeft(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.velocity.x = -(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         update() {
             switch (this._direction) {

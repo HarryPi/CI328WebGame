@@ -101,11 +101,11 @@ export class DataConfig {
     switch (this._difficulty) {
       case Difficulty.EASY:
       case Difficulty.NORMAL:
-        return 3;
-      case Difficulty.HARD:
         return 4;
+      case Difficulty.HARD:
+        return 8;
       case Difficulty.INSANE:
-        return 5;
+        return 10;
       default:
         break;
     }
@@ -117,7 +117,6 @@ export class DataConfig {
       case Difficulty.NORMAL:
         return 2;
       case Difficulty.HARD:
-        return 1;
       case Difficulty.INSANE:
         return 1;
       default:

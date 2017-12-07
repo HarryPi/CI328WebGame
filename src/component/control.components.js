@@ -70,15 +70,17 @@ var ControlComponents;
     }
     ControlComponents.BulletComponent = BulletComponent;
     class AiComponent extends component_1.Component {
-        constructor(player) {
+        constructor(player, aiFriendlies) {
             super(GameConstants_1.ComponentType.AI);
             this._requiredComponents = [GameConstants_1.ComponentType.MOVABLE, GameConstants_1.ComponentType.PHYSICS, GameConstants_1.ComponentType.SHOOT, GameConstants_1.ComponentType.TANK];
             this._player = player;
+            this._friendlies = aiFriendlies;
         }
         update() {
             this.decide();
         }
         decide() {
+            // Check if state was given externally or has to be calculated
             // Justify this in the report say tanks can only spawn on the right of the player
             let sComp = this._target.getComponent(GameConstants_1.ComponentType.STATE);
             // Here we are adding some random params to simulate a more realistic behaviour
@@ -87,7 +89,17 @@ var ControlComponents;
                     sComp.setState(GameConstants_1.FsmStateName.FIRING);
                     break;
                 case GameConstants_1.AIConstant.CLOSE:
-                    sComp.setState(GameConstants_1.FsmStateName.FLEEING);
+                    let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+                    let lowHealth = healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
+                    if (!lowHealth) {
+                        sComp.setState(GameConstants_1.FsmStateName.FIRING);
+                    }
+                    else {
+                        // Check if there is long range support close by
+                        if (this.checkIfAliesNearby()) {
+                            sComp.setState(GameConstants_1.FsmStateName.SUICIDE);
+                        }
+                    }
                     break;
                 case GameConstants_1.AIConstant.FAR_AWAY:
                     sComp.setState(GameConstants_1.FsmStateName.SEEK);
@@ -96,14 +108,17 @@ var ControlComponents;
                     break;
             }
         }
+        checkIfAliesNearby() {
+            return this._friendlies.length > 0;
+        }
         canHitPlayer() {
             const tankComponent = this.target.getComponent(GameConstants_1.ComponentType.TANK);
             const physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
             const distance = Math.abs(this._player.sprite.x - this.target.sprite.x);
             const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
             const rangeOfProjectile = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-            const approximateError = 10;
-            if (math_util_1.MathUtil.isBetween(rangeOfProjectile, distance + approximateError, distance - approximateError)) {
+            const decisionMakingDistance = 50;
+            if (math_util_1.MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
                 return GameConstants_1.AIConstant.CAN_HIT_ENEMY;
             }
             else if (rangeOfProjectile > distance) {

@@ -60,7 +60,6 @@ export class MenuManager {
         itemToAttach[i] ? attachment = itemToAttach[i] : null;
       }
       if (attachment) {
-        console.log(attachment);
         if (attachment.includes('level') || attachment.includes('img')) {
           let imageSprite = state.game.add.sprite(0, 0, attachment);
           imageSprite.anchor.setTo(childRelevantPosition.x, childRelevantPosition.y);
@@ -155,7 +154,6 @@ export class MenuManager {
 
     config.getSprite(MainMenuButtons.NEW_GAME).events.onInputDown.add(() => {
       this._fakeMapExists ? this._fakeMap.destroy() : null;
-      console.log(DataConfig.level);
       state.game.state.start(States.GAME_STATE); // Phaser cant detect start on first state???
     });
 

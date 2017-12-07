@@ -7,8 +7,12 @@ import { DataComponents } from './data.components';
 
 import State = FsmStates.State;
 import TankComponent = DataComponents.TankComponent;
+import {MathUtil} from '../util/math.util';
+import {ControlComponents} from './control.components';
+import {DataConfig} from '../config/data.config';
 
 export namespace EventComponents {
+
   export class ShootComponent extends Component{
     private _canShoot: boolean = false;
     private _factory: TankWorldFactory;
@@ -48,8 +52,12 @@ export namespace EventComponents {
       return this;
     }
     public setState(name: FsmStateName): StateComponent {
-      this._fsm.enter(name);
-      return this;
+      try {
+        this._fsm.enter(name);
+        return this;
+      } catch (e) {
+        console.log(e);
+      }
     }
     public get currentState(): State {
       return this._fsm.current;
@@ -60,10 +68,7 @@ export namespace EventComponents {
   }
   export class MovableComponent extends Component {
 
-    private _speed: number;
     private _direction: InputType;
-    private _isMoving: boolean = false;
-
     constructor() {
       super(ComponentType.MOVABLE);
     }
@@ -78,12 +83,13 @@ export namespace EventComponents {
     }
 
     private moveRight(): void {
-      this.target.sprite.body.moveRight(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
+      this.target.sprite.body.velocity.x = (this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
     private moveLeft(): void {
-      this.target.sprite.body.moveLeft(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
+      this.target.sprite.body.velocity.x = -(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
     public update(){
+
       switch (this._direction) {
         case InputType.LEFT_INPUT:
           this.moveLeft();
@@ -99,7 +105,6 @@ export namespace EventComponents {
           break;
       }
     }
-
     get direction(): InputType {
       return this._direction;
     }

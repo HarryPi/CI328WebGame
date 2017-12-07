@@ -25,6 +25,7 @@ var OwnerComponent = data_components_1.DataComponents.OwnerComponent;
 var MovableComponent = event_components_1.EventComponents.MovableComponent;
 var ShootComponent = event_components_1.EventComponents.ShootComponent;
 var StateComponent = event_components_1.EventComponents.StateComponent;
+var SuicideState = fsm_states_1.FsmStates.SuicideState;
 /**
  * @class TankWorldFactory
  * @description
@@ -120,7 +121,9 @@ class TankWorldFactory {
             new LayerComponent(),
             new CollisionsComponent(),
             new StateComponent(),
-            new AiComponent(this._player),
+            new AiComponent(this._player, this._entities.filter((entity) => {
+                return entity.hasComponent(GameConstants_1.ComponentType.AI);
+            })),
             new HealthComponent(),
             new TankComponent(kindOfTank)
         ]);
@@ -131,10 +134,10 @@ class TankWorldFactory {
             .addState(GameConstants_1.FsmStateName.IDLE, new IdleState())
             .addState(GameConstants_1.FsmStateName.FIRING, new FiringState())
             .addState(GameConstants_1.FsmStateName.FLEEING, new FleeState())
+            .addState(GameConstants_1.FsmStateName.SUICIDE, new SuicideState())
             .setState(GameConstants_1.FsmStateName.IDLE);
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
-            .addPhysics()
-            .flipSprite();
+            .addPhysics();
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(kindOfTank);
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._enemyTankCollisionGroup)
@@ -149,7 +152,6 @@ class TankWorldFactory {
         };
         let sub = enemy.whenDestroyed.subscribe(() => {
             subFunction();
-            console.log('I am here');
             const index = this._entities.indexOf(enemy);
             this._entities.splice(index, 1);
             this._currentLevel.enemiesCount--;

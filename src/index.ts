@@ -14,7 +14,7 @@ import { GameStates } from './states/gameStates';
 
 import BootState = GameStates.BootState;
 import PreloadState = GameStates.PreloadState;
-import GameState = GameStates.GameState;
+import GameState = GameStates.MainGameState;
 import MainMenuState = GameStates.MainMenuState;
 import GameoverState = GameStates.GameoverState;
 

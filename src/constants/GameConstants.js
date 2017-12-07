@@ -119,10 +119,11 @@ var AnimationTypes;
 })(AnimationTypes = exports.AnimationTypes || (exports.AnimationTypes = {}));
 var FsmStateName;
 (function (FsmStateName) {
-    FsmStateName[FsmStateName["IDLE"] = 0] = "IDLE";
-    FsmStateName[FsmStateName["SEEK"] = 1] = "SEEK";
-    FsmStateName[FsmStateName["FIRING"] = 2] = "FIRING";
-    FsmStateName[FsmStateName["FLEEING"] = 3] = "FLEEING";
+    FsmStateName[FsmStateName["SUICIDE"] = 0] = "SUICIDE";
+    FsmStateName[FsmStateName["IDLE"] = 1] = "IDLE";
+    FsmStateName[FsmStateName["SEEK"] = 2] = "SEEK";
+    FsmStateName[FsmStateName["FIRING"] = 3] = "FIRING";
+    FsmStateName[FsmStateName["FLEEING"] = 4] = "FLEEING";
 })(FsmStateName = exports.FsmStateName || (exports.FsmStateName = {}));
 var MainMenuButtons;
 (function (MainMenuButtons) {
@@ -138,6 +139,7 @@ var AIConstant;
 (function (AIConstant) {
     AIConstant[AIConstant["FAR_AWAY"] = 0] = "FAR_AWAY";
     AIConstant[AIConstant["CLOSE"] = 1] = "CLOSE";
-    AIConstant[AIConstant["CAN_HIT_ENEMY"] = 2] = "CAN_HIT_ENEMY";
+    AIConstant[AIConstant["CANNOT_HIT"] = 2] = "CANNOT_HIT";
+    AIConstant[AIConstant["CAN_HIT_ENEMY"] = 3] = "CAN_HIT_ENEMY";
 })(AIConstant = exports.AIConstant || (exports.AIConstant = {}));
 //# sourceMappingURL=GameConstants.js.map

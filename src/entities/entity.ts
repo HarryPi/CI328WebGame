@@ -1,5 +1,5 @@
 import { Component } from '../component/component';
-import {  TankLayout } from '../constants/GameConstants';
+import {ComponentType, TankLayout} from '../constants/GameConstants';
 import { Subject } from 'rxjs/Subject';
 
 /**
@@ -33,7 +33,9 @@ export class Entity {
     this._components.get(component.name).target = this;
     return component;
   }
-
+  public hasComponent(componentName: ComponentType) {
+    return this._components.has(componentName);
+  }
   /**
    * Retrieves a component by Component type see {@Link ComponentType}
    * and casts it to any parameter that extends Component see {@Link Component}

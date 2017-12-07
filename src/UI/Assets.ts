@@ -95,7 +95,6 @@ class AssetLoader {
       this.loader.image(UIComponents.PROGRESS_BAR, this._progressBarUrl);
       this.loader.image(UIComponents.LOGO, this._logoUrl);
     } catch (e) {
-      console.log(e);
       // todo: Exception handling class
     }
   }

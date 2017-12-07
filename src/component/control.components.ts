@@ -10,11 +10,14 @@ import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import TankComponent = DataComponents.TankComponent;
 import OwnerComponent = DataComponents.OwnerComponent;
 import StateComponent = EventComponents.StateComponent;
+import {TankUtil} from '../UI/tank.util';
+import {log} from 'util';
+import {DataConfig} from '../config/data.config';
 
 
 export namespace ControlComponents {
 
-
+  import HealthComponent = DataComponents.HealthComponent;
 
   export class BulletComponent extends Component {
     private _game: Phaser.Game;
@@ -94,29 +97,41 @@ export namespace ControlComponents {
 
   export class AiComponent extends Component {
     private _player: Entity;
+    private _friendlies: Array<Entity>;
 
-    constructor(player: Entity) {
+    constructor(player: Entity, aiFriendlies: Array<Entity>) {
+
       super(ComponentType.AI);
       this._requiredComponents = [ComponentType.MOVABLE, ComponentType.PHYSICS, ComponentType.SHOOT, ComponentType.TANK];
       this._player = player;
+      this._friendlies = aiFriendlies;
     }
 
     update() {
       this.decide();
     }
 
-    private decide() {
-
-
+    public decide() {
+      // Check if state was given externally or has to be calculated
       // Justify this in the report say tanks can only spawn on the right of the player
       let sComp = this._target.getComponent<StateComponent>(ComponentType.STATE);
       // Here we are adding some random params to simulate a more realistic behaviour
+
       switch (this.canHitPlayer()) {
         case AIConstant.CAN_HIT_ENEMY:
           sComp.setState(FsmStateName.FIRING);
           break;
         case AIConstant.CLOSE:
-          sComp.setState(FsmStateName.FLEEING);
+          let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
+          let lowHealth: boolean =  healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
+          if (!lowHealth) {
+            sComp.setState(FsmStateName.FIRING);
+          } else {
+            // Check if there is long range support close by
+            if (this.checkIfAliesNearby()) {
+              sComp.setState(FsmStateName.SUICIDE);
+            }
+          }
           break;
         case AIConstant.FAR_AWAY:
           sComp.setState(FsmStateName.SEEK);
@@ -127,15 +142,18 @@ export namespace ControlComponents {
       }
     }
 
+    private checkIfAliesNearby(): boolean {
+      return this._friendlies.length > 0;
+    }
     private canHitPlayer(): AIConstant {
       const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
       const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       const distance: number = Math.abs(this._player.sprite.x - this.target.sprite.x);
       const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
       const rangeOfProjectile: number = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-      const approximateError = 10;
+      const decisionMakingDistance = 50;
 
-      if (MathUtil.isBetween(rangeOfProjectile, distance + approximateError, distance - approximateError)) {
+      if (MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
         return AIConstant.CAN_HIT_ENEMY;
       } else if (rangeOfProjectile > distance) {
         return AIConstant.CLOSE;

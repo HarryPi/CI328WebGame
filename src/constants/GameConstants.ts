@@ -104,6 +104,7 @@ export enum AnimationTypes {
 }
 
 export enum FsmStateName {
+  SUICIDE,
   IDLE,
   SEEK,
   FIRING,
@@ -122,5 +123,6 @@ export enum MainMenuButtons {
 export enum AIConstant {
   FAR_AWAY,
   CLOSE,
+  CANNOT_HIT,
   CAN_HIT_ENEMY
 }

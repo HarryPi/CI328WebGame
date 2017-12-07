@@ -8,6 +8,7 @@ import CollisionsComponent = CollisionComponents.CollisionsComponent;
 
 export namespace DataComponents {
   export class HealthComponent extends Component {
+    private _maxHealth: number;
     constructor() {
       super(ComponentType.HEALTH);
       this._requiredComponents.push(ComponentType.LAYER);
@@ -29,13 +30,19 @@ export namespace DataComponents {
           this.target.destroy();
         });
       } else {
-        console.log(this.target.sprite.health);
         this.target.sprite.damage(damage);
       }
     }
 
     public setHealth(health: number) {
       this.target.sprite.health = health;
+      this._maxHealth = health;
+    }
+    public getCurrentHealth(): number {
+      return this.target.sprite.health;
+    }
+    public getMaxHealth(): number{
+      return this._maxHealth;
     }
   }
 
@@ -152,6 +159,9 @@ export namespace DataComponents {
 
     get angle(): number {
       return 180;
+    }
+    get tankKind(): TankLayout {
+      return this._tankKind;
     }
   }
 

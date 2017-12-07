@@ -54,7 +54,6 @@ class AssetLoader {
             this.loader.image(GameConstants_1.UIComponents.LOGO, this._logoUrl);
         }
         catch (e) {
-            console.log(e);
             // todo: Exception handling class
         }
     }

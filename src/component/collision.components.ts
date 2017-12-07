@@ -45,6 +45,7 @@ export namespace CollisionComponents {
             if (aiComp) {
               body.collides(collidesWith, () => {
                 healthComp.dealDamage(DataConfig.playerDamage);
+                console.log(healthComp.getCurrentHealth());
               }, this);
             } else {
               body.collides(collidesWith, () => {
@@ -80,8 +81,8 @@ export namespace CollisionComponents {
     public get gravity(): number {
       return this._game.physics.p2.gravity.y;
     }
-    public flipSprite(): PhysicsComponent{
-      this.target.sprite.scale.x = -1;
+    public scaleSprite(scale: number): PhysicsComponent{
+      this.target.sprite.scale.x = scale;
       return this;
     }
     public stopSprite() {

@@ -126,7 +126,6 @@ var GameStates;
                 // The sprites must be set to top and visible otherwise will be hidden
                 sprite.bringToTop();
                 sprite.visible = true;
-                console.log(sprite);
             });
         }
         update() {

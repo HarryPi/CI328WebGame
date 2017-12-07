@@ -76,11 +76,11 @@ class DataConfig {
         switch (this._difficulty) {
             case GameConstants_1.Difficulty.EASY:
             case GameConstants_1.Difficulty.NORMAL:
-                return 3;
-            case GameConstants_1.Difficulty.HARD:
                 return 4;
+            case GameConstants_1.Difficulty.HARD:
+                return 8;
             case GameConstants_1.Difficulty.INSANE:
-                return 5;
+                return 10;
             default:
                 break;
         }
@@ -92,7 +92,6 @@ class DataConfig {
             case GameConstants_1.Difficulty.NORMAL:
                 return 2;
             case GameConstants_1.Difficulty.HARD:
-                return 1;
             case GameConstants_1.Difficulty.INSANE:
                 return 1;
             default:
