@@ -1,17 +1,32 @@
 import { Entity } from './entities/entity';
-import { Action, ComponentType, FSMStates, Levels, States, TankLayout } from './constants/GameConstants';
-import TankLevel from './config/levels/tankLevel';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import { IdleState } from './AI/fsm/idle.state';
-import { SeekState } from './AI/fsm/seek.state';
-import { FiringState } from './AI/fsm/firing.state';
 import { Guid } from './util/guid';
-import { FleeState } from './AI/fsm/flee.state';
 import { DataConfig } from './config/data.config';
-import {HealthComponent, LayerComponent, OwnerComponent, TankComponent} from './component/data.components';
-import {AiComponent, BulletComponent, CameraComponent} from './component/control.components';
-import { CollisionsComponent, PhysicsComponent } from './component/collision.components';
-import {MovableComponent, ShootComponent, StateComponent} from './component/event.components';
+import { Action, ComponentType, FsmStateName, States, TankLayout } from './constants/GameConstants';
+import { FsmStates } from './AI/fsm/fsm.states';
+import { CollisionComponents } from './component/collision.components';
+import { ControlComponents } from './component/control.components';
+import { DataComponents } from './component/data.components';
+import { EventComponents } from './component/event.components';
+import { TankGameLevels } from './config/levels/levels.tankLevels';
+
+import IdleState = FsmStates.IdleState;
+import FiringState = FsmStates.FiringState;
+import FleeState = FsmStates.FleeState;
+import SeekState = FsmStates.SeekState;
+import PhysicsComponent = CollisionComponents.PhysicsComponent;
+import CollisionsComponent = CollisionComponents.CollisionsComponent;
+import CameraComponent = ControlComponents.CameraComponent;
+import AiComponent = ControlComponents.AiComponent;
+import BulletComponent = ControlComponents.BulletComponent;
+import LayerComponent = DataComponents.LayerComponent;
+import HealthComponent = DataComponents.HealthComponent;
+import TankComponent = DataComponents.TankComponent;
+import OwnerComponent = DataComponents.OwnerComponent;
+import MovableComponent = EventComponents.MovableComponent;
+import ShootComponent = EventComponents.ShootComponent;
+import StateComponent = EventComponents.StateComponent;
+import TankLevel = TankGameLevels.TankLevel;
 
 /**
  * @class TankWorldFactory
@@ -156,11 +171,11 @@ export default class TankWorldFactory {
     enemy.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(DataConfig.enemyHealth);
 
     enemy.getComponent<StateComponent>(ComponentType.STATE)
-      .addState(FSMStates.SEEK, new SeekState())
-      .addState(FSMStates.IDLE, new IdleState())
-      .addState(FSMStates.FIRING, new FiringState())
-      .addState(FSMStates.FLEEING, new FleeState())
-      .setState(FSMStates.IDLE);
+      .addState(FsmStateName.SEEK, new SeekState())
+      .addState(FsmStateName.IDLE, new IdleState())
+      .addState(FsmStateName.FIRING, new FiringState())
+      .addState(FsmStateName.FLEEING, new FleeState())
+      .setState(FsmStateName.IDLE);
 
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics()

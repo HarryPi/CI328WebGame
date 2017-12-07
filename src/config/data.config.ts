@@ -1,5 +1,4 @@
 import { Difficulty, Levels, TankLayout } from '../constants/GameConstants';
-import TankLevel from './levels/tankLevel';
 
 /**
  * @class

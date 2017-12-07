@@ -1,18 +1,19 @@
-import {FSMStates} from '../../constants/GameConstants';
-import {State} from './state';
+import {FsmStateName} from '../../constants/GameConstants';
+import {FsmStates} from './fsm.states';
+import State = FsmStates.State;
 
 export default class StateMachine {
 
-  private _states: Map<FSMStates, State>;
+  private _states: Map<FsmStateName, State>;
   private _current: State;
 
   constructor(){
     this._states = new Map();
   }
-  public add(name: FSMStates, state: State) {
+  public add(name: FsmStateName, state: State) {
     this._states.set(name, state);
   }
-  public enter(name: FSMStates){
+  public enter(name: FsmStateName){
     if (this._current) {
       this._current.leave();
     }
@@ -24,7 +25,7 @@ export default class StateMachine {
       this._current.update();
     }
   }
-  public hasState(name: FSMStates): boolean {
+  public hasState(name: FsmStateName): boolean {
     return this._states.has(name);
   }
   public get current(): State{

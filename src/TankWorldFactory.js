@@ -1,17 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const entity_1 = require("./entities/entity");
-const GameConstants_1 = require("./constants/GameConstants");
-const idle_state_1 = require("./AI/fsm/idle.state");
-const seek_state_1 = require("./AI/fsm/seek.state");
-const firing_state_1 = require("./AI/fsm/firing.state");
 const guid_1 = require("./util/guid");
-const flee_state_1 = require("./AI/fsm/flee.state");
 const data_config_1 = require("./config/data.config");
-const data_components_1 = require("./component/data.components");
-const control_components_1 = require("./component/control.components");
+const GameConstants_1 = require("./constants/GameConstants");
+const fsm_states_1 = require("./AI/fsm/fsm.states");
 const collision_components_1 = require("./component/collision.components");
+const control_components_1 = require("./component/control.components");
+const data_components_1 = require("./component/data.components");
 const event_components_1 = require("./component/event.components");
+var IdleState = fsm_states_1.FsmStates.IdleState;
+var FiringState = fsm_states_1.FsmStates.FiringState;
+var FleeState = fsm_states_1.FsmStates.FleeState;
+var SeekState = fsm_states_1.FsmStates.SeekState;
+var PhysicsComponent = collision_components_1.CollisionComponents.PhysicsComponent;
+var CollisionsComponent = collision_components_1.CollisionComponents.CollisionsComponent;
+var CameraComponent = control_components_1.ControlComponents.CameraComponent;
+var AiComponent = control_components_1.ControlComponents.AiComponent;
+var BulletComponent = control_components_1.ControlComponents.BulletComponent;
+var LayerComponent = data_components_1.DataComponents.LayerComponent;
+var HealthComponent = data_components_1.DataComponents.HealthComponent;
+var TankComponent = data_components_1.DataComponents.TankComponent;
+var OwnerComponent = data_components_1.DataComponents.OwnerComponent;
+var MovableComponent = event_components_1.EventComponents.MovableComponent;
+var ShootComponent = event_components_1.EventComponents.ShootComponent;
+var StateComponent = event_components_1.EventComponents.StateComponent;
 /**
  * @class TankWorldFactory
  * @description
@@ -62,14 +75,14 @@ class TankWorldFactory {
      * */
     newPlayer() {
         let player = new entity_1.Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
-            .withComponent([new event_components_1.MovableComponent(),
-            new control_components_1.CameraComponent(this._game),
-            new collision_components_1.PhysicsComponent(this._game),
-            new event_components_1.ShootComponent(this._game, this),
-            new data_components_1.LayerComponent(),
-            new collision_components_1.CollisionsComponent(),
-            new data_components_1.HealthComponent(),
-            new data_components_1.TankComponent(data_config_1.DataConfig.tank)]);
+            .withComponent([new MovableComponent(),
+            new CameraComponent(this._game),
+            new PhysicsComponent(this._game),
+            new ShootComponent(this._game, this),
+            new LayerComponent(),
+            new CollisionsComponent(),
+            new HealthComponent(),
+            new TankComponent(data_config_1.DataConfig.tank)]);
         player.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         player.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(100000); //DataConfig.health);
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
@@ -101,24 +114,24 @@ class TankWorldFactory {
         // Get one store it and use it where appropriate
         let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
             .withComponent([
-            new event_components_1.MovableComponent(),
-            new collision_components_1.PhysicsComponent(this._game),
-            new event_components_1.ShootComponent(this._game, this),
-            new data_components_1.LayerComponent(),
-            new collision_components_1.CollisionsComponent(),
-            new event_components_1.StateComponent(),
-            new control_components_1.AiComponent(this._player),
-            new data_components_1.HealthComponent(),
-            new data_components_1.TankComponent(kindOfTank)
+            new MovableComponent(),
+            new PhysicsComponent(this._game),
+            new ShootComponent(this._game, this),
+            new LayerComponent(),
+            new CollisionsComponent(),
+            new StateComponent(),
+            new AiComponent(this._player),
+            new HealthComponent(),
+            new TankComponent(kindOfTank)
         ]);
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         enemy.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(data_config_1.DataConfig.enemyHealth);
         enemy.getComponent(GameConstants_1.ComponentType.STATE)
-            .addState(GameConstants_1.FSMStates.SEEK, new seek_state_1.SeekState())
-            .addState(GameConstants_1.FSMStates.IDLE, new idle_state_1.IdleState())
-            .addState(GameConstants_1.FSMStates.FIRING, new firing_state_1.FiringState())
-            .addState(GameConstants_1.FSMStates.FLEEING, new flee_state_1.FleeState())
-            .setState(GameConstants_1.FSMStates.IDLE);
+            .addState(GameConstants_1.FsmStateName.SEEK, new SeekState())
+            .addState(GameConstants_1.FsmStateName.IDLE, new IdleState())
+            .addState(GameConstants_1.FsmStateName.FIRING, new FiringState())
+            .addState(GameConstants_1.FsmStateName.FLEEING, new FleeState())
+            .setState(GameConstants_1.FsmStateName.IDLE);
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics()
             .flipSprite();
@@ -148,12 +161,12 @@ class TankWorldFactory {
     newBullet(x, y, owner) {
         let bullet = new entity_1.Entity(this._game, x, y)
             .withComponent([
-            new collision_components_1.PhysicsComponent(this._game),
-            new data_components_1.LayerComponent(),
-            new control_components_1.BulletComponent(this._game),
-            new collision_components_1.CollisionsComponent(),
-            new data_components_1.HealthComponent(),
-            new data_components_1.OwnerComponent()
+            new PhysicsComponent(this._game),
+            new LayerComponent(),
+            new BulletComponent(this._game),
+            new CollisionsComponent(),
+            new HealthComponent(),
+            new OwnerComponent()
         ]);
         bullet.getComponent(GameConstants_1.ComponentType.OWNER).owner = owner;
         bullet.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(1);
@@ -180,11 +193,11 @@ class TankWorldFactory {
     newDisaster() {
         let disaster = new entity_1.Entity(this._game, this._player.sprite.x, this._game.world.top)
             .withComponent([
-            new collision_components_1.PhysicsComponent(this._game),
-            new data_components_1.LayerComponent(),
-            new control_components_1.BulletComponent(this._game),
-            new collision_components_1.CollisionsComponent(),
-            new data_components_1.HealthComponent()
+            new PhysicsComponent(this._game),
+            new LayerComponent(),
+            new BulletComponent(this._game),
+            new CollisionsComponent(),
+            new HealthComponent()
         ]);
         disaster.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(1);
         disaster.getComponent(GameConstants_1.ComponentType.PHYSICS)

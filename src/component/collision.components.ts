@@ -1,112 +1,98 @@
-import {Component} from './component';
-import {Action, ComponentType} from '../constants/GameConstants';
+import { Component } from './component';
+import { Action, ComponentType } from '../constants/GameConstants';
+import { DataConfig } from '../config/data.config';
+import { DataComponents } from './data.components';
+
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import {HealthComponent, LayerComponent, OwnerComponent} from './data.components';
-import {DataConfig} from '../config/data.config';
+import HealthComponent = DataComponents.HealthComponent;
 
-export class CollisionsComponent extends Component {
-  private _ignoreCollision: boolean = true;
+export namespace CollisionComponents {
 
-  constructor() {
-    super(ComponentType.COLLISION);
-    this._requiredComponents = [
-      ComponentType.PHYSICS
-    ];
-  }
+  export class CollisionsComponent extends Component {
 
-  public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
-    this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
-    return this;
-  }
+    constructor() {
+      super(ComponentType.COLLISION);
+      this._requiredComponents = [
+        ComponentType.PHYSICS
+      ];
+    }
 
-  public cleanCollisions() {
-    this.target.sprite.body.data.shapes[0].sensor = true;
-  }
+    public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
+      this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
+      return this;
+    }
 
-  public collidesWith(collidesWith: CollisionGroup, actions: Array<Action>): CollisionsComponent {
-    let body: Phaser.Physics.P2.Body = this.target.sprite.body;
+    public cleanCollisions() {
+      this.target.sprite.body.data.shapes[0].sensor = true;
+    }
 
-    /*
-        if (body.collidesWith.includes(collidesWith)) {
-          return; // In case we attempt to set the same collision group twice
+    public collidesWith(collidesWith: CollisionGroup, actions: Array<Action>): CollisionsComponent {
+      let body: Phaser.Physics.P2.Body = this.target.sprite.body;
+
+
+      actions.forEach((action) => {
+        switch (action) {
+          case Action.NOTHING:
+            body.collides(collidesWith);
+            break;
+
+          case Action.DAMAGE:
+            // Each bullet does the same damage regardless of type
+            // Bullet damage depends on difficulty level
+            let aiComp = this.target.getComponent(ComponentType.AI);
+            let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
+
+            if (aiComp) {
+              body.collides(collidesWith, () => {
+                healthComp.dealDamage(DataConfig.playerDamage);
+              }, this);
+            } else {
+              body.collides(collidesWith, () => {
+                healthComp.dealDamage(DataConfig.enemyDamage);
+              });
+            }
+            break;
+
+          default:
+            break;
         }
-    */
+      });
+      return this;
+    }
 
-    actions.forEach((action) => {
-      switch (action) {
-        case Action.NOTHING:
-          body.collides(collidesWith);
-          break;
-
-        /*
-                case Action.EXPLODE:
-                  body.collides(collidesWith, this.explode, this);
-                  break;
-        */
-
-        case Action.DAMAGE:
-          // Each bullet does the same damage regardless of type
-          // Bullet damage depends on difficulty level
-          let aiComp = this.target.getComponent(ComponentType.AI);
-          let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
-
-          if (aiComp) {
-            body.collides(collidesWith, () => {
-              healthComp.dealDamage(DataConfig.playerDamage);
-            }, this);
-          } else {
-            body.collides(collidesWith, () => {
-              healthComp.dealDamage(DataConfig.enemyDamage);
-            });
-          }
-          break;
-
-        default:
-          break;
-      }
-    });
-    return this;
   }
+  export class PhysicsComponent extends Component {
+    private _game: Phaser.Game;
 
-  private explode(ownerBody: Phaser.Physics.P2.Body, impacted: Phaser.Physics.P2.Body): void {
-    let ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER); // Here we check if this Entity is a bullet as only bullets have owners
-    // Thus if this is bullet
-    if (ownerComponent) {
-      this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite(); // This should be true only if bullet
-      this.target.getComponent<LayerComponent>(ComponentType.LAYER).playAnimation(Action.EXPLODE, null, null, true);
+    constructor(game: Phaser.Game) {
+      super(ComponentType.PHYSICS);
+      this._game = game;
+    }
+
+    public addPhysics(drag: boolean = true): PhysicsComponent {
+      this._game.physics.p2.enable(this.target.sprite);
+      this.target.sprite.anchor.setTo(0.5, 0.5);
+      drag ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
+
+      return this;
+    }
+
+    public get gravity(): number {
+      return this._game.physics.p2.gravity.y;
+    }
+    public flipSprite(): PhysicsComponent{
+      this.target.sprite.scale.x = -1;
+      return this;
+    }
+    public stopSprite() {
+      this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;
+      this.target.sprite.body.restitution = 0.0;
+      this.target.sprite.body.velocity.x = 0;
+      this.target.sprite.body.velocity.y = 0;
+      this.target.sprite.body.allowGravity = false;
+      this.target.sprite.body.data.gravityScale = 0;
+      this.target.sprite.body.angularDumping = 1;
     }
   }
 }
-export class PhysicsComponent extends Component {
-  private _game: Phaser.Game;
 
-  constructor(game: Phaser.Game) {
-    super(ComponentType.PHYSICS);
-    this._game = game;
-  }
-
-  public addPhysics(drag: boolean = true): PhysicsComponent {
-    this._game.physics.p2.enable(this.target.sprite);
-    this.target.sprite.anchor.setTo(0.5, 0.5);
-    drag ? this.target.sprite.body.angularDamping = 0.7 : this.target.sprite.body.angularDamping = 0.0;
-
-    return this;
-  }
-
-  public get gravity(): number {
-    return this._game.physics.p2.gravity.y;
-  }
-  public flipSprite(): PhysicsComponent{
-    this.target.sprite.scale.x = -1;
-    return this;
-  }
-  public stopSprite() {
-    this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;
-    this.target.sprite.body.restitution = 0.0;
-    this.target.sprite.body.velocity.x = 0;
-    this.target.sprite.body.velocity.y = 0;
-    this.target.sprite.body.allowGravity = false;
-    this.target.sprite.body.data.gravityScale = 0;
-    this.target.sprite.body.angularDumping = 1;
-  }
-}

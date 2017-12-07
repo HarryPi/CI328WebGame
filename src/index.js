@@ -6,21 +6,22 @@ require('p2');
 require('phaser');
 require("styles/style.styl");
 const GameConstants_1 = require("./constants/GameConstants");
-const boot_state_1 = require("./states/boot.state");
-const preload_state_1 = require("./states/preload.state");
-const game_state_1 = require("./states/game.state");
-const mainMenu_state_1 = require("./states/mainMenu.state");
 const ScreenMetrics_1 = require("./util/ScreenMetrics");
-const gameover_state_1 = require("./states/gameover.state");
+const gameStates_1 = require("./states/gameStates");
+var BootState = gameStates_1.GameStates.BootState;
+var PreloadState = gameStates_1.GameStates.PreloadState;
+var GameState = gameStates_1.GameStates.GameState;
+var MainMenuState = gameStates_1.GameStates.MainMenuState;
+var GameoverState = gameStates_1.GameStates.GameoverState;
 // The main class of our application
 class App extends Phaser.Game {
     constructor(config) {
         super(config);
-        this.state.add(GameConstants_1.States.BOOT_STATE, boot_state_1.BootState);
-        this.state.add(GameConstants_1.States.PRELOAD_STATE, preload_state_1.PreloadState);
-        this.state.add(GameConstants_1.States.GAME_STATE, game_state_1.GameState);
-        this.state.add(GameConstants_1.States.MAIN_MENU_STATE, mainMenu_state_1.MainMenuState);
-        this.state.add(GameConstants_1.States.GAMEOVER_SATE, gameover_state_1.GameoverState);
+        this.state.add(GameConstants_1.States.BOOT_STATE, BootState);
+        this.state.add(GameConstants_1.States.PRELOAD_STATE, PreloadState);
+        this.state.add(GameConstants_1.States.GAME_STATE, GameState);
+        this.state.add(GameConstants_1.States.MAIN_MENU_STATE, MainMenuState);
+        this.state.add(GameConstants_1.States.GAMEOVER_SATE, GameoverState);
         this.state.start(GameConstants_1.States.BOOT_STATE);
     }
 }

@@ -8,13 +8,15 @@ require('phaser');
 
 import 'styles/style.styl';
 import { States } from './constants/GameConstants';
-import { BootState } from './states/boot.state';
-import { PreloadState } from './states/preload.state';
-import { GameState } from './states/game.state';
-import { MainMenuState } from './states/mainMenu.state';
 
 import { DEFAULT_GAME_HEIGHT, DEFAULT_GAME_WIDTH, SCALE_MODE, ScreenMetrics, ScreenUtils } from './util/ScreenMetrics';
-import { GameoverState } from './states/gameover.state';
+import { GameStates } from './states/gameStates';
+
+import BootState = GameStates.BootState;
+import PreloadState = GameStates.PreloadState;
+import GameState = GameStates.GameState;
+import MainMenuState = GameStates.MainMenuState;
+import GameoverState = GameStates.GameoverState;
 
 // The main class of our application
 export class App extends Phaser.Game {

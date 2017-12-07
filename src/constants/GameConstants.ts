@@ -103,7 +103,7 @@ export enum AnimationTypes {
   EXPLOSION = 'explosion_animation'
 }
 
-export enum FSMStates {
+export enum FsmStateName {
   IDLE,
   SEEK,
   FIRING,

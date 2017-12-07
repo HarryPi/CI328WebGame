@@ -117,13 +117,13 @@ var AnimationTypes;
 (function (AnimationTypes) {
     AnimationTypes["EXPLOSION"] = "explosion_animation";
 })(AnimationTypes = exports.AnimationTypes || (exports.AnimationTypes = {}));
-var FSMStates;
-(function (FSMStates) {
-    FSMStates[FSMStates["IDLE"] = 0] = "IDLE";
-    FSMStates[FSMStates["SEEK"] = 1] = "SEEK";
-    FSMStates[FSMStates["FIRING"] = 2] = "FIRING";
-    FSMStates[FSMStates["FLEEING"] = 3] = "FLEEING";
-})(FSMStates = exports.FSMStates || (exports.FSMStates = {}));
+var FsmStateName;
+(function (FsmStateName) {
+    FsmStateName[FsmStateName["IDLE"] = 0] = "IDLE";
+    FsmStateName[FsmStateName["SEEK"] = 1] = "SEEK";
+    FsmStateName[FsmStateName["FIRING"] = 2] = "FIRING";
+    FsmStateName[FsmStateName["FLEEING"] = 3] = "FLEEING";
+})(FsmStateName = exports.FsmStateName || (exports.FsmStateName = {}));
 var MainMenuButtons;
 (function (MainMenuButtons) {
     MainMenuButtons["NEW_GAME"] = "new_game";
