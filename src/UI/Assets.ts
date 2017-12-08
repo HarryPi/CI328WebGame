@@ -125,14 +125,6 @@ class AssetLoader {
   }
 
 
-
-
-
-
-
-
-
-
   /**
    * @description
    * Returns the cached memory object see {@link Phaser.Loader}

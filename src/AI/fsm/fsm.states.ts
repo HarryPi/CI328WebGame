@@ -1,7 +1,7 @@
-import { Entity } from '../../entities/entity';
+import {Entity} from '../../entities/entity';
 import {ComponentType, FsmStateName, InputType} from '../../constants/GameConstants';
-import { EventComponents } from '../../component/event.components';
-import { ControlComponents } from '../../component/control.components';
+import {EventComponents} from '../../component/event.components';
+import {ControlComponents} from '../../component/control.components';
 
 import ShootComponent = EventComponents.ShootComponent;
 import MovableComponent = EventComponents.MovableComponent;
@@ -47,8 +47,16 @@ export namespace FsmStates {
   export class FleeState extends State {
 
     enter(): void {
-      // We know any component implementing SeekState will have an AI component
-      this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
+      let direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;
+      console.log(`direction is ${direction.toString()}`);
+      let physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+      if (direction > 0) {
+        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
+        physicsComponent.scaleSprite(-1);
+      } else {
+        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
+        physicsComponent.scaleSprite(1);
+      }
     }
 
     leave(): void {
@@ -62,25 +70,37 @@ export namespace FsmStates {
   }
 
   export class SuicideState extends State {
+    private _direction: number;
     enter(): void {
-      let aiComponent = this._entity.getComponent<AiComponent>(ComponentType.AI);
-      let distance = Math.abs(aiComponent.player.sprite.x - this._entity.sprite.x);
-      let overKillDamage = 10000;
-      if (MathUtil.isBetween(distance, 100, 0)) {
-        this._entity.getComponent<HealthComponent>(ComponentType.HEALTH).dealDamage(overKillDamage);
-        aiComponent.player.getComponent<HealthComponent>(ComponentType.HEALTH).dealDamage(2);
+      this._direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;
+      let physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+      if (this._direction < 0) {
+        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
+        physicsComponent.scaleSprite(-1);
+      } else {
+        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
+        physicsComponent.scaleSprite(1);
       }
-
     }
 
     leave(): void {
-      this._entity.getComponent<StateComponent>(ComponentType.STATE).setState(FsmStateName.SUICIDE);
     }
 
     update(): void {
+      console.log(this._direction);
+      if (Math.abs(this._direction) <= 10) {
+        const overKillDamage: number = 10000;
+        const playerDamageOnSuicide = 2;
+
+        this._entity.getComponent<HealthComponent>(ComponentType.HEALTH).dealDamage(overKillDamage);
+        this._entity.getComponent<AiComponent>(ComponentType.AI)
+          .player.getComponent<HealthComponent>(ComponentType.HEALTH)
+          .dealDamage(playerDamageOnSuicide);
+      }
     }
 
   }
+
   export class IdleState extends State {
 
     enter(): void {
@@ -94,7 +114,7 @@ export namespace FsmStates {
 
   }
 
-  export class SeekState extends State {
+  export class WonderState extends State {
 
     enter(): void {
       let direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;

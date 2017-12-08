@@ -92,17 +92,19 @@ var ControlComponents;
                     let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
                     let lowHealth = healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
                     if (!lowHealth) {
-                        sComp.setState(GameConstants_1.FsmStateName.FIRING);
+                        sComp.setState(GameConstants_1.FsmStateName.FLEEING);
                     }
                     else {
-                        // Check if there is long range support close by
+                        // Check if there is a reason to die
                         if (this.checkIfAliesNearby()) {
                             sComp.setState(GameConstants_1.FsmStateName.SUICIDE);
+                            return;
                         }
+                        sComp.setState(GameConstants_1.FsmStateName.FLEEING);
                     }
                     break;
                 case GameConstants_1.AIConstant.FAR_AWAY:
-                    sComp.setState(GameConstants_1.FsmStateName.SEEK);
+                    sComp.setState(GameConstants_1.FsmStateName.WANDER);
                     break;
                 default:
                     break;
@@ -117,14 +119,17 @@ var ControlComponents;
             const distance = Math.abs(this._player.sprite.x - this.target.sprite.x);
             const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
             const rangeOfProjectile = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-            const decisionMakingDistance = 50;
+            const decisionMakingDistance = 15;
             if (math_util_1.MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
+                console.log(GameConstants_1.AIConstant.CAN_HIT_ENEMY);
                 return GameConstants_1.AIConstant.CAN_HIT_ENEMY;
             }
             else if (rangeOfProjectile > distance) {
+                console.log(GameConstants_1.AIConstant.CLOSE);
                 return GameConstants_1.AIConstant.CLOSE;
             }
             else {
+                console.log(GameConstants_1.AIConstant.FAR_AWAY);
                 return GameConstants_1.AIConstant.FAR_AWAY;
             }
         }

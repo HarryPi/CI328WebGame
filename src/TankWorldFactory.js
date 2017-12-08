@@ -12,7 +12,7 @@ const event_components_1 = require("./component/event.components");
 var IdleState = fsm_states_1.FsmStates.IdleState;
 var FiringState = fsm_states_1.FsmStates.FiringState;
 var FleeState = fsm_states_1.FsmStates.FleeState;
-var SeekState = fsm_states_1.FsmStates.SeekState;
+var SeekState = fsm_states_1.FsmStates.WonderState;
 var PhysicsComponent = collision_components_1.CollisionComponents.PhysicsComponent;
 var CollisionsComponent = collision_components_1.CollisionComponents.CollisionsComponent;
 var CameraComponent = control_components_1.ControlComponents.CameraComponent;
@@ -26,6 +26,8 @@ var MovableComponent = event_components_1.EventComponents.MovableComponent;
 var ShootComponent = event_components_1.EventComponents.ShootComponent;
 var StateComponent = event_components_1.EventComponents.StateComponent;
 var SuicideState = fsm_states_1.FsmStates.SuicideState;
+const math_util_1 = require("./util/math.util");
+const vector_1 = require("./util/vector");
 /**
  * @class TankWorldFactory
  * @description
@@ -40,7 +42,7 @@ class TankWorldFactory {
     /**
      * @constructor
      * @param {Phaser.Game} game
-     * @param state - Current state
+     * @param state - Current conditions
      * */
     constructor(game, state) {
         this._entitiesSubscriptions = []; // Keep a record of the subscriptions to remove later
@@ -113,7 +115,17 @@ class TankWorldFactory {
     newEnemy(subFunction) {
         let kindOfTank = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
         // Get one store it and use it where appropriate
-        let enemy = new entity_1.Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
+        const startingPost = new vector_1.default();
+        const random = math_util_1.MathUtil.randomIntFromInterval(0, 1);
+        if (random === 1) {
+            startingPost.x = this.currentLevel.playerStartPos.x;
+            startingPost.y = this.currentLevel.playerStartPos.y;
+        }
+        else {
+            startingPost.x = this.currentLevel.enemyStartPos.x;
+            startingPost.y = this.currentLevel.enemyStartPos.y;
+        }
+        let enemy = new entity_1.Entity(this._game, startingPost.x, startingPost.y, null)
             .withComponent([
             new MovableComponent(),
             new PhysicsComponent(this._game),
@@ -130,7 +142,7 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         enemy.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(data_config_1.DataConfig.enemyHealth);
         enemy.getComponent(GameConstants_1.ComponentType.STATE)
-            .addState(GameConstants_1.FsmStateName.SEEK, new SeekState())
+            .addState(GameConstants_1.FsmStateName.WANDER, new SeekState())
             .addState(GameConstants_1.FsmStateName.IDLE, new IdleState())
             .addState(GameConstants_1.FsmStateName.FIRING, new FiringState())
             .addState(GameConstants_1.FsmStateName.FLEEING, new FleeState())
@@ -151,6 +163,7 @@ class TankWorldFactory {
             tag: guid_1.Guid.newGuid()
         };
         let sub = enemy.whenDestroyed.subscribe(() => {
+            // this is to ensure when the entity is destroyed all memorie refs are released for garbage collection
             subFunction();
             const index = this._entities.indexOf(enemy);
             this._entities.splice(index, 1);

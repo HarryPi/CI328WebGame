@@ -125,16 +125,18 @@ export namespace ControlComponents {
           let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
           let lowHealth: boolean =  healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
           if (!lowHealth) {
-            sComp.setState(FsmStateName.FIRING);
+            sComp.setState(FsmStateName.FLEEING);
           } else {
-            // Check if there is long range support close by
+            // Check if there is a reason to die
             if (this.checkIfAliesNearby()) {
               sComp.setState(FsmStateName.SUICIDE);
+              return;
             }
+            sComp.setState(FsmStateName.FLEEING);
           }
           break;
         case AIConstant.FAR_AWAY:
-          sComp.setState(FsmStateName.SEEK);
+          sComp.setState(FsmStateName.WANDER);
           break;
         default:
           break;
@@ -151,13 +153,16 @@ export namespace ControlComponents {
       const distance: number = Math.abs(this._player.sprite.x - this.target.sprite.x);
       const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
       const rangeOfProjectile: number = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-      const decisionMakingDistance = 50;
+      const decisionMakingDistance = 15;
 
       if (MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
+        console.log(AIConstant.CAN_HIT_ENEMY);
         return AIConstant.CAN_HIT_ENEMY;
       } else if (rangeOfProjectile > distance) {
+        console.log(AIConstant.CLOSE);
         return AIConstant.CLOSE;
-      } else {
+      } else  {
+        console.log(AIConstant.FAR_AWAY);
         return AIConstant.FAR_AWAY;
       }
 

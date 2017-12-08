@@ -41,7 +41,7 @@ class DataConfig {
     }
     /**
      * @description
-     * Will revert the values to their prior state NOT the initial state
+     * Will revert the values to their prior conditions NOT the initial conditions
      * */
     static revertChanges() {
         this._shadowLevel ? this._level = this._shadowLevel : this._level = this._level;

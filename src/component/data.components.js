@@ -18,6 +18,7 @@ var DataComponents;
          * */
         dealDamage(damage) {
             // Check if the damage will kill the entity
+            console.log(`Sprites health is ${this.target.sprite.health.toString()} and damage is ${damage.toString()}`);
             if (this.target.sprite.health - damage <= 0) {
                 this.target.getComponent(GameConstants_1.ComponentType.COLLISION).cleanCollisions();
                 this.target.getComponent(GameConstants_1.ComponentType.PHYSICS).stopSprite();

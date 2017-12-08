@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../../constants/GameConstants");
-const math_util_1 = require("../../util/math.util");
 var FsmStates;
 (function (FsmStates) {
     class State {
@@ -23,8 +22,17 @@ var FsmStates;
     FsmStates.FiringState = FiringState;
     class FleeState extends State {
         enter() {
-            // We know any component implementing SeekState will have an AI component
-            this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.RIGHT_INPUT;
+            let direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
+            console.log(`direction is ${direction.toString()}`);
+            let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            if (direction > 0) {
+                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.LEFT_INPUT;
+                physicsComponent.scaleSprite(-1);
+            }
+            else {
+                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.RIGHT_INPUT;
+                physicsComponent.scaleSprite(1);
+            }
         }
         leave() {
             this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.STOP;
@@ -36,18 +44,29 @@ var FsmStates;
     FsmStates.FleeState = FleeState;
     class SuicideState extends State {
         enter() {
-            let aiComponent = this._entity.getComponent(GameConstants_1.ComponentType.AI);
-            let distance = Math.abs(aiComponent.player.sprite.x - this._entity.sprite.x);
-            let overKillDamage = 10000;
-            if (math_util_1.MathUtil.isBetween(distance, 100, 0)) {
-                this._entity.getComponent(GameConstants_1.ComponentType.HEALTH).dealDamage(overKillDamage);
-                aiComponent.player.getComponent(GameConstants_1.ComponentType.HEALTH).dealDamage(2);
+            this._direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
+            let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            if (this._direction < 0) {
+                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.LEFT_INPUT;
+                physicsComponent.scaleSprite(-1);
+            }
+            else {
+                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.RIGHT_INPUT;
+                physicsComponent.scaleSprite(1);
             }
         }
         leave() {
-            this._entity.getComponent(GameConstants_1.ComponentType.STATE).setState(GameConstants_1.FsmStateName.SUICIDE);
         }
         update() {
+            console.log(this._direction);
+            if (Math.abs(this._direction) <= 10) {
+                const overKillDamage = 10000;
+                const playerDamageOnSuicide = 2;
+                this._entity.getComponent(GameConstants_1.ComponentType.HEALTH).dealDamage(overKillDamage);
+                this._entity.getComponent(GameConstants_1.ComponentType.AI)
+                    .player.getComponent(GameConstants_1.ComponentType.HEALTH)
+                    .dealDamage(playerDamageOnSuicide);
+            }
         }
     }
     FsmStates.SuicideState = SuicideState;
@@ -60,7 +79,7 @@ var FsmStates;
         }
     }
     FsmStates.IdleState = IdleState;
-    class SeekState extends State {
+    class WonderState extends State {
         enter() {
             let direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
             let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
@@ -80,6 +99,6 @@ var FsmStates;
             this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).update();
         }
     }
-    FsmStates.SeekState = SeekState;
+    FsmStates.WonderState = WonderState;
 })(FsmStates = exports.FsmStates || (exports.FsmStates = {}));
 //# sourceMappingURL=fsm.states.js.map

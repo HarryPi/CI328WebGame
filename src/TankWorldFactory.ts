@@ -13,7 +13,7 @@ import { TankGameLevels } from './config/levels/levels.tankLevels';
 import IdleState = FsmStates.IdleState;
 import FiringState = FsmStates.FiringState;
 import FleeState = FsmStates.FleeState;
-import SeekState = FsmStates.SeekState;
+import SeekState = FsmStates.WonderState;
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import CollisionsComponent = CollisionComponents.CollisionsComponent;
 import CameraComponent = ControlComponents.CameraComponent;
@@ -28,6 +28,8 @@ import ShootComponent = EventComponents.ShootComponent;
 import StateComponent = EventComponents.StateComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import SuicideState = FsmStates.SuicideState;
+import {MathUtil} from './util/math.util';
+import Vector from './util/vector';
 
 /**
  * @class TankWorldFactory
@@ -66,7 +68,7 @@ export default class TankWorldFactory {
   /**
    * @constructor
    * @param {Phaser.Game} game
-   * @param state - Current state
+   * @param state - Current conditions
    * */
     constructor(game: Phaser.Game, state: Phaser.State) {
 
@@ -151,7 +153,18 @@ export default class TankWorldFactory {
   public newEnemy(subFunction?: () => void ) {
     let kindOfTank: TankLayout = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
                                                                     // Get one store it and use it where appropriate
-    let enemy = new Entity(this._game, this._currentLevel.enemyStartPos.x, this._currentLevel.enemyStartPos.y, null)
+    const startingPost = new Vector();
+    const random = MathUtil.randomIntFromInterval(0,1);
+
+    if (random === 1) {
+      startingPost.x = this.currentLevel.playerStartPos.x;
+      startingPost.y = this.currentLevel.playerStartPos.y;
+    } else {
+      startingPost.x = this.currentLevel.enemyStartPos.x;
+      startingPost.y = this.currentLevel.enemyStartPos.y;
+    }
+
+    let enemy = new Entity(this._game, startingPost.x, startingPost.y, null)
       .withComponent(
         [
           new MovableComponent(),
@@ -174,7 +187,7 @@ export default class TankWorldFactory {
     enemy.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(DataConfig.enemyHealth);
 
     enemy.getComponent<StateComponent>(ComponentType.STATE)
-      .addState(FsmStateName.SEEK, new SeekState())
+      .addState(FsmStateName.WANDER, new SeekState())
       .addState(FsmStateName.IDLE, new IdleState())
       .addState(FsmStateName.FIRING, new FiringState())
       .addState(FsmStateName.FLEEING, new FleeState())
@@ -199,6 +212,8 @@ export default class TankWorldFactory {
       tag: Guid.newGuid()
     };
     let sub = enemy.whenDestroyed.subscribe(() => {
+
+      // this is to ensure when the entity is destroyed all memorie refs are released for garbage collection
       subFunction();
       const index = this._entities.indexOf(enemy);
       this._entities.splice(index, 1);
