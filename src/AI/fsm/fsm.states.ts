@@ -47,15 +47,16 @@ export namespace FsmStates {
   export class FleeState extends State {
 
     enter(): void {
-      let direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-      console.log(`direction is ${direction.toString()}`);
-      let physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
-      if (direction > 0) {
-        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
-        physicsComponent.scaleSprite(-1);
-      } else {
-        this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
-        physicsComponent.scaleSprite(1);
+      let aiComponent: AiComponent = this._entity.getComponent<AiComponent>(ComponentType.AI);
+      let moveComponent: MovableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
+     // Get player direction
+      let playerDir = aiComponent.player.sprite.scale.x;
+      // Go in the other direction of the player
+      if (playerDir === 1) {
+        moveComponent.direction = InputType.LEFT_INPUT;
+      }
+      else {
+        moveComponent.direction = InputType.RIGHT_INPUT;
       }
     }
 
@@ -66,7 +67,6 @@ export namespace FsmStates {
     update(): void {
       this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).update();
     }
-
   }
 
   export class SuicideState extends State {
@@ -114,7 +114,7 @@ export namespace FsmStates {
 
   }
 
-  export class WonderState extends State {
+  export class SeekState extends State {
 
     enter(): void {
       let direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;

@@ -79,14 +79,15 @@ export namespace ControlComponents {
 
       function calculateVelocityX(isAi: boolean = true, tankSpeed: number, angle: number): number {
         if (isAi) {
+          angle = -45;
           return velocity * Math.cos(angle);
         }
         return velocity * Math.cos(angle);
       }
 
       function calculateVelocityY(isAi: boolean = true, tankSpeed: number, angle: number): number {
-
         if (isAi) {
+          angle = -45;
           return velocity * Math.sin(angle);
         }
         return velocity * Math.sin(angle);
@@ -170,6 +171,9 @@ export namespace ControlComponents {
 
     get player(): Entity {
       return this._player;
+    }
+    get friendlies(): Array<Entity> {
+      return this._friendlies;
     }
   }
 

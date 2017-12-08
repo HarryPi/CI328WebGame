@@ -13,7 +13,7 @@ import { TankGameLevels } from './config/levels/levels.tankLevels';
 import IdleState = FsmStates.IdleState;
 import FiringState = FsmStates.FiringState;
 import FleeState = FsmStates.FleeState;
-import SeekState = FsmStates.WonderState;
+import SeekState = FsmStates.SeekState;
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import CollisionsComponent = CollisionComponents.CollisionsComponent;
 import CameraComponent = ControlComponents.CameraComponent;

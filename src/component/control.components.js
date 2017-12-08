@@ -56,12 +56,14 @@ var ControlComponents;
                 : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
             function calculateVelocityX(isAi = true, tankSpeed, angle) {
                 if (isAi) {
+                    angle = -45;
                     return velocity * Math.cos(angle);
                 }
                 return velocity * Math.cos(angle);
             }
             function calculateVelocityY(isAi = true, tankSpeed, angle) {
                 if (isAi) {
+                    angle = -45;
                     return velocity * Math.sin(angle);
                 }
                 return velocity * Math.sin(angle);
@@ -135,6 +137,9 @@ var ControlComponents;
         }
         get player() {
             return this._player;
+        }
+        get friendlies() {
+            return this._friendlies;
         }
     }
     ControlComponents.AiComponent = AiComponent;

@@ -22,16 +22,16 @@ var FsmStates;
     FsmStates.FiringState = FiringState;
     class FleeState extends State {
         enter() {
-            let direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-            console.log(`direction is ${direction.toString()}`);
-            let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
-            if (direction > 0) {
-                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.LEFT_INPUT;
-                physicsComponent.scaleSprite(-1);
+            let aiComponent = this._entity.getComponent(GameConstants_1.ComponentType.AI);
+            let moveComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            // Get player direction
+            let playerDir = aiComponent.player.sprite.scale.x;
+            // Go in the other direction of the player
+            if (playerDir === 1) {
+                moveComponent.direction = GameConstants_1.InputType.LEFT_INPUT;
             }
             else {
-                this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.RIGHT_INPUT;
-                physicsComponent.scaleSprite(1);
+                moveComponent.direction = GameConstants_1.InputType.RIGHT_INPUT;
             }
         }
         leave() {
@@ -79,7 +79,7 @@ var FsmStates;
         }
     }
     FsmStates.IdleState = IdleState;
-    class WonderState extends State {
+    class SeekState extends State {
         enter() {
             let direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
             let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
@@ -99,6 +99,6 @@ var FsmStates;
             this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).update();
         }
     }
-    FsmStates.WonderState = WonderState;
+    FsmStates.SeekState = SeekState;
 })(FsmStates = exports.FsmStates || (exports.FsmStates = {}));
 //# sourceMappingURL=fsm.states.js.map
