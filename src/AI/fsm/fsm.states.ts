@@ -64,7 +64,7 @@ export namespace FsmStates {
 
       if (MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
         shootComponent.canShoot = true;
-      }  else if (Math.abs(direction) < rangeOfProjectile) {
+      }  else if (Math.abs(direction) < rangeOfProjectile ) {
         direction > 0 ? movableComponent.direction = InputType.LEFT_INPUT : movableComponent.direction = InputType.RIGHT_INPUT;
       } else {
         direction > 0 ? movableComponent.direction = InputType.RIGHT_INPUT : movableComponent.direction = InputType.LEFT_INPUT;
