@@ -119,11 +119,12 @@ var AnimationTypes;
 })(AnimationTypes = exports.AnimationTypes || (exports.AnimationTypes = {}));
 var FsmStateName;
 (function (FsmStateName) {
-    FsmStateName[FsmStateName["SUICIDE"] = 0] = "SUICIDE";
-    FsmStateName[FsmStateName["IDLE"] = 1] = "IDLE";
-    FsmStateName[FsmStateName["SEEK"] = 2] = "SEEK";
-    FsmStateName[FsmStateName["FIRING"] = 3] = "FIRING";
-    FsmStateName[FsmStateName["FLEEING"] = 4] = "FLEEING";
+    FsmStateName[FsmStateName["EVADE"] = 0] = "EVADE";
+    FsmStateName[FsmStateName["SUICIDE"] = 1] = "SUICIDE";
+    FsmStateName[FsmStateName["IDLE"] = 2] = "IDLE";
+    FsmStateName[FsmStateName["SEEK"] = 3] = "SEEK";
+    FsmStateName[FsmStateName["PURSUING"] = 4] = "PURSUING";
+    FsmStateName[FsmStateName["FLEEING"] = 5] = "FLEEING";
 })(FsmStateName = exports.FsmStateName || (exports.FsmStateName = {}));
 var MainMenuButtons;
 (function (MainMenuButtons) {

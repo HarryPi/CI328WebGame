@@ -1,5 +1,5 @@
 import { Entity } from '../../entities/entity';
-import {  ComponentType, InputType } from '../../constants/GameConstants';
+import {ComponentType, FsmStateName, InputType} from '../../constants/GameConstants';
 import { EventComponents } from '../../component/event.components';
 import { ControlComponents } from '../../component/control.components';
 
@@ -8,6 +8,7 @@ import MovableComponent = EventComponents.MovableComponent;
 import { CollisionComponents } from '../../component/collision.components';
 import { DataComponents } from '../../component/data.components';
 import { DataConfig } from '../../config/data.config';
+import {MathUtil} from '../../util/math.util';
 
 export namespace FsmStates {
 
@@ -15,6 +16,7 @@ export namespace FsmStates {
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
   import HealthComponent = DataComponents.HealthComponent;
   import TankComponent = DataComponents.TankComponent;
+  import StateComponent = EventComponents.StateComponent;
 
   export abstract class State {
     protected _entity: Entity;
@@ -30,9 +32,9 @@ export namespace FsmStates {
     }
   }
 
-  export class FiringState extends State {
+  // todo: rename to pursing state
+  export class PursuingState extends State {
     enter(): void {
-      this._entity.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
     }
 
     leave(): void {
@@ -42,20 +44,33 @@ export namespace FsmStates {
     update(): void {
       const tankComponent = this._entity.getComponent<TankComponent>(ComponentType.TANK);
       const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
-      const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
+      const stateComponent = this._entity.getComponent<StateComponent>(ComponentType.STATE);
       const shootComponent = this._entity.getComponent<ShootComponent>(ComponentType.SHOOT);
+      const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
 
       const distance = this._entity.sprite.x - aiComp.player.sprite.x;
 
-      let frames = (distance / tankComponent.speed) + (1 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
-      let futurePosition = aiComp.player.sprite.x + aiComp.player.sprite.body.velocity.x * frames;
-      let direction = futurePosition - this._entity.sprite.x;
+      let frames = (distance / tankComponent.speed) + (10 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
 
-      if (!(Math.abs(futurePosition) - this.rangeOfProjectile() === 0)) {
+      let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
+
+      let direction = futurePosition - this._entity.sprite.x;
+      let rangeOfProjectile = shootComponent.rangeOfProjectile;
+
+      console.log(`future pos is ${futurePosition.toString()}`);
+      console.log(`range of proj is ${rangeOfProjectile.toString()}`);
+      console.log(`player tank loc is ${aiComp.player.sprite.x.toString()}`);
+      console.log(`player - ai loc is ${direction.toString()}`);
+
+      if (MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
         shootComponent.canShoot = true;
+      }  else if (Math.abs(direction) < rangeOfProjectile) {
+        direction > 0 ? movableComponent.direction = InputType.LEFT_INPUT : movableComponent.direction = InputType.RIGHT_INPUT;
+      } else {
+        direction > 0 ? movableComponent.direction = InputType.RIGHT_INPUT : movableComponent.direction = InputType.LEFT_INPUT;
       }
-      direction > 0 ? movableComponent.direction = InputType.RIGHT_INPUT : movableComponent.direction = InputType.LEFT_INPUT;
       this.correctScale();
+
     }
     private correctScale (){
       const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
@@ -66,16 +81,7 @@ export namespace FsmStates {
         this._entity.sprite.scale.x = -1;
       }
     }
-    private rangeOfProjectile(): number {
-      const tankComponent: TankComponent = this._entity.getComponent<TankComponent>(ComponentType.TANK);
-      const physicsComponent: PhysicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
 
-      const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
-      const rangeOfProjectile: number = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
-
-      return rangeOfProjectile;
-
-    }
   }
 
   export class FleeState extends State {
@@ -170,4 +176,22 @@ export namespace FsmStates {
 
   }
 
+  export class EvadeState extends State {
+
+    enter(): void {
+    }
+
+    leave(): void {
+    }
+
+    update(): void {
+      console.log('i am evading');
+      const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
+      const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
+
+      // Move until in range to pursuit again
+      aiComp.player.sprite.scale.x > 0 ? movableComponent.direction = InputType.LEFT_INPUT : movableComponent.direction = InputType.RIGHT_INPUT;
+    }
+
+  }
 }

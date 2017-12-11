@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../../constants/GameConstants");
 const data_config_1 = require("../../config/data.config");
+const math_util_1 = require("../../util/math.util");
 var FsmStates;
 (function (FsmStates) {
     class State {
@@ -10,9 +11,9 @@ var FsmStates;
         }
     }
     FsmStates.State = State;
-    class FiringState extends State {
+    // todo: rename to pursing state
+    class PursuingState extends State {
         enter() {
-            this._entity.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
         }
         leave() {
             this._entity.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = false;
@@ -20,16 +21,27 @@ var FsmStates;
         update() {
             const tankComponent = this._entity.getComponent(GameConstants_1.ComponentType.TANK);
             const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
-            const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            const stateComponent = this._entity.getComponent(GameConstants_1.ComponentType.STATE);
             const shootComponent = this._entity.getComponent(GameConstants_1.ComponentType.SHOOT);
+            const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
             const distance = this._entity.sprite.x - aiComp.player.sprite.x;
-            let frames = (distance / tankComponent.speed) + (1 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
-            let futurePosition = aiComp.player.sprite.x + aiComp.player.sprite.body.velocity.x * frames;
+            let frames = (distance / tankComponent.speed) + (10 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+            let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
             let direction = futurePosition - this._entity.sprite.x;
-            if (!(Math.abs(futurePosition) - this.rangeOfProjectile() === 0)) {
+            let rangeOfProjectile = shootComponent.rangeOfProjectile;
+            console.log(`future pos is ${futurePosition.toString()}`);
+            console.log(`range of proj is ${rangeOfProjectile.toString()}`);
+            console.log(`player tank loc is ${aiComp.player.sprite.x.toString()}`);
+            console.log(`player - ai loc is ${direction.toString()}`);
+            if (math_util_1.MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
                 shootComponent.canShoot = true;
             }
-            direction > 0 ? movableComponent.direction = GameConstants_1.InputType.RIGHT_INPUT : movableComponent.direction = GameConstants_1.InputType.LEFT_INPUT;
+            else if (Math.abs(direction) < rangeOfProjectile) {
+                direction > 0 ? movableComponent.direction = GameConstants_1.InputType.LEFT_INPUT : movableComponent.direction = GameConstants_1.InputType.RIGHT_INPUT;
+            }
+            else {
+                direction > 0 ? movableComponent.direction = GameConstants_1.InputType.RIGHT_INPUT : movableComponent.direction = GameConstants_1.InputType.LEFT_INPUT;
+            }
             this.correctScale();
         }
         correctScale() {
@@ -42,15 +54,8 @@ var FsmStates;
                 this._entity.sprite.scale.x = -1;
             }
         }
-        rangeOfProjectile() {
-            const tankComponent = this._entity.getComponent(GameConstants_1.ComponentType.TANK);
-            const physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
-            const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
-            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
-            return rangeOfProjectile;
-        }
     }
-    FsmStates.FiringState = FiringState;
+    FsmStates.PursuingState = PursuingState;
     class FleeState extends State {
         enter() {
             let aiComponent = this._entity.getComponent(GameConstants_1.ComponentType.AI);
@@ -127,5 +132,19 @@ var FsmStates;
         }
     }
     FsmStates.SeekState = SeekState;
+    class EvadeState extends State {
+        enter() {
+        }
+        leave() {
+        }
+        update() {
+            console.log('i am evading');
+            const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
+            const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            // Move until in range to pursuit again
+            aiComp.player.sprite.scale.x > 0 ? movableComponent.direction = GameConstants_1.InputType.LEFT_INPUT : movableComponent.direction = GameConstants_1.InputType.RIGHT_INPUT;
+        }
+    }
+    FsmStates.EvadeState = EvadeState;
 })(FsmStates = exports.FsmStates || (exports.FsmStates = {}));
 //# sourceMappingURL=fsm.states.js.map

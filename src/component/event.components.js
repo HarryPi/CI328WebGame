@@ -27,6 +27,13 @@ var EventComponents;
             this._factory.newBullet(this.target.sprite.x + 50, this.target.sprite.y - 20, this.target);
             this._timer = Date.now();
         }
+        get rangeOfProjectile() {
+            const tankComponent = this.target.getComponent(GameConstants_1.ComponentType.TANK);
+            const physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+            return rangeOfProjectile;
+        }
     }
     EventComponents.ShootComponent = ShootComponent;
     class StateComponent extends component_1.Component {

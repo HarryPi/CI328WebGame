@@ -104,10 +104,11 @@ export enum AnimationTypes {
 }
 
 export enum FsmStateName {
+  EVADE,
   SUICIDE,
   IDLE,
   SEEK,
-  FIRING,
+  PURSUING,
   FLEEING
 }
 

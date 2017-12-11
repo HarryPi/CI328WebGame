@@ -42,6 +42,16 @@ export namespace EventComponents {
       this._factory.newBullet(this.target.sprite.x + 50 , this.target.sprite.y - 20, this.target);
       this._timer = Date.now();
     }
+    public get rangeOfProjectile(): number {
+      const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
+      const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+
+      const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+      const rangeOfProjectile: number = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+
+      return rangeOfProjectile;
+
+    }
   }
   export class StateComponent extends Component{
     private _fsm: StateMachine;

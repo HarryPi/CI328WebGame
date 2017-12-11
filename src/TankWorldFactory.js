@@ -10,7 +10,7 @@ const control_components_1 = require("./component/control.components");
 const data_components_1 = require("./component/data.components");
 const event_components_1 = require("./component/event.components");
 var IdleState = fsm_states_1.FsmStates.IdleState;
-var FiringState = fsm_states_1.FsmStates.FiringState;
+var PursuingState = fsm_states_1.FsmStates.PursuingState;
 var FleeState = fsm_states_1.FsmStates.FleeState;
 var SeekState = fsm_states_1.FsmStates.SeekState;
 var PhysicsComponent = collision_components_1.CollisionComponents.PhysicsComponent;
@@ -28,6 +28,7 @@ var StateComponent = event_components_1.EventComponents.StateComponent;
 var SuicideState = fsm_states_1.FsmStates.SuicideState;
 const math_util_1 = require("./util/math.util");
 const vector_1 = require("./util/vector");
+var EvadeState = fsm_states_1.FsmStates.EvadeState;
 /**
  * @class TankWorldFactory
  * @description
@@ -143,9 +144,10 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.STATE)
             .addState(GameConstants_1.FsmStateName.SEEK, new SeekState())
             .addState(GameConstants_1.FsmStateName.IDLE, new IdleState())
-            .addState(GameConstants_1.FsmStateName.FIRING, new FiringState())
+            .addState(GameConstants_1.FsmStateName.PURSUING, new PursuingState())
             .addState(GameConstants_1.FsmStateName.FLEEING, new FleeState())
             .addState(GameConstants_1.FsmStateName.SUICIDE, new SuicideState())
+            .addState(GameConstants_1.FsmStateName.EVADE, new EvadeState())
             .setState(GameConstants_1.FsmStateName.IDLE);
         enemy.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics();

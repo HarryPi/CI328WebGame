@@ -46,7 +46,6 @@ var ControlComponents;
         accelerateToObject(obj1, obj2, velocity = 500) {
             let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
             const ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
-            let tankComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.TANK);
             let aiComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.AI);
             let aiAngle;
             ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
@@ -82,13 +81,13 @@ var ControlComponents;
             // Here we are adding some random params to simulate a more realistic behaviour
             switch (this.canHitPlayer()) {
                 case GameConstants_1.AIConstant.CAN_HIT_ENEMY:
-                    sComp.setState(GameConstants_1.FsmStateName.FIRING);
+                    sComp.setState(GameConstants_1.FsmStateName.PURSUING);
                     break;
                 case GameConstants_1.AIConstant.CLOSE:
                     let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
                     let lowHealth = healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
                     if (!lowHealth) {
-                        sComp.setState(GameConstants_1.FsmStateName.FLEEING);
+                        sComp.setState(GameConstants_1.FsmStateName.EVADE);
                     }
                     else {
                         // Check if there is a reason to die

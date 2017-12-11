@@ -10,9 +10,6 @@ import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import TankComponent = DataComponents.TankComponent;
 import OwnerComponent = DataComponents.OwnerComponent;
 import StateComponent = EventComponents.StateComponent;
-import { TankUtil } from '../UI/tank.util';
-import { log } from 'util';
-import { DataConfig } from '../config/data.config';
 
 
 export namespace ControlComponents {
@@ -67,7 +64,6 @@ export namespace ControlComponents {
     private accelerateToObject(obj1, obj2, velocity = 500) {
       let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
       const ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);
-      let tankComponent = ownerComponent.owner.getComponent<TankComponent>(ComponentType.TANK);
       let aiComponent = ownerComponent.owner.getComponent<AiComponent>(ComponentType.AI);
       let aiAngle: number;
       ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
@@ -113,13 +109,13 @@ export namespace ControlComponents {
 
       switch (this.canHitPlayer()) {
         case AIConstant.CAN_HIT_ENEMY:
-          sComp.setState(FsmStateName.FIRING);
+          sComp.setState(FsmStateName.PURSUING);
           break;
         case AIConstant.CLOSE:
           let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
           let lowHealth: boolean =  healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
           if (!lowHealth) {
-            sComp.setState(FsmStateName.FLEEING);
+            sComp.setState(FsmStateName.EVADE);
           } else {
             // Check if there is a reason to die
             if (this.checkIfAliesNearby()) {

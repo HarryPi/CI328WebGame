@@ -163,6 +163,7 @@ export namespace DataComponents {
     get tankKind(): TankLayout {
       return this._tankKind;
     }
+
   }
 
   export class OwnerComponent extends Component {
@@ -179,6 +180,7 @@ export namespace DataComponents {
     get owner(): Entity {
       return this._owner;
     }
+
   }
 }
 

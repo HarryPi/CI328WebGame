@@ -11,7 +11,7 @@ import { EventComponents } from './component/event.components';
 import { TankGameLevels } from './config/levels/levels.tankLevels';
 
 import IdleState = FsmStates.IdleState;
-import FiringState = FsmStates.FiringState;
+import PursuingState = FsmStates.PursuingState;
 import FleeState = FsmStates.FleeState;
 import SeekState = FsmStates.SeekState;
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
@@ -30,6 +30,7 @@ import TankLevel = TankGameLevels.TankLevel;
 import SuicideState = FsmStates.SuicideState;
 import {MathUtil} from './util/math.util';
 import Vector from './util/vector';
+import EvadeState = FsmStates.EvadeState;
 
 /**
  * @class TankWorldFactory
@@ -188,14 +189,14 @@ export default class TankWorldFactory {
     enemy.getComponent<StateComponent>(ComponentType.STATE)
       .addState(FsmStateName.SEEK, new SeekState())
       .addState(FsmStateName.IDLE, new IdleState())
-      .addState(FsmStateName.FIRING, new FiringState())
+      .addState(FsmStateName.PURSUING, new PursuingState())
       .addState(FsmStateName.FLEEING, new FleeState())
       .addState(FsmStateName.SUICIDE, new SuicideState())
+      .addState(FsmStateName.EVADE, new EvadeState())
       .setState(FsmStateName.IDLE);
 
     enemy.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics();
-
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(kindOfTank);
 
     enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
