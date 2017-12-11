@@ -48,24 +48,18 @@ var ControlComponents;
             const ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
             let tankComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.TANK);
             let aiComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.AI);
+            let aiAngle;
+            ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
             aiComponent
-                ? obj1.body.velocity.x = calculateVelocityX(true, velocity, tankComponent.angle)
+                ? obj1.body.velocity.x = calculateVelocityX(true, velocity, aiAngle)
                 : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
             aiComponent
-                ? obj1.body.velocity.y = calculateVelocityY(true, velocity, tankComponent.angle)
+                ? obj1.body.velocity.y = calculateVelocityY(true, velocity, aiAngle)
                 : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
             function calculateVelocityX(isAi = true, tankSpeed, angle) {
-                if (isAi) {
-                    angle = -45;
-                    return velocity * Math.cos(angle);
-                }
                 return velocity * Math.cos(angle);
             }
             function calculateVelocityY(isAi = true, tankSpeed, angle) {
-                if (isAi) {
-                    angle = -45;
-                    return velocity * Math.sin(angle);
-                }
                 return velocity * Math.sin(angle);
             }
         }
@@ -106,32 +100,31 @@ var ControlComponents;
                     }
                     break;
                 case GameConstants_1.AIConstant.FAR_AWAY:
-                    sComp.setState(GameConstants_1.FsmStateName.WANDER);
+                    sComp.setState(GameConstants_1.FsmStateName.SEEK);
                     break;
                 default:
                     break;
             }
         }
         checkIfAliesNearby() {
-            return this._friendlies.length > 0;
+            return this._friendlies.some((entity) => {
+                return Math.abs(this.target.sprite.x - entity.sprite.x) < 20;
+            });
         }
         canHitPlayer() {
             const tankComponent = this.target.getComponent(GameConstants_1.ComponentType.TANK);
             const physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
-            const distance = Math.abs(this._player.sprite.x - this.target.sprite.x);
+            const distance = this._player.sprite.x - this.target.sprite.x;
             const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
-            const rangeOfProjectile = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-            const decisionMakingDistance = 15;
-            if (math_util_1.MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
-                console.log(GameConstants_1.AIConstant.CAN_HIT_ENEMY);
+            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+            const decisionMakingDistance = 300;
+            if (math_util_1.MathUtil.isBetween(rangeOfProjectile, Math.abs(distance) + decisionMakingDistance, Math.abs(distance) - decisionMakingDistance)) {
                 return GameConstants_1.AIConstant.CAN_HIT_ENEMY;
             }
-            else if (rangeOfProjectile > distance) {
-                console.log(GameConstants_1.AIConstant.CLOSE);
+            else if (rangeOfProjectile > Math.abs(distance)) {
                 return GameConstants_1.AIConstant.CLOSE;
             }
             else {
-                console.log(GameConstants_1.AIConstant.FAR_AWAY);
                 return GameConstants_1.AIConstant.FAR_AWAY;
             }
         }

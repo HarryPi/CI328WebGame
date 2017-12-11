@@ -130,7 +130,6 @@ export default class TankWorldFactory {
     player.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._tankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._enemyTankCollisionGroup, [Action.NOTHING])
       .collidesWith(this._enemyBulletsCollisionGroup, [Action.DAMAGE]);
 
     this._entities.push(player);
@@ -187,7 +186,7 @@ export default class TankWorldFactory {
     enemy.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(DataConfig.enemyHealth);
 
     enemy.getComponent<StateComponent>(ComponentType.STATE)
-      .addState(FsmStateName.WANDER, new SeekState())
+      .addState(FsmStateName.SEEK, new SeekState())
       .addState(FsmStateName.IDLE, new IdleState())
       .addState(FsmStateName.FIRING, new FiringState())
       .addState(FsmStateName.FLEEING, new FleeState())
@@ -202,9 +201,7 @@ export default class TankWorldFactory {
     enemy.getComponent<CollisionsComponent>(ComponentType.COLLISION)
       .setCollisionGroup(this._enemyTankCollisionGroup)
       .collidesWith(this._groundCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._tankCollisionGroup, [Action.NOTHING])
-      .collidesWith(this._playerBulletCollisionGroup, [Action.DAMAGE])
-      .collidesWith(this._enemyTankCollisionGroup, [Action.NOTHING]);
+      .collidesWith(this._playerBulletCollisionGroup, [Action.DAMAGE]);
 
     this._entities.push(enemy);
     // NECESSARY FOR BULLET TO GET CORRECT GROUP

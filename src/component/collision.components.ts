@@ -45,7 +45,6 @@ export namespace CollisionComponents {
             if (aiComp) {
               body.collides(collidesWith, () => {
                 healthComp.dealDamage(DataConfig.playerDamage);
-                console.log(healthComp.getCurrentHealth());
               }, this);
             } else {
               body.collides(collidesWith, () => {

@@ -17,8 +17,11 @@ import MovableComponent = EventComponents.MovableComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
+import {CollisionComponents} from '../component/collision.components';
 
 export namespace GameStates {
+
+  import PhysicsComponent = CollisionComponents.PhysicsComponent;
 
   export abstract class   GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class // todo: Comment: game is exported globally is this needed now?
@@ -93,14 +96,23 @@ export namespace GameStates {
     create() {
       // Input
       let player: Entity = this._factory.newPlayer();
+      const physicsComponent = player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), InputType.SHOOT);
 
       // Subscribe to inputs
       this._inputSubscription = this._input.emitter.subscribe((input: InputType) => {
-        input !== InputType.SHOOT.toString() ? player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input
-          : player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
+        if (input !== InputType.SHOOT.toString()){
+          player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input;
+          if (input === InputType.RIGHT_INPUT) {
+            physicsComponent.scaleSprite(1);
+          } else {
+            physicsComponent.scaleSprite(-1);
+          }
+        } else {
+          player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
+        }
       });
 
       this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {font: '22px Arial', fill: '#ff0044'});

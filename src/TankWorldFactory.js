@@ -95,7 +95,6 @@ class TankWorldFactory {
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.NOTHING])
             .collidesWith(this._enemyBulletsCollisionGroup, [GameConstants_1.Action.DAMAGE]);
         this._entities.push(player);
         this._player = player;
@@ -142,7 +141,7 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         enemy.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(data_config_1.DataConfig.enemyHealth);
         enemy.getComponent(GameConstants_1.ComponentType.STATE)
-            .addState(GameConstants_1.FsmStateName.WANDER, new SeekState())
+            .addState(GameConstants_1.FsmStateName.SEEK, new SeekState())
             .addState(GameConstants_1.FsmStateName.IDLE, new IdleState())
             .addState(GameConstants_1.FsmStateName.FIRING, new FiringState())
             .addState(GameConstants_1.FsmStateName.FLEEING, new FleeState())
@@ -154,9 +153,7 @@ class TankWorldFactory {
         enemy.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._enemyTankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._playerBulletCollisionGroup, [GameConstants_1.Action.DAMAGE])
-            .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.NOTHING]);
+            .collidesWith(this._playerBulletCollisionGroup, [GameConstants_1.Action.DAMAGE]);
         this._entities.push(enemy);
         // NECESSARY FOR BULLET TO GET CORRECT GROUP
         enemy.sprite.data = {

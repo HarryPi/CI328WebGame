@@ -68,13 +68,24 @@ var GameStates;
         create() {
             // Input
             let player = this._factory.newPlayer();
+            const physicsComponent = player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), GameConstants_1.InputType.SHOOT);
             // Subscribe to inputs
             this._inputSubscription = this._input.emitter.subscribe((input) => {
-                input !== GameConstants_1.InputType.SHOOT.toString() ? player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input
-                    : player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
+                if (input !== GameConstants_1.InputType.SHOOT.toString()) {
+                    player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input;
+                    if (input === GameConstants_1.InputType.RIGHT_INPUT) {
+                        physicsComponent.scaleSprite(1);
+                    }
+                    else {
+                        physicsComponent.scaleSprite(-1);
+                    }
+                }
+                else {
+                    player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
+                }
             });
             this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, { font: '22px Arial', fill: '#ff0044' });
             this._scoreText.fixedToCamera = true;

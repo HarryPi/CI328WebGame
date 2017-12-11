@@ -121,7 +121,7 @@ var FsmStateName;
 (function (FsmStateName) {
     FsmStateName[FsmStateName["SUICIDE"] = 0] = "SUICIDE";
     FsmStateName[FsmStateName["IDLE"] = 1] = "IDLE";
-    FsmStateName[FsmStateName["WANDER"] = 2] = "WANDER";
+    FsmStateName[FsmStateName["SEEK"] = 2] = "SEEK";
     FsmStateName[FsmStateName["FIRING"] = 3] = "FIRING";
     FsmStateName[FsmStateName["FLEEING"] = 4] = "FLEEING";
 })(FsmStateName = exports.FsmStateName || (exports.FsmStateName = {}));

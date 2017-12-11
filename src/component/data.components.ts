@@ -23,7 +23,6 @@ export namespace DataComponents {
     public dealDamage(damage: number) {
 
       // Check if the damage will kill the entity
-      console.log(`Sprites health is ${this.target.sprite.health.toString()} and damage is ${damage.toString()}`);
       if (this.target.sprite.health - damage <= 0) {
         this.target.getComponent<CollisionsComponent>(ComponentType.COLLISION).cleanCollisions();
         this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS).stopSprite();

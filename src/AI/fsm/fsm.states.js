@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../../constants/GameConstants");
+const data_config_1 = require("../../config/data.config");
 var FsmStates;
 (function (FsmStates) {
     class State {
@@ -17,6 +18,36 @@ var FsmStates;
             this._entity.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = false;
         }
         update() {
+            const tankComponent = this._entity.getComponent(GameConstants_1.ComponentType.TANK);
+            const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
+            const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            const shootComponent = this._entity.getComponent(GameConstants_1.ComponentType.SHOOT);
+            const distance = this._entity.sprite.x - aiComp.player.sprite.x;
+            let frames = (distance / tankComponent.speed) + (1 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+            let futurePosition = aiComp.player.sprite.x + aiComp.player.sprite.body.velocity.x * frames;
+            let direction = futurePosition - this._entity.sprite.x;
+            if (!(Math.abs(futurePosition) - this.rangeOfProjectile() === 0)) {
+                shootComponent.canShoot = true;
+            }
+            direction > 0 ? movableComponent.direction = GameConstants_1.InputType.RIGHT_INPUT : movableComponent.direction = GameConstants_1.InputType.LEFT_INPUT;
+            this.correctScale();
+        }
+        correctScale() {
+            const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
+            const distance = aiComp.player.sprite.x - this._entity.sprite.x;
+            if (distance > 0 && this._entity.sprite.scale.x === -1) {
+                this._entity.sprite.scale.x = 1;
+            }
+            else if (distance < 0 && this._entity.sprite.scale.x === 1) {
+                this._entity.sprite.scale.x = -1;
+            }
+        }
+        rangeOfProjectile() {
+            const tankComponent = this._entity.getComponent(GameConstants_1.ComponentType.TANK);
+            const physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+            return rangeOfProjectile;
         }
     }
     FsmStates.FiringState = FiringState;
@@ -45,20 +76,16 @@ var FsmStates;
     class SuicideState extends State {
         enter() {
             this._direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-            let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
             if (this._direction < 0) {
                 this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.LEFT_INPUT;
-                physicsComponent.scaleSprite(-1);
             }
             else {
                 this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.RIGHT_INPUT;
-                physicsComponent.scaleSprite(1);
             }
         }
         leave() {
         }
         update() {
-            console.log(this._direction);
             if (Math.abs(this._direction) <= 10) {
                 const overKillDamage = 10000;
                 const playerDamageOnSuicide = 2;
@@ -82,7 +109,7 @@ var FsmStates;
     class SeekState extends State {
         enter() {
             let direction = this._entity.getComponent(GameConstants_1.ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-            let physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            const physicsComponent = this._entity.getComponent(GameConstants_1.ComponentType.PHYSICS);
             if (direction < 0) {
                 this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = GameConstants_1.InputType.LEFT_INPUT;
                 physicsComponent.scaleSprite(-1);

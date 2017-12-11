@@ -1,20 +1,20 @@
-import {Entity} from '../../entities/entity';
-import {ComponentType, FsmStateName, InputType} from '../../constants/GameConstants';
-import {EventComponents} from '../../component/event.components';
-import {ControlComponents} from '../../component/control.components';
+import { Entity } from '../../entities/entity';
+import {  ComponentType, InputType } from '../../constants/GameConstants';
+import { EventComponents } from '../../component/event.components';
+import { ControlComponents } from '../../component/control.components';
 
 import ShootComponent = EventComponents.ShootComponent;
 import MovableComponent = EventComponents.MovableComponent;
-import {CollisionComponents} from '../../component/collision.components';
-import {MathUtil} from '../../util/math.util';
-import {DataComponents} from '../../component/data.components';
+import { CollisionComponents } from '../../component/collision.components';
+import { DataComponents } from '../../component/data.components';
+import { DataConfig } from '../../config/data.config';
 
 export namespace FsmStates {
 
   import AiComponent = ControlComponents.AiComponent;
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
-  import StateComponent = EventComponents.StateComponent;
   import HealthComponent = DataComponents.HealthComponent;
+  import TankComponent = DataComponents.TankComponent;
 
   export abstract class State {
     protected _entity: Entity;
@@ -40,8 +40,42 @@ export namespace FsmStates {
     }
 
     update(): void {
-    }
+      const tankComponent = this._entity.getComponent<TankComponent>(ComponentType.TANK);
+      const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
+      const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
+      const shootComponent = this._entity.getComponent<ShootComponent>(ComponentType.SHOOT);
 
+      const distance = this._entity.sprite.x - aiComp.player.sprite.x;
+
+      let frames = (distance / tankComponent.speed) + (1 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+      let futurePosition = aiComp.player.sprite.x + aiComp.player.sprite.body.velocity.x * frames;
+      let direction = futurePosition - this._entity.sprite.x;
+
+      if (!(Math.abs(futurePosition) - this.rangeOfProjectile() === 0)) {
+        shootComponent.canShoot = true;
+      }
+      direction > 0 ? movableComponent.direction = InputType.RIGHT_INPUT : movableComponent.direction = InputType.LEFT_INPUT;
+      this.correctScale();
+    }
+    private correctScale (){
+      const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
+      const distance = aiComp.player.sprite.x - this._entity.sprite.x;
+      if (distance > 0 && this._entity.sprite.scale.x === -1) {
+        this._entity.sprite.scale.x = 1;
+      } else if (distance < 0 && this._entity.sprite.scale.x === 1) {
+        this._entity.sprite.scale.x = -1;
+      }
+    }
+    private rangeOfProjectile(): number {
+      const tankComponent: TankComponent = this._entity.getComponent<TankComponent>(ComponentType.TANK);
+      const physicsComponent: PhysicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+
+      const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
+      const rangeOfProjectile: number = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+
+      return rangeOfProjectile;
+
+    }
   }
 
   export class FleeState extends State {
@@ -73,13 +107,10 @@ export namespace FsmStates {
     private _direction: number;
     enter(): void {
       this._direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-      let physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       if (this._direction < 0) {
         this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
-        physicsComponent.scaleSprite(-1);
       } else {
         this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
-        physicsComponent.scaleSprite(1);
       }
     }
 
@@ -87,7 +118,6 @@ export namespace FsmStates {
     }
 
     update(): void {
-      console.log(this._direction);
       if (Math.abs(this._direction) <= 10) {
         const overKillDamage: number = 10000;
         const playerDamageOnSuicide = 2;
@@ -118,13 +148,15 @@ export namespace FsmStates {
 
     enter(): void {
       let direction = this._entity.getComponent<AiComponent>(ComponentType.AI).player.sprite.x - this._entity.sprite.x;
-      let physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+      const physicsComponent = this._entity.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       if (direction < 0) {
         this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.LEFT_INPUT;
         physicsComponent.scaleSprite(-1);
+
       } else {
         this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = InputType.RIGHT_INPUT;
         physicsComponent.scaleSprite(1);
+
       }
     }
 

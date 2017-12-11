@@ -75,6 +75,7 @@ var EventComponents;
             this.target.sprite.body.velocity.x = -(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         update() {
+            let physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
             switch (this._direction) {
                 case GameConstants_1.InputType.LEFT_INPUT:
                     this.moveLeft();

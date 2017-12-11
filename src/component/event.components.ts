@@ -10,8 +10,11 @@ import TankComponent = DataComponents.TankComponent;
 import {MathUtil} from '../util/math.util';
 import {ControlComponents} from './control.components';
 import {DataConfig} from '../config/data.config';
+import {CollisionComponents} from './collision.components';
 
 export namespace EventComponents {
+
+  import PhysicsComponent = CollisionComponents.PhysicsComponent;
 
   export class ShootComponent extends Component{
     private _canShoot: boolean = false;
@@ -89,6 +92,7 @@ export namespace EventComponents {
       this.target.sprite.body.velocity.x = -(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
     public update(){
+      let physicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
 
       switch (this._direction) {
         case InputType.LEFT_INPUT:

@@ -4,15 +4,15 @@ import { AIConstant, ComponentType, FsmStateName } from '../constants/GameConsta
 import { CollisionComponents } from './collision.components';
 import { MathUtil } from '../util/math.util';
 import { DataComponents } from './data.components';
-import {EventComponents} from './event.components';
+import { EventComponents } from './event.components';
 
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import TankComponent = DataComponents.TankComponent;
 import OwnerComponent = DataComponents.OwnerComponent;
 import StateComponent = EventComponents.StateComponent;
-import {TankUtil} from '../UI/tank.util';
-import {log} from 'util';
-import {DataConfig} from '../config/data.config';
+import { TankUtil } from '../UI/tank.util';
+import { log } from 'util';
+import { DataConfig } from '../config/data.config';
 
 
 export namespace ControlComponents {
@@ -69,27 +69,20 @@ export namespace ControlComponents {
       const ownerComponent = this.target.getComponent<OwnerComponent>(ComponentType.OWNER);
       let tankComponent = ownerComponent.owner.getComponent<TankComponent>(ComponentType.TANK);
       let aiComponent = ownerComponent.owner.getComponent<AiComponent>(ComponentType.AI);
-
+      let aiAngle: number;
+      ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
       aiComponent
-        ? obj1.body.velocity.x = calculateVelocityX(true, velocity, tankComponent.angle)
+        ? obj1.body.velocity.x = calculateVelocityX(true, velocity, aiAngle)
         : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
       aiComponent
-        ? obj1.body.velocity.y = calculateVelocityY(true, velocity, tankComponent.angle)
+        ? obj1.body.velocity.y = calculateVelocityY(true, velocity, aiAngle)
         : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
 
       function calculateVelocityX(isAi: boolean = true, tankSpeed: number, angle: number): number {
-        if (isAi) {
-          angle = -45;
-          return velocity * Math.cos(angle);
-        }
         return velocity * Math.cos(angle);
       }
 
       function calculateVelocityY(isAi: boolean = true, tankSpeed: number, angle: number): number {
-        if (isAi) {
-          angle = -45;
-          return velocity * Math.sin(angle);
-        }
         return velocity * Math.sin(angle);
       }
     }
@@ -137,7 +130,7 @@ export namespace ControlComponents {
           }
           break;
         case AIConstant.FAR_AWAY:
-          sComp.setState(FsmStateName.WANDER);
+          sComp.setState(FsmStateName.SEEK);
           break;
         default:
           break;
@@ -146,24 +139,24 @@ export namespace ControlComponents {
     }
 
     private checkIfAliesNearby(): boolean {
-      return this._friendlies.length > 0;
+      return this._friendlies.some((entity: Entity) => {
+        return Math.abs(this.target.sprite.x - entity.sprite.x) < 20;
+      });
     }
     private canHitPlayer(): AIConstant {
       const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
       const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
-      const distance: number = Math.abs(this._player.sprite.x - this.target.sprite.x);
+      const distance: number = this._player.sprite.x - this.target.sprite.x;
       const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
-      const rangeOfProjectile: number = Math.abs((2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity);
-      const decisionMakingDistance = 15;
 
-      if (MathUtil.isBetween(rangeOfProjectile, distance + decisionMakingDistance, distance - decisionMakingDistance)) {
-        console.log(AIConstant.CAN_HIT_ENEMY);
+      const rangeOfProjectile: number = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+      const decisionMakingDistance = 300;
+
+      if (MathUtil.isBetween(rangeOfProjectile, Math.abs(distance ) + decisionMakingDistance, Math.abs(distance) - decisionMakingDistance)) {
         return AIConstant.CAN_HIT_ENEMY;
-      } else if (rangeOfProjectile > distance) {
-        console.log(AIConstant.CLOSE);
+      } else if (rangeOfProjectile > Math.abs(distance)) {
         return AIConstant.CLOSE;
       } else  {
-        console.log(AIConstant.FAR_AWAY);
         return AIConstant.FAR_AWAY;
       }
 
