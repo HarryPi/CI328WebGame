@@ -18,6 +18,7 @@ export namespace CollisionComponents {
     }
 
     public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
+
       this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
       return this;
     }
@@ -29,6 +30,9 @@ export namespace CollisionComponents {
     public collidesWith(collidesWith: CollisionGroup, actions: Array<Action>): CollisionsComponent {
       let body: Phaser.Physics.P2.Body = this.target.sprite.body;
 
+      if (this.target.sprite.body.collidesWith.includes(collidesWith)) {
+        return;
+      }
 
       actions.forEach((action) => {
         switch (action) {
@@ -80,6 +84,7 @@ export namespace CollisionComponents {
     public get gravity(): number {
       return this._game.physics.p2.gravity.y;
     }
+
     public scaleSprite(scale: number): PhysicsComponent{
       this.target.sprite.scale.x = scale;
       return this;

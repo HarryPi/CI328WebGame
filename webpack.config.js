@@ -178,7 +178,7 @@ module.exports = {
   },
   module: {
     rules: [
-      /** AssetLoader */
+      /** Assets */
       {
         test: (path) => path.indexOf(assetsPath) === 0,
         loader: 'file-loader',

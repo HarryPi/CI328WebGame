@@ -1,40 +1,44 @@
 /** Imports */
-import { EventComponents } from '../component/event.components';
+import {ActionComponents} from '../component/action.components';
 import AssetsUtils from '../UI/Assets';
-import { ComponentType, InputType, Levels, States } from '../constants/GameConstants';
-import { MenuManager } from '../UI/MenuManager';
+import {ComponentType, InputType, Levels, States} from '../constants/GameConstants';
+import {MenuManager} from '../UI/MenuManager';
 import TankWorldFactory from '../TankWorldFactory';
-import { Subscription } from 'rxjs/Subscription';
+import {Subscription} from 'rxjs/Subscription';
 import Input from '../util/input';
-import { DataConfig } from '../config/data.config';
-import { Entity } from '../entities/entity';
-import { MenuConfig } from '../config/menu.config';
-import { TankGameLevels } from '../config/levels/levels.tankLevels';
+import {DataConfig} from '../config/data.config';
+import {Entity} from '../entities/entity';
+import {MenuConfig} from '../config/menu.config';
+import {TankGameLevels} from '../config/levels/levels.tankLevels';
 
 
-import ShootComponent = EventComponents.ShootComponent;
-import MovableComponent = EventComponents.MovableComponent;
+import ShootComponent = ActionComponents.ShootComponent;
+import MovableComponent = ActionComponents.MovableComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
 import {CollisionComponents} from '../component/collision.components';
+import {MathUtil} from '../util/math.util';
 
 export namespace GameStates {
 
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
 
-  export abstract class   GameState extends Phaser.State {
+  export abstract class GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class // todo: Comment: game is exported globally is this needed now?
   }
 
   export class BootState extends GameState {
     private _args;
+
     constructor() {
       super();
     }
+
     init(args) {
       this._args = args;
     }
+
     preload(): void {
       AssetsUtils.init(this.load);
       AssetsUtils.loadBoot();
@@ -49,18 +53,23 @@ export namespace GameStates {
       this.game.state.start(States.PRELOAD_STATE, true, false, this._args);
     }
   }
+
   export class GameoverState extends GameState {
     private _args;
+
     init(args) {
       this._args = args;
     }
-    preload(){
+
+    preload() {
 
     }
-    create(){
+
+    create() {
       MenuManager.drawGameOver(this);
     }
-    update(){
+
+    update() {
 
     }
   }
@@ -68,14 +77,15 @@ export namespace GameStates {
   export class MainGameState extends GameState {
     private _input: Input;
     private _inputSubscription;
-    private _direction: InputType;
     private _factory: TankWorldFactory;
     private _levels: Map<Levels, TankLevel>;
     private _score: number = 0;
-    private _subs: Subscription[];
     // keep record of spawn time in miliseconds
     private _timer: number = 0;
     private _scoreText: Phaser.Text;
+    private _player: Entity;
+    private _disasterTimer: number = 0;
+    private _activeDisasters: number = 0;
 
     constructor() {
       super();
@@ -95,76 +105,99 @@ export namespace GameStates {
 
     create() {
       // Input
-      let player: Entity = this._factory.newPlayer();
-      const physicsComponent = player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+      this._player = this._factory.newPlayer();
+      const physicsComponent = this._player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), InputType.SHOOT);
 
       // Subscribe to inputs
       this._inputSubscription = this._input.emitter.subscribe((input: InputType) => {
-        if (input !== InputType.SHOOT.toString()){
-          player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input;
+        if (input !== InputType.SHOOT.toString()) {
+          this._player.getComponent<MovableComponent>(ComponentType.MOVABLE).direction = input;
           if (input === InputType.RIGHT_INPUT) {
             physicsComponent.scaleSprite(1);
           } else {
             physicsComponent.scaleSprite(-1);
           }
         } else {
-          player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
+          this._player.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = true;
         }
       });
 
-      this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {font: '22px Arial', fill: '#ff0044'});
+      this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {
+        font: '22px Arial',
+        fill: '#ff0044'
+      });
       this._scoreText.fixedToCamera = true;
-      this.game.time.events.add(Phaser.Timer.SECOND * 5, this.generateRandomEventFromCurrentLevel, this);
-
     }
 
     update() {
-      this.spawnEnemiesAsCurrentLevel();
+      if (this.canSpawnDisaster()) {
+        this.spawnDisaster();
+      }
+      if (this.canSpawnEnemy()) {
+        this.spawnEnemies();
+      }
       this._input.run();
       this._factory.entities.forEach((e) => {
         e.update();
       });
     }
-    shutdown(){
+
+    shutdown() {
       // Ensure no memory leaks
       this._inputSubscription.unsubscribe();
       this._factory.cleanUp();
 
 
     }
-    private generateRandomEventFromCurrentLevel() {
-        for (let i = 0; i < 6; i++) {
-          this._factory.newDisaster();
+    private spawnDisaster() {
+      this._factory.newDisaster(this._player.sprite.x  + 100 * MathUtil.randomIntFromInterval(-10, 10), this.game.world.top);
+      this._activeDisasters++;
+      if (this._activeDisasters >= 7) {
+        this._disasterTimer = Date.now();
+        this._activeDisasters = 0;
       }
-    }
-    private spawnEnemiesAsCurrentLevel() {
-          // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
-          if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
-            if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
-              this._factory.newEnemy( () => {
-                this._score += 100;
-                this._scoreText.setText(`Score: ${this._score}`);
-              });
-              this._factory.currentLevel.enemiesCount++;
-              this._timer = Date.now();
 
-            }
+    }
+    private canSpawnEnemy(): boolean {
+      if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
+        if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private spawnEnemies() {
+      this._factory.newEnemy(() => {
+        this._score += 100;
+        this._scoreText.setText(`Score: ${this._score}`);
+      });
+      this._factory.currentLevel.enemiesCount++;
+      this._timer = Date.now();
+    }
+
+    private canSpawnDisaster() {
+      if (Date.now() - this._disasterTimer >  5000) {
+        return true;
       }
     }
   }
 
   export class MainMenuState extends GameState {
     private _args;
+
     init(args) {
       this._args = args;
     }
-    preload(){
+
+    preload() {
 
     }
-    create(){
+
+    create() {
       let config: MenuConfig = MenuManager.drawMainMenu(this);
       this.game.camera.unfollow();
       config.allSprites.forEach((sprite: Phaser.Sprite) => {
@@ -175,18 +208,23 @@ export namespace GameStates {
       });
 
     }
-    update(){
+
+    update() {
 
     }
   }
+
   export class PreloadState extends GameState {
     private _args = {};
+
     constructor() {
       super();
     }
-    init(args){
+
+    init(args) {
       this._args = args;
     }
+
     preload() {
 
       MenuManager.setLoadingScreen(this);

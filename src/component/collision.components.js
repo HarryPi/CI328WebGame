@@ -21,6 +21,9 @@ var CollisionComponents;
         }
         collidesWith(collidesWith, actions) {
             let body = this.target.sprite.body;
+            if (this.target.sprite.body.collidesWith.includes(collidesWith)) {
+                return;
+            }
             actions.forEach((action) => {
                 switch (action) {
                     case GameConstants_1.Action.NOTHING:

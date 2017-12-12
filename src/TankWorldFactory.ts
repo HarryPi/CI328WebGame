@@ -7,7 +7,7 @@ import { FsmStates } from './AI/fsm/fsm.states';
 import { CollisionComponents } from './component/collision.components';
 import { ControlComponents } from './component/control.components';
 import { DataComponents } from './component/data.components';
-import { EventComponents } from './component/event.components';
+import { ActionComponents } from './component/action.components';
 import { TankGameLevels } from './config/levels/levels.tankLevels';
 
 import IdleState = FsmStates.IdleState;
@@ -23,14 +23,15 @@ import LayerComponent = DataComponents.LayerComponent;
 import HealthComponent = DataComponents.HealthComponent;
 import TankComponent = DataComponents.TankComponent;
 import OwnerComponent = DataComponents.OwnerComponent;
-import MovableComponent = EventComponents.MovableComponent;
-import ShootComponent = EventComponents.ShootComponent;
-import StateComponent = EventComponents.StateComponent;
+import MovableComponent = ActionComponents.MovableComponent;
+import ShootComponent = ActionComponents.ShootComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import SuicideState = FsmStates.SuicideState;
-import {MathUtil} from './util/math.util';
+import { MathUtil } from './util/math.util';
 import Vector from './util/vector';
 import EvadeState = FsmStates.EvadeState;
+import { StateComponent } from './component/state.component';
+import DisasterComponent = ControlComponents.DisasterComponent;
 
 /**
  * @class TankWorldFactory
@@ -39,7 +40,7 @@ import EvadeState = FsmStates.EvadeState;
  * create a new player {@link TankWorldFactory#newPlayer}
  * create a new bullet {@link TankWorldFactory#newBullet}
  * create a new enemy {@link TankWorldFactory#newEnemy}
- * start spawning enemies {@Link TankWorldFactory#spawnEnemiesAsCurrentLevel}
+ * start spawning enemies {@Link TankWorldFactory#spawnEnemies}
  * All of the above are dependant on the information passed to the factory by what {@link TankLevel} is loaded
  * */
 export default class TankWorldFactory {
@@ -61,21 +62,14 @@ export default class TankWorldFactory {
   private _enemyBulletsCollisionGroup: CollisionGroup;
   private _groundCollisionGroup: CollisionGroup;
 
-  // Phaser groups
-  private _tanks: Phaser.Group;
-  private _bullets: Phaser.Group;
-
-
   /**
    * @constructor
    * @param {Phaser.Game} game
    * @param state - Current conditions
    * */
     constructor(game: Phaser.Game, state: Phaser.State) {
-
     this._game = game;
     this._currentState = state;
-
   }
 
   public init() {
@@ -86,7 +80,6 @@ export default class TankWorldFactory {
     this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
-
     // Have to do this here as we cannot enforce layer to be Entity to attach component
     this._currentLevel.collisionLayer.forEach((layer) => {
       layer.setCollisionGroup(this._groundCollisionGroup);
@@ -154,7 +147,7 @@ export default class TankWorldFactory {
     let kindOfTank: TankLayout = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
                                                                     // Get one store it and use it where appropriate
     const startingPost = new Vector();
-    const random = MathUtil.randomIntFromInterval(0,1);
+    const random = MathUtil.randomIntFromInterval(0, 1);
 
     if (random === 1) {
       startingPost.x = this.currentLevel.playerStartPos.x;
@@ -236,8 +229,8 @@ export default class TankWorldFactory {
     bullet.getComponent<OwnerComponent>(ComponentType.OWNER).owner = owner;
     bullet.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(1);
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
-      .addPhysics(false);
-
+      .addPhysics(false)
+      .scaleSprite(owner.sprite.scale.x);
 
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addLayer(owner.getComponent<TankComponent>(ComponentType.TANK).bulletKind);
     bullet.getComponent<BulletComponent>(ComponentType.BULLET)
@@ -263,33 +256,34 @@ export default class TankWorldFactory {
     return bullet;
 
   }
-  public newDisaster() {
-    let disaster = new Entity(this._game, this._player.sprite.x, this._game.world.top)
+  public newDisaster(x: number , y: number) {
+    let disaster = new Entity(this._game, x, y)
       .withComponent([
         new PhysicsComponent(this._game),
         new LayerComponent(),
-        new BulletComponent(this._game),
         new CollisionsComponent(),
+        new DisasterComponent(),
         new HealthComponent()
       ]);
 
-    disaster.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(1);
     disaster.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics(false);
 
+    disaster.getComponent<LayerComponent>(ComponentType.LAYER)
+      .addLayer(getRandomLayout())
+      .addAnimation(
+        Action.EXPLODE,
+        Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
 
-    disaster.getComponent<BulletComponent>(ComponentType.BULLET)
-      .disasterBullet();
+    disaster.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(1);
 
     disaster.getComponent<CollisionsComponent>(ComponentType.COLLISION)
+      .setCollisionGroup(this._enemyBulletsCollisionGroup)
       .collidesWith(this._tankCollisionGroup, [Action.DAMAGE])
       .collidesWith(this._groundCollisionGroup, [Action.DAMAGE]);
 
-    disaster.getComponent<LayerComponent>(ComponentType.LAYER)
-      .addLayer(TankLayout.BULLET_SIX)
-      .addAnimation(
-      Action.EXPLODE,
-      Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+
+
 
     this._entities.push(disaster);
     let sub = disaster.whenDestroyed.subscribe(() => {
@@ -298,6 +292,26 @@ export default class TankWorldFactory {
       sub.unsubscribe();
     });
     this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
+    return disaster;
+
+    function getRandomLayout() {
+      let random = MathUtil.randomIntFromInterval(0, 5);
+      let tankLayout = () => {
+        switch (random) {
+          case 0:
+            return TankLayout.BULLET_ONE;
+          case 1:
+            return TankLayout.BULLET_TWO;
+          case 2:
+            return TankLayout.BULLET_THREE;
+          case 3:
+            return TankLayout.BULLET_FOUR;
+          case 4:
+            return TankLayout.BULLET_FIVE;
+        }
+      };
+      return tankLayout();
+    }
   }
 
   public cleanUp(){
@@ -326,3 +340,4 @@ export default class TankWorldFactory {
     this._currentLevel = value;
   }
 }
+

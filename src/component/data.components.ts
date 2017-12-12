@@ -65,6 +65,9 @@ export namespace DataComponents {
     public getAnimation(name: string): Phaser.Animation {
       return this.target.sprite.animations.getAnimation(name);
     }
+    public getCurrentAnimation(): Phaser.Animation {
+      return this.target.sprite.animations.currentAnim;
+    }
 
     public playAnimation(name: string, frameRate?: number, loop?: boolean, killOnComplete?: boolean): Promise<void> {
       return new Promise(((resolve, reject) => {

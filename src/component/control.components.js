@@ -3,8 +3,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
 const math_util_1 = require("../util/math.util");
+const data_config_1 = require("../config/data.config");
 var ControlComponents;
 (function (ControlComponents) {
+    class DisasterComponent extends component_1.Component {
+        constructor() {
+            super(GameConstants_1.ComponentType.DISASTER);
+        }
+        update() {
+            const layoutComponent = this.target.getComponent(GameConstants_1.ComponentType.LAYER);
+            const animation = layoutComponent.getCurrentAnimation();
+            if (!animation.isPlaying) {
+                this.target.sprite.angle = 45;
+                this.target.sprite.body.velocity.y = 200 * (5 - data_config_1.DataConfig.difficulty);
+                this.target.sprite.body.velocity.x = 100;
+            }
+        }
+    }
+    ControlComponents.DisasterComponent = DisasterComponent;
     class BulletComponent extends component_1.Component {
         // todo: Should this be on the PhysicsComponent?
         constructor(game) {
@@ -12,14 +28,6 @@ var ControlComponents;
             this._game = game;
             this._requiredComponents.push(GameConstants_1.ComponentType.OWNER);
             this._requiredComponents.push(GameConstants_1.ComponentType.LAYER);
-        }
-        /**
-         * @description
-         * This is to be called if a bullet is not a 'normal' bullet instead is a random disaster bullet
-         * */
-        disasterBullet() {
-            this.target.sprite.angle = 90;
-            this.target.sprite.body.velocity.y = 2000;
         }
         /**
          * @description

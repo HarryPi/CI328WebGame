@@ -16,7 +16,7 @@ export default class Input {
 
   run(){
     this._map.forEach((value: InputType, key: Phaser.Key) => {
-      if (key.isDown === true)  {
+      if (key.isDown)  {
         this._emitter.next(value);
       }
     });

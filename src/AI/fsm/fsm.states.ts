@@ -1,10 +1,10 @@
 import { Entity } from '../../entities/entity';
 import {ComponentType, FsmStateName, InputType} from '../../constants/GameConstants';
-import { EventComponents } from '../../component/event.components';
+import { ActionComponents } from '../../component/action.components';
 import { ControlComponents } from '../../component/control.components';
 
-import ShootComponent = EventComponents.ShootComponent;
-import MovableComponent = EventComponents.MovableComponent;
+import ShootComponent = ActionComponents.ShootComponent;
+import MovableComponent = ActionComponents.MovableComponent;
 import { CollisionComponents } from '../../component/collision.components';
 import { DataComponents } from '../../component/data.components';
 import { DataConfig } from '../../config/data.config';
@@ -16,7 +16,6 @@ export namespace FsmStates {
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
   import HealthComponent = DataComponents.HealthComponent;
   import TankComponent = DataComponents.TankComponent;
-  import StateComponent = EventComponents.StateComponent;
 
   export abstract class State {
     protected _entity: Entity;
@@ -45,17 +44,16 @@ export namespace FsmStates {
       const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
       const shootComponent = this._entity.getComponent<ShootComponent>(ComponentType.SHOOT);
       const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
-
+      const difficultyModifier = 10 + DataConfig.difficulty * DataConfig.difficulty;
       const distance = this._entity.sprite.x - aiComp.player.sprite.x;
 
-      let frames = (distance / tankComponent.speed) + (1 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+      let seconds = (distance / tankComponent.speed);
 
-      let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
-
+      let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * seconds;
       let direction = futurePosition - this._entity.sprite.x;
       let rangeOfProjectile = shootComponent.rangeOfProjectile;
 
-      if (MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
+      if (MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + difficultyModifier, rangeOfProjectile - difficultyModifier)) {
         shootComponent.canShoot = true;
       }  else if (Math.abs(direction) < rangeOfProjectile ) {
         direction > 0 ? movableComponent.direction = InputType.LEFT_INPUT : movableComponent.direction = InputType.RIGHT_INPUT;
@@ -178,7 +176,6 @@ export namespace FsmStates {
     }
 
     update(): void {
-      console.log('i am evading');
       const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
       const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
 

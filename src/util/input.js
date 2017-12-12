@@ -11,7 +11,7 @@ class Input {
     }
     run() {
         this._map.forEach((value, key) => {
-            if (key.isDown === true) {
+            if (key.isDown) {
                 this._emitter.next(value);
             }
         });

@@ -12,10 +12,10 @@ export enum Levels {
 }
 
 export enum Difficulty {
-  INSANE,
-  HARD,
-  NORMAL,
-  EASY
+  INSANE = 1,
+  HARD = 2,
+  NORMAL = 3,
+  EASY = 4
 }
 
 export enum TankLayout {
@@ -50,6 +50,7 @@ export enum TankLayout {
 }
 
 export enum ComponentType {
+  DISASTER = 'disaster_component',
   HEALTH = 'health_component',
   TANK = 'tank_component',
   OWNER = 'owner_component',

@@ -8,7 +8,7 @@ const fsm_states_1 = require("./AI/fsm/fsm.states");
 const collision_components_1 = require("./component/collision.components");
 const control_components_1 = require("./component/control.components");
 const data_components_1 = require("./component/data.components");
-const event_components_1 = require("./component/event.components");
+const action_components_1 = require("./component/action.components");
 var IdleState = fsm_states_1.FsmStates.IdleState;
 var PursuingState = fsm_states_1.FsmStates.PursuingState;
 var FleeState = fsm_states_1.FsmStates.FleeState;
@@ -22,13 +22,14 @@ var LayerComponent = data_components_1.DataComponents.LayerComponent;
 var HealthComponent = data_components_1.DataComponents.HealthComponent;
 var TankComponent = data_components_1.DataComponents.TankComponent;
 var OwnerComponent = data_components_1.DataComponents.OwnerComponent;
-var MovableComponent = event_components_1.EventComponents.MovableComponent;
-var ShootComponent = event_components_1.EventComponents.ShootComponent;
-var StateComponent = event_components_1.EventComponents.StateComponent;
+var MovableComponent = action_components_1.ActionComponents.MovableComponent;
+var ShootComponent = action_components_1.ActionComponents.ShootComponent;
 var SuicideState = fsm_states_1.FsmStates.SuicideState;
 const math_util_1 = require("./util/math.util");
 const vector_1 = require("./util/vector");
 var EvadeState = fsm_states_1.FsmStates.EvadeState;
+const state_component_1 = require("./component/state.component");
+var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 /**
  * @class TankWorldFactory
  * @description
@@ -36,7 +37,7 @@ var EvadeState = fsm_states_1.FsmStates.EvadeState;
  * create a new player {@link TankWorldFactory#newPlayer}
  * create a new bullet {@link TankWorldFactory#newBullet}
  * create a new enemy {@link TankWorldFactory#newEnemy}
- * start spawning enemies {@Link TankWorldFactory#spawnEnemiesAsCurrentLevel}
+ * start spawning enemies {@Link TankWorldFactory#spawnEnemies}
  * All of the above are dependant on the information passed to the factory by what {@link TankLevel} is loaded
  * */
 class TankWorldFactory {
@@ -132,7 +133,7 @@ class TankWorldFactory {
             new ShootComponent(this._game, this),
             new LayerComponent(),
             new CollisionsComponent(),
-            new StateComponent(),
+            new state_component_1.StateComponent(),
             new AiComponent(this._player, this._entities.filter((entity) => {
                 return entity.hasComponent(GameConstants_1.ComponentType.AI);
             })),
@@ -185,7 +186,8 @@ class TankWorldFactory {
         bullet.getComponent(GameConstants_1.ComponentType.OWNER).owner = owner;
         bullet.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(1);
         bullet.getComponent(GameConstants_1.ComponentType.PHYSICS)
-            .addPhysics(false);
+            .addPhysics(false)
+            .scaleSprite(owner.sprite.scale.x);
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addLayer(owner.getComponent(GameConstants_1.ComponentType.TANK).bulletKind);
         bullet.getComponent(GameConstants_1.ComponentType.BULLET)
             .bulletInit();
@@ -204,26 +206,25 @@ class TankWorldFactory {
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
         return bullet;
     }
-    newDisaster() {
-        let disaster = new entity_1.Entity(this._game, this._player.sprite.x, this._game.world.top)
+    newDisaster(x, y) {
+        let disaster = new entity_1.Entity(this._game, x, y)
             .withComponent([
             new PhysicsComponent(this._game),
             new LayerComponent(),
-            new BulletComponent(this._game),
             new CollisionsComponent(),
+            new DisasterComponent(),
             new HealthComponent()
         ]);
-        disaster.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(1);
         disaster.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics(false);
-        disaster.getComponent(GameConstants_1.ComponentType.BULLET)
-            .disasterBullet();
+        disaster.getComponent(GameConstants_1.ComponentType.LAYER)
+            .addLayer(getRandomLayout())
+            .addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
+        disaster.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(1);
         disaster.getComponent(GameConstants_1.ComponentType.COLLISION)
+            .setCollisionGroup(this._enemyBulletsCollisionGroup)
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.DAMAGE])
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.DAMAGE]);
-        disaster.getComponent(GameConstants_1.ComponentType.LAYER)
-            .addLayer(GameConstants_1.TankLayout.BULLET_SIX)
-            .addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         this._entities.push(disaster);
         let sub = disaster.whenDestroyed.subscribe(() => {
             const index = this._entities.indexOf(disaster);
@@ -231,6 +232,25 @@ class TankWorldFactory {
             sub.unsubscribe();
         });
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
+        return disaster;
+        function getRandomLayout() {
+            let random = math_util_1.MathUtil.randomIntFromInterval(0, 5);
+            let tankLayout = () => {
+                switch (random) {
+                    case 0:
+                        return GameConstants_1.TankLayout.BULLET_ONE;
+                    case 1:
+                        return GameConstants_1.TankLayout.BULLET_TWO;
+                    case 2:
+                        return GameConstants_1.TankLayout.BULLET_THREE;
+                    case 3:
+                        return GameConstants_1.TankLayout.BULLET_FOUR;
+                    case 4:
+                        return GameConstants_1.TankLayout.BULLET_FIVE;
+                }
+            };
+            return tankLayout();
+        }
     }
     cleanUp() {
         this._currentLevel.destroy();

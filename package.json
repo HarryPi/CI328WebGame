@@ -9,7 +9,7 @@
     "build": "webpack",
     "lint": "tslint src/**/*.ts",
     "test": "echo 'noop'",
-    "prepublish": "npm run lint && npm run build && npm run test",
+    "prepublish": "npm run build && npm run test",
     "prepush": "npm run prepublish",
     "precommit": "npm run lint"
   },

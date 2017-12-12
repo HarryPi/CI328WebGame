@@ -12,7 +12,7 @@ import {ControlComponents} from './control.components';
 import {DataConfig} from '../config/data.config';
 import {CollisionComponents} from './collision.components';
 
-export namespace EventComponents {
+export namespace ActionComponents {
 
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
 
@@ -53,32 +53,7 @@ export namespace EventComponents {
 
     }
   }
-  export class StateComponent extends Component{
-    private _fsm: StateMachine;
-    constructor(){
-      super(ComponentType.STATE);
-      this._fsm = new StateMachine();
-    }
-    public addState(name: FsmStateName, state: State): StateComponent {
-      this._fsm.add(name, state);
-      state.entity = this.target;
-      return this;
-    }
-    public setState(name: FsmStateName): StateComponent {
-      try {
-        this._fsm.enter(name);
-        return this;
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    public get currentState(): State {
-      return this._fsm.current;
-    }
-    update(): void {
-      this._fsm.update();
-    }
-  }
+
   export class MovableComponent extends Component {
 
     private _direction: InputType;

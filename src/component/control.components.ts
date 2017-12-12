@@ -1,21 +1,37 @@
 import { Component } from './component';
 import { Entity } from '../entities/entity';
-import { AIConstant, ComponentType, FsmStateName } from '../constants/GameConstants';
+import {AIConstant, AnimationTypes, ComponentType, FsmStateName, TankLayout} from '../constants/GameConstants';
 import { CollisionComponents } from './collision.components';
 import { MathUtil } from '../util/math.util';
 import { DataComponents } from './data.components';
-import { EventComponents } from './event.components';
 
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import TankComponent = DataComponents.TankComponent;
 import OwnerComponent = DataComponents.OwnerComponent;
-import StateComponent = EventComponents.StateComponent;
+import { StateComponent } from './state.component';
+import {DataConfig} from '../config/data.config';
 
 
 export namespace ControlComponents {
 
   import HealthComponent = DataComponents.HealthComponent;
+  import LayerComponent = DataComponents.LayerComponent;
 
+  export class DisasterComponent extends Component {
+    constructor() {
+      super(ComponentType.DISASTER);
+    }
+
+    update(){
+      const layoutComponent = this.target.getComponent<LayerComponent>(ComponentType.LAYER);
+      const animation = layoutComponent.getCurrentAnimation();
+      if (!animation.isPlaying) {
+          this.target.sprite.angle = 45;
+          this.target.sprite.body.velocity.y = 200 * (5 - DataConfig.difficulty) ;
+          this.target.sprite.body.velocity.x = 100;
+      }
+    }
+  }
   export class BulletComponent extends Component {
     private _game: Phaser.Game;
 
@@ -25,15 +41,6 @@ export namespace ControlComponents {
       this._game = game;
       this._requiredComponents.push(ComponentType.OWNER);
       this._requiredComponents.push(ComponentType.LAYER);
-    }
-
-    /**
-     * @description
-     * This is to be called if a bullet is not a 'normal' bullet instead is a random disaster bullet
-     * */
-    disasterBullet() {
-      this.target.sprite.angle = 90;
-      this.target.sprite.body.velocity.y = 2000;
     }
 
     /**
@@ -113,7 +120,7 @@ export namespace ControlComponents {
           break;
         case AIConstant.CLOSE:
           let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
-          let lowHealth: boolean =  healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
+          let lowHealth: boolean = healthComp.getCurrentHealth() <= healthComp.getMaxHealth() / 2;
           if (!lowHealth) {
             sComp.setState(FsmStateName.EVADE);
           } else {
@@ -139,6 +146,7 @@ export namespace ControlComponents {
         return Math.abs(this.target.sprite.x - entity.sprite.x) < 20;
       });
     }
+
     private canHitPlayer(): AIConstant {
       const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
       const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
@@ -148,11 +156,11 @@ export namespace ControlComponents {
       const rangeOfProjectile: number = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
       const decisionMakingDistance = 300;
 
-      if (MathUtil.isBetween(rangeOfProjectile, Math.abs(distance ) + decisionMakingDistance, Math.abs(distance) - decisionMakingDistance)) {
+      if (MathUtil.isBetween(rangeOfProjectile, Math.abs(distance) + decisionMakingDistance, Math.abs(distance) - decisionMakingDistance)) {
         return AIConstant.CAN_HIT_ENEMY;
       } else if (rangeOfProjectile > Math.abs(distance)) {
         return AIConstant.CLOSE;
-      } else  {
+      } else {
         return AIConstant.FAR_AWAY;
       }
 
@@ -161,6 +169,7 @@ export namespace ControlComponents {
     get player(): Entity {
       return this._player;
     }
+
     get friendlies(): Array<Entity> {
       return this._friendlies;
     }

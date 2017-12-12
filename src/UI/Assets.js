@@ -73,9 +73,9 @@ class AssetLoader {
         this.loader.image(GameConstants_1.TileLayers.CANDY_LAYER, this._candyLayerUrl);
         this.loader.image(GameConstants_1.UIComponents.CANDY_ARTILLERY_IMG, this._tank1Url);
         this.loader.image(GameConstants_1.UIComponents.CANDY_HUNTER_IMG, this._tank2Url);
-        this.loader.image(GameConstants_1.UIComponents.CANDY_LIGHT_IMG, this._tank4Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_LIGHT_IMG, this._tank5Url);
         this.loader.image(GameConstants_1.UIComponents.CANDY_FORTRESS_IMG, this._tank3Url);
-        this.loader.image(GameConstants_1.UIComponents.CANDY_RECON_IMG, this._tank5Url);
+        this.loader.image(GameConstants_1.UIComponents.CANDY_RECON_IMG, this._tank4Url);
     }
     /**
      * @description

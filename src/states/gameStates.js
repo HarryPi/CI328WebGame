@@ -9,6 +9,7 @@ const data_config_1 = require("../config/data.config");
 const levels_tankLevels_1 = require("../config/levels/levels.tankLevels");
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
+const math_util_1 = require("../util/math.util");
 var GameStates;
 (function (GameStates) {
     class GameState extends Phaser.State {
@@ -54,6 +55,8 @@ var GameStates;
             this._score = 0;
             // keep record of spawn time in miliseconds
             this._timer = 0;
+            this._disasterTimer = 0;
+            this._activeDisasters = 0;
             this._input = new input_1.default();
             this._levels = new Map();
         }
@@ -67,15 +70,15 @@ var GameStates;
         }
         create() {
             // Input
-            let player = this._factory.newPlayer();
-            const physicsComponent = player.getComponent(GameConstants_1.ComponentType.PHYSICS);
+            this._player = this._factory.newPlayer();
+            const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), GameConstants_1.InputType.SHOOT);
             // Subscribe to inputs
             this._inputSubscription = this._input.emitter.subscribe((input) => {
                 if (input !== GameConstants_1.InputType.SHOOT.toString()) {
-                    player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input;
+                    this._player.getComponent(GameConstants_1.ComponentType.MOVABLE).direction = input;
                     if (input === GameConstants_1.InputType.RIGHT_INPUT) {
                         physicsComponent.scaleSprite(1);
                     }
@@ -84,15 +87,22 @@ var GameStates;
                     }
                 }
                 else {
-                    player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
+                    this._player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
                 }
             });
-            this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, { font: '22px Arial', fill: '#ff0044' });
+            this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {
+                font: '22px Arial',
+                fill: '#ff0044'
+            });
             this._scoreText.fixedToCamera = true;
-            this.game.time.events.add(Phaser.Timer.SECOND * 5, this.generateRandomEventFromCurrentLevel, this);
         }
         update() {
-            this.spawnEnemiesAsCurrentLevel();
+            if (this.canSpawnDisaster()) {
+                this.spawnDisaster();
+            }
+            if (this.canSpawnEnemy()) {
+                this.spawnEnemies();
+            }
             this._input.run();
             this._factory.entities.forEach((e) => {
                 e.update();
@@ -103,22 +113,33 @@ var GameStates;
             this._inputSubscription.unsubscribe();
             this._factory.cleanUp();
         }
-        generateRandomEventFromCurrentLevel() {
-            for (let i = 0; i < 6; i++) {
-                this._factory.newDisaster();
+        spawnDisaster() {
+            this._factory.newDisaster(this._player.sprite.x + 100 * math_util_1.MathUtil.randomIntFromInterval(-10, 10), this.game.world.top);
+            this._activeDisasters++;
+            if (this._activeDisasters >= 7) {
+                this._disasterTimer = Date.now();
+                this._activeDisasters = 0;
             }
         }
-        spawnEnemiesAsCurrentLevel() {
-            // typeof is there as enemiesCount can be 0 and javascript considers that as false what we are looking to avoid is typeof 'undefined'
+        canSpawnEnemy() {
             if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
                 if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
-                    this._factory.newEnemy(() => {
-                        this._score += 100;
-                        this._scoreText.setText(`Score: ${this._score}`);
-                    });
-                    this._factory.currentLevel.enemiesCount++;
-                    this._timer = Date.now();
+                    return true;
                 }
+            }
+            return false;
+        }
+        spawnEnemies() {
+            this._factory.newEnemy(() => {
+                this._score += 100;
+                this._scoreText.setText(`Score: ${this._score}`);
+            });
+            this._factory.currentLevel.enemiesCount++;
+            this._timer = Date.now();
+        }
+        canSpawnDisaster() {
+            if (Date.now() - this._disasterTimer > 5000) {
+                return true;
             }
         }
     }

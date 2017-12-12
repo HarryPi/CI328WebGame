@@ -276,16 +276,16 @@ class MenuManager {
         arr.forEach((sprite, index) => {
             state.game.add.tween(sprite.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
             switch (index) {
-                case 3:
+                case 0:
                     config.setSprite(GameConstants_1.Difficulty.EASY, sprite);
                     break;
-                case 2:
+                case 1:
                     config.setSprite(GameConstants_1.Difficulty.NORMAL, sprite);
                     break;
-                case 1:
+                case 2:
                     config.setSprite(GameConstants_1.Difficulty.HARD, sprite);
                     break;
-                case 0:
+                case 3:
                     config.setSprite(GameConstants_1.Difficulty.INSANE, sprite);
                     break;
                 default:
@@ -311,7 +311,6 @@ class MenuManager {
             this.fadeoutSprites(state, bArr);
             this.fadeoutSprites(state, arr).then(() => {
                 this.drawPreferences(state);
-                console.log(data_config_1.DataConfig.difficulty);
             });
         });
         bArr[1].events.onInputDown.add(() => {

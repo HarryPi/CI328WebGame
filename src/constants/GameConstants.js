@@ -15,10 +15,10 @@ var Levels;
 })(Levels = exports.Levels || (exports.Levels = {}));
 var Difficulty;
 (function (Difficulty) {
-    Difficulty[Difficulty["INSANE"] = 0] = "INSANE";
-    Difficulty[Difficulty["HARD"] = 1] = "HARD";
-    Difficulty[Difficulty["NORMAL"] = 2] = "NORMAL";
-    Difficulty[Difficulty["EASY"] = 3] = "EASY";
+    Difficulty[Difficulty["INSANE"] = 1] = "INSANE";
+    Difficulty[Difficulty["HARD"] = 2] = "HARD";
+    Difficulty[Difficulty["NORMAL"] = 3] = "NORMAL";
+    Difficulty[Difficulty["EASY"] = 4] = "EASY";
 })(Difficulty = exports.Difficulty || (exports.Difficulty = {}));
 var TankLayout;
 (function (TankLayout) {
@@ -64,6 +64,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["DISASTER"] = "disaster_component";
     ComponentType["HEALTH"] = "health_component";
     ComponentType["TANK"] = "tank_component";
     ComponentType["OWNER"] = "owner_component";

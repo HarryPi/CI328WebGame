@@ -22,12 +22,13 @@ var FsmStates;
             const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
             const shootComponent = this._entity.getComponent(GameConstants_1.ComponentType.SHOOT);
             const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
+            const difficultyModifier = 10 + data_config_1.DataConfig.difficulty * data_config_1.DataConfig.difficulty;
             const distance = this._entity.sprite.x - aiComp.player.sprite.x;
-            let frames = (distance / tankComponent.speed) + (1 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
-            let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
+            let seconds = (distance / tankComponent.speed);
+            let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * seconds;
             let direction = futurePosition - this._entity.sprite.x;
             let rangeOfProjectile = shootComponent.rangeOfProjectile;
-            if (math_util_1.MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
+            if (math_util_1.MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + difficultyModifier, rangeOfProjectile - difficultyModifier)) {
                 shootComponent.canShoot = true;
             }
             else if (Math.abs(direction) < rangeOfProjectile) {
@@ -132,7 +133,6 @@ var FsmStates;
         leave() {
         }
         update() {
-            console.log('i am evading');
             const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
             const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
             // Move until in range to pursuit again

@@ -2,9 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 const component_1 = require("./component");
-const stateMachine_1 = require("../AI/fsm/stateMachine");
-var EventComponents;
-(function (EventComponents) {
+var ActionComponents;
+(function (ActionComponents) {
     class ShootComponent extends component_1.Component {
         constructor(game, factory) {
             super(GameConstants_1.ComponentType.SHOOT);
@@ -35,34 +34,7 @@ var EventComponents;
             return rangeOfProjectile;
         }
     }
-    EventComponents.ShootComponent = ShootComponent;
-    class StateComponent extends component_1.Component {
-        constructor() {
-            super(GameConstants_1.ComponentType.STATE);
-            this._fsm = new stateMachine_1.default();
-        }
-        addState(name, state) {
-            this._fsm.add(name, state);
-            state.entity = this.target;
-            return this;
-        }
-        setState(name) {
-            try {
-                this._fsm.enter(name);
-                return this;
-            }
-            catch (e) {
-                console.log(e);
-            }
-        }
-        get currentState() {
-            return this._fsm.current;
-        }
-        update() {
-            this._fsm.update();
-        }
-    }
-    EventComponents.StateComponent = StateComponent;
+    ActionComponents.ShootComponent = ShootComponent;
     class MovableComponent extends component_1.Component {
         constructor() {
             super(GameConstants_1.ComponentType.MOVABLE);
@@ -105,6 +77,6 @@ var EventComponents;
             this._direction = value;
         }
     }
-    EventComponents.MovableComponent = MovableComponent;
-})(EventComponents = exports.EventComponents || (exports.EventComponents = {}));
-//# sourceMappingURL=event.components.js.map
+    ActionComponents.MovableComponent = MovableComponent;
+})(ActionComponents = exports.ActionComponents || (exports.ActionComponents = {}));
+//# sourceMappingURL=action.components.js.map

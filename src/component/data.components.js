@@ -57,6 +57,9 @@ var DataComponents;
         getAnimation(name) {
             return this.target.sprite.animations.getAnimation(name);
         }
+        getCurrentAnimation() {
+            return this.target.sprite.animations.currentAnim;
+        }
         playAnimation(name, frameRate, loop, killOnComplete) {
             return new Promise(((resolve, reject) => {
                 this.target.sprite.animations.play(name, frameRate, loop).onComplete.add(() => {
