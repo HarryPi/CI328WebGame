@@ -58,16 +58,16 @@ class DataConfig {
         this._shadowTank = null;
         this._shadowDifficulty = null;
     }
-    static get health() {
+    static get playerMaxHealth() {
         switch (this._difficulty) {
             case GameConstants_1.Difficulty.EASY:
-                return 7;
+                return 8;
             case GameConstants_1.Difficulty.NORMAL:
-                return 5;
+                return 6;
             case GameConstants_1.Difficulty.HARD:
-                return 3;
+                return 4;
             case GameConstants_1.Difficulty.INSANE:
-                return 1;
+                return 2;
             default:
                 break;
         }

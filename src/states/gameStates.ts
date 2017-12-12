@@ -1,28 +1,29 @@
 /** Imports */
-import {ActionComponents} from '../component/action.components';
+import { ActionComponents } from '../component/action.components';
 import AssetsUtils from '../UI/Assets';
-import {ComponentType, InputType, Levels, States} from '../constants/GameConstants';
-import {MenuManager} from '../UI/MenuManager';
+import { ComponentType, InputType, Levels, States } from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
-import {Subscription} from 'rxjs/Subscription';
 import Input from '../util/input';
-import {DataConfig} from '../config/data.config';
-import {Entity} from '../entities/entity';
-import {MenuConfig} from '../config/menu.config';
-import {TankGameLevels} from '../config/levels/levels.tankLevels';
-
+import { DataConfig } from '../config/data.config';
+import { Entity } from '../entities/entity';
+import { MenuConfig } from '../config/menu.config';
+import { TankGameLevels } from '../config/levels/levels.tankLevels';
+import { CollisionComponents } from '../component/collision.components';
+import { MathUtil } from '../util/math.util';
+import { UiManagers } from '../UI/uimanagers';
 
 import ShootComponent = ActionComponents.ShootComponent;
 import MovableComponent = ActionComponents.MovableComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
-import {CollisionComponents} from '../component/collision.components';
-import {MathUtil} from '../util/math.util';
+
 
 export namespace GameStates {
 
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
+  import MenuManager = UiManagers.MenuManager;
+  import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
 
   export abstract class GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class // todo: Comment: game is exported globally is this needed now?
@@ -104,8 +105,10 @@ export namespace GameStates {
     }
 
     create() {
+      const playerUIBuilder = new PlayerVisualsManager(this);
       // Input
       this._player = this._factory.newPlayer();
+      playerUIBuilder.displayPlayerMaxHealth();
       const physicsComponent = this._player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);

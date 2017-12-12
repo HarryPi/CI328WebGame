@@ -82,16 +82,16 @@ export class DataConfig {
   }
 
 
-  static get health(): number {
+  static get playerMaxHealth(): number {
     switch (this._difficulty) {
       case Difficulty.EASY:
-        return 7;
+        return 8;
       case Difficulty.NORMAL:
-        return 5;
+        return 6;
       case Difficulty.HARD:
-        return 3;
+        return 4;
       case Difficulty.INSANE:
-        return 1;
+        return 2;
       default:
         break;
     }

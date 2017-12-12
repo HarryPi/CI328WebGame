@@ -16,6 +16,8 @@ class AssetLoader {
   // Spritesheet
   private _tankSpritesheetUrl: string;
   private _tankSpritesheetUrlXLM: string;
+  private _playerVisualsSpritesheetUrl: string;
+  private _playerVisualsSpritesheetUrlXML: string;
 
   // loading screen
   private _progressBarUrl: string;
@@ -75,6 +77,8 @@ class AssetLoader {
     this._backgroundUrl = require('assets/spritesheet/backgroundElements.png');
     this._uiBackgroundUrl = require('assets/spritesheet/UISpritesheet.png');
     this.uiBackgroundUrlXML = require('assets/spritesheet/UISpritesheet_xml.xml');
+    this._playerVisualsSpritesheetUrl = require('assets/spritesheet/playerVisuals.png');
+    this._playerVisualsSpritesheetUrlXML = require('assets/spritesheet/playerVisuals.xml');
   }
 
   /**
@@ -110,6 +114,7 @@ class AssetLoader {
 
     this.loader.atlasXML(TankLayout.TANK_SPRITESHEET, this._tankSpritesheetUrl, this._tankSpritesheetUrlXLM);
     this.loader.atlasXML(UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
+    this.loader.atlasXML(UIComponents.PLAYER_VISUALS_SPRITESHEET, this._playerVisualsSpritesheetUrl, this._playerVisualsSpritesheetUrlXML);
 
     this.loader.image(TileLayers.GRASS_LAYER, this._grassLayerUrl);
     this.loader.image(TileLayers.BACKGROUND, this._backgroundUrl);
