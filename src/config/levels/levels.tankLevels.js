@@ -75,7 +75,7 @@ var TankGameLevels;
             this._enemiesSpawnTime = 3;
             this._playerStartPos = new vector_1.default(this._game.world.bounds.left, this._game.world.centerY + 100);
             this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
-            this._capEnemies = 1;
+            this._capEnemies = 3;
             this._totalEnemies = 30;
             this._randomDisasterSpawnTime = 5000;
             this._enemyTankKind = [GameConstants_1.TankLayout.DARK_RECON, GameConstants_1.TankLayout.DARK_ARTILLERY, GameConstants_1.TankLayout.DARK_FORTRESS, GameConstants_1.TankLayout.DARK_LIGHT, GameConstants_1.TankLayout.DARK_HUNTER];

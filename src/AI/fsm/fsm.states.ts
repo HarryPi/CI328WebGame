@@ -38,29 +38,22 @@ export namespace FsmStates {
     }
 
     leave(): void {
-      this._entity.getComponent<ShootComponent>(ComponentType.SHOOT).canShoot = false;
     }
 
     update(): void {
       const tankComponent = this._entity.getComponent<TankComponent>(ComponentType.TANK);
       const aiComp = this._entity.getComponent<AiComponent>(ComponentType.AI);
-      const stateComponent = this._entity.getComponent<StateComponent>(ComponentType.STATE);
       const shootComponent = this._entity.getComponent<ShootComponent>(ComponentType.SHOOT);
       const movableComponent = this._entity.getComponent<MovableComponent>(ComponentType.MOVABLE);
 
       const distance = this._entity.sprite.x - aiComp.player.sprite.x;
 
-      let frames = (distance / tankComponent.speed) + (10 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+      let frames = (distance / tankComponent.speed) + (1 * DataConfig.difficulty); // Highter the difficulty the less slopy it gets
 
       let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
 
       let direction = futurePosition - this._entity.sprite.x;
       let rangeOfProjectile = shootComponent.rangeOfProjectile;
-
-      console.log(`future pos is ${futurePosition.toString()}`);
-      console.log(`range of proj is ${rangeOfProjectile.toString()}`);
-      console.log(`player tank loc is ${aiComp.player.sprite.x.toString()}`);
-      console.log(`player - ai loc is ${direction.toString()}`);
 
       if (MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
         shootComponent.canShoot = true;

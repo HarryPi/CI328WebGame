@@ -16,23 +16,17 @@ var FsmStates;
         enter() {
         }
         leave() {
-            this._entity.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = false;
         }
         update() {
             const tankComponent = this._entity.getComponent(GameConstants_1.ComponentType.TANK);
             const aiComp = this._entity.getComponent(GameConstants_1.ComponentType.AI);
-            const stateComponent = this._entity.getComponent(GameConstants_1.ComponentType.STATE);
             const shootComponent = this._entity.getComponent(GameConstants_1.ComponentType.SHOOT);
             const movableComponent = this._entity.getComponent(GameConstants_1.ComponentType.MOVABLE);
             const distance = this._entity.sprite.x - aiComp.player.sprite.x;
-            let frames = (distance / tankComponent.speed) + (10 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
+            let frames = (distance / tankComponent.speed) + (1 * data_config_1.DataConfig.difficulty); // Highter the difficulty the less slopy it gets
             let futurePosition = aiComp.player.sprite.x + (aiComp.player.sprite.body.velocity.x / 1000) * frames;
             let direction = futurePosition - this._entity.sprite.x;
             let rangeOfProjectile = shootComponent.rangeOfProjectile;
-            console.log(`future pos is ${futurePosition.toString()}`);
-            console.log(`range of proj is ${rangeOfProjectile.toString()}`);
-            console.log(`player tank loc is ${aiComp.player.sprite.x.toString()}`);
-            console.log(`player - ai loc is ${direction.toString()}`);
             if (math_util_1.MathUtil.isBetween(Math.abs(direction), rangeOfProjectile + 15, rangeOfProjectile - 15)) {
                 shootComponent.canShoot = true;
             }

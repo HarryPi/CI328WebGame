@@ -107,7 +107,7 @@ export namespace TankGameLevels {
       this._enemiesSpawnTime = 3;
       this._playerStartPos = new Vector(this._game.world.bounds.left, this._game.world.centerY + 100);
       this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
-      this._capEnemies = 1;
+      this._capEnemies = 3;
       this._totalEnemies = 30;
       this._randomDisasterSpawnTime = 5000;
       this._enemyTankKind = [TankLayout.DARK_RECON, TankLayout.DARK_ARTILLERY, TankLayout.DARK_FORTRESS, TankLayout.DARK_LIGHT, TankLayout.DARK_HUNTER];

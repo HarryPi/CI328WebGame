@@ -34,7 +34,6 @@ var CollisionComponents;
                         if (aiComp) {
                             body.collides(collidesWith, () => {
                                 healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
-                                console.log(healthComp.getCurrentHealth());
                             }, this);
                         }
                         else {
