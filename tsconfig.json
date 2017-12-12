@@ -12,8 +12,7 @@
     "./node_modules/phaser/typescript/box2d.d.ts",
     "./node_modules/phaser/typescript/p2.d.ts",
     "./node_modules/phaser/typescript/phaser.comments.d.ts",
-    "./node_modules/phaser/typescript/pixi.comments.d.ts",
-    "./node_modules/typestate/src/typestate.ts"
+    "./node_modules/phaser/typescript/pixi.comments.d.ts"
   ],
   "include": [
     "./src/**/*.ts",
