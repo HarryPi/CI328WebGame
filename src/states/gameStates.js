@@ -2,16 +2,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Assets_1 = require("../UI/Assets");
 const GameConstants_1 = require("../constants/GameConstants");
-const MenuManager_1 = require("../UI/MenuManager");
 const TankWorldFactory_1 = require("../TankWorldFactory");
 const input_1 = require("../util/input");
 const data_config_1 = require("../config/data.config");
 const levels_tankLevels_1 = require("../config/levels/levels.tankLevels");
+const math_util_1 = require("../util/math.util");
+const uimanagers_1 = require("../UI/uimanagers");
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
-const math_util_1 = require("../util/math.util");
 var GameStates;
 (function (GameStates) {
+    var MenuManager = uimanagers_1.UiManagers.MenuManager;
+    var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class GameState extends Phaser.State {
     }
     GameStates.GameState = GameState;
@@ -43,7 +45,7 @@ var GameStates;
         preload() {
         }
         create() {
-            MenuManager_1.MenuManager.drawGameOver(this);
+            MenuManager.drawGameOver(this);
         }
         update() {
         }
@@ -69,8 +71,10 @@ var GameStates;
             this._factory.init(); // Initialise collision groups
         }
         create() {
+            const playerUIBuilder = new PlayerVisualsManager(this);
             // Input
             this._player = this._factory.newPlayer();
+            playerUIBuilder.displayPlayerMaxHealth();
             const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
@@ -151,7 +155,7 @@ var GameStates;
         preload() {
         }
         create() {
-            let config = MenuManager_1.MenuManager.drawMainMenu(this);
+            let config = MenuManager.drawMainMenu(this);
             this.game.camera.unfollow();
             config.allSprites.forEach((sprite) => {
                 // This is when the game restars
@@ -173,7 +177,7 @@ var GameStates;
             this._args = args;
         }
         preload() {
-            MenuManager_1.MenuManager.setLoadingScreen(this);
+            MenuManager.setLoadingScreen(this);
             // Reminder to me: When loading phaser assets, it must be done on a state prior to the state of usage!
             Assets_1.default.loadAll();
             // Set World variables

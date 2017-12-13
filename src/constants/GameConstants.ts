@@ -77,8 +77,11 @@ export enum UIComponents {
   LEVEL_TWO_IMAGE = 'level_two_image',
   CANDY_FORTRESS_IMG = 'candy_fortress_img', CANDY_ARTILLERY_IMG = 'candy_artillery_img',
   CANDY_HUNTER_IMG = 'candy_hunter_img', CANDY_RECON_IMG = 'candy_recon_img',
-  CANDY_LIGHT_IMG = 'candy_light_img'
-
+  CANDY_LIGHT_IMG = 'candy_light_img',
+  PLAYER_VISUALS_SPRITESHEET = 'player_visuals_spritesheet',
+  FULL_HEART = 'hudHeart_full.png',
+  HALF_HEART = 'hudHeart_half.png',
+  EMPTY_HEART = 'hudHeart_empty.png'
 }
 
 export enum TileLayers {

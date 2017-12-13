@@ -35,6 +35,8 @@ class AssetLoader {
         this._backgroundUrl = require('assets/spritesheet/backgroundElements.png');
         this._uiBackgroundUrl = require('assets/spritesheet/UISpritesheet.png');
         this.uiBackgroundUrlXML = require('assets/spritesheet/UISpritesheet_xml.xml');
+        this._playerVisualsSpritesheetUrl = require('assets/spritesheet/playerVisuals.png');
+        this._playerVisualsSpritesheetUrlXML = require('assets/spritesheet/playerVisuals.xml');
     }
     /**
      * Run once during Boot state to pass reference to loader.
@@ -66,6 +68,7 @@ class AssetLoader {
         this.loader.tilemap(GameConstants_1.Levels.LEVEL_TWO, this._levelTwoUrl, null, Phaser.Tilemap.TILED_JSON);
         this.loader.atlasXML(GameConstants_1.TankLayout.TANK_SPRITESHEET, this._tankSpritesheetUrl, this._tankSpritesheetUrlXLM);
         this.loader.atlasXML(GameConstants_1.UIComponents.UI_SPRITESHEET, this._uiBackgroundUrl, this.uiBackgroundUrlXML);
+        this.loader.atlasXML(GameConstants_1.UIComponents.PLAYER_VISUALS_SPRITESHEET, this._playerVisualsSpritesheetUrl, this._playerVisualsSpritesheetUrlXML);
         this.loader.image(GameConstants_1.TileLayers.GRASS_LAYER, this._grassLayerUrl);
         this.loader.image(GameConstants_1.TileLayers.BACKGROUND, this._backgroundUrl);
         this.loader.image(GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, this._levelOneImgUrl);

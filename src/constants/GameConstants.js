@@ -94,6 +94,10 @@ var UIComponents;
     UIComponents["CANDY_HUNTER_IMG"] = "candy_hunter_img";
     UIComponents["CANDY_RECON_IMG"] = "candy_recon_img";
     UIComponents["CANDY_LIGHT_IMG"] = "candy_light_img";
+    UIComponents["PLAYER_VISUALS_SPRITESHEET"] = "player_visuals_spritesheet";
+    UIComponents["FULL_HEART"] = "hudHeart_full.png";
+    UIComponents["HALF_HEART"] = "hudHeart_half.png";
+    UIComponents["EMPTY_HEART"] = "hudHeart_empty.png";
 })(UIComponents = exports.UIComponents || (exports.UIComponents = {}));
 var TileLayers;
 (function (TileLayers) {
