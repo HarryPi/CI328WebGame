@@ -1,12 +1,16 @@
-import { Component } from './component';
-import { Action, ComponentType } from '../constants/GameConstants';
-import { DataConfig } from '../config/data.config';
-import { DataComponents } from './data.components';
+import {Component} from './component';
+import {Action, ComponentType} from '../constants/GameConstants';
+import {DataConfig} from '../config/data.config';
+import {DataComponents} from './data.components';
 
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import HealthComponent = DataComponents.HealthComponent;
+import {UiManagers} from '../UI/uimanagers';
 
 export namespace CollisionComponents {
+
+  import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
+  import TankComponent = DataComponents.TankComponent;
 
   export class CollisionsComponent extends Component {
 
@@ -43,18 +47,21 @@ export namespace CollisionComponents {
           case Action.DAMAGE:
             // Each bullet does the same damage regardless of type
             // Bullet damage depends on difficulty level
-            let aiComp = this.target.getComponent(ComponentType.AI);
-            let healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
+            const aiComp = this.target.getComponent(ComponentType.AI);
+            const healthComp = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
+            const tankComp = this.target.getComponent<TankComponent>(ComponentType.TANK);
 
-            if (aiComp) {
+            if (!aiComp && tankComp) {
               body.collides(collidesWith, () => {
-                healthComp.dealDamage(DataConfig.playerDamage);
-              }, this);
-            } else {
-              body.collides(collidesWith, () => {
+                let heartManager = new PlayerVisualsManager();
+                heartManager.removeHeartByDamage(DataConfig.enemyDamage);
                 healthComp.dealDamage(DataConfig.enemyDamage);
               });
+              break;
             }
+            body.collides(collidesWith, () => {
+              healthComp.dealDamage(DataConfig.playerDamage);
+            });
             break;
 
           default:
@@ -65,6 +72,7 @@ export namespace CollisionComponents {
     }
 
   }
+
   export class PhysicsComponent extends Component {
     private _game: Phaser.Game;
 
@@ -85,10 +93,11 @@ export namespace CollisionComponents {
       return this._game.physics.p2.gravity.y;
     }
 
-    public scaleSprite(scale: number): PhysicsComponent{
+    public scaleSprite(scale: number): PhysicsComponent {
       this.target.sprite.scale.x = scale;
       return this;
     }
+
     public stopSprite() {
       this.target.sprite.body.motionState = Phaser.Physics.P2.Body.STATIC;
       this.target.sprite.body.restitution = 0.0;

@@ -396,7 +396,10 @@ var UiManagers;
                     this.drawMainMenu(state);
                 });
             });
-            let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', { font: '22px Arial', fill: '#ff0044' });
+            let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', {
+                font: '22px Arial',
+                fill: '#ff0044'
+            });
             gameOver.scale.setTo(0.0, 0.0);
             state.game.add.tween(gameOver.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
         }
@@ -409,31 +412,33 @@ var UiManagers;
     UiManagers.MenuManager = MenuManager;
     class PlayerVisualsManager {
         constructor(state) {
-            this._heartList = [];
             this._state = state;
         }
         displayPlayerMaxHealth() {
             this.drawHearts(data_config_1.DataConfig.playerMaxHealth / 2, this._state.game.world.left + 50, this._state.game.world.top + 20, GameConstants_1.UIComponents.FULL_HEART);
         }
         removeHeartByDamage(damage) {
-            for (let i = damage; i >= 0; i--) {
-                let heart = this._heartList.reverse().find((heart) => {
-                    return heart.frameName === GameConstants_1.UIComponents.FULL_HEART || heart.frameName === GameConstants_1.UIComponents.HALF_HEART;
+            for (let i = damage; i > 0; i--) {
+                let heart = PlayerVisualsManager._heartList.reverse().find((heartSprite) => {
+                    return heartSprite.frameName === GameConstants_1.UIComponents.FULL_HEART || heartSprite.frameName === GameConstants_1.UIComponents.HALF_HEART;
                 });
-                if (heart.frameName === GameConstants_1.UIComponents.HALF_HEART) {
-                    heart.frame = GameConstants_1.UIComponents.EMPTY_HEART;
-                }
-                else {
-                    heart.frame = GameConstants_1.UIComponents.HALF_HEART;
+                if (heart) {
+                    if (heart.frameName === GameConstants_1.UIComponents.HALF_HEART) {
+                        heart.frameName = GameConstants_1.UIComponents.EMPTY_HEART;
+                    }
+                    else {
+                        heart.frameName = GameConstants_1.UIComponents.HALF_HEART;
+                    }
+                    PlayerVisualsManager._heartList.reverse(); // ensure array returns to its original form
                 }
             }
         }
         addHeartByHealingReceived(healing) {
             for (let i = healing; i >= 0; i--) {
-                let heart = this._heartList.find((heart) => {
-                    return heart.frameName === GameConstants_1.UIComponents.EMPTY_HEART || heart.frameName === GameConstants_1.UIComponents.HALF_HEART;
+                let heart = PlayerVisualsManager._heartList.find((heart) => {
+                    return heart.frame === GameConstants_1.UIComponents.EMPTY_HEART || heart.frame === GameConstants_1.UIComponents.HALF_HEART;
                 });
-                if (heart.frameName === GameConstants_1.UIComponents.HALF_HEART) {
+                if (heart.frame === GameConstants_1.UIComponents.HALF_HEART) {
                     heart.frame = GameConstants_1.UIComponents.FULL_HEART;
                 }
                 else {
@@ -443,16 +448,16 @@ var UiManagers;
         }
         drawHearts(no, x, y, kindOfHeart) {
             const heartWidth = 128;
-            console.log(no);
             for (let i = 0; i < no; i++) {
                 console.log(i);
                 let heart = this._state.add.sprite(x + (heartWidth / 2) * i, y, GameConstants_1.UIComponents.PLAYER_VISUALS_SPRITESHEET, kindOfHeart);
                 heart.fixedToCamera = true;
                 heart.scale = new Phaser.Point(0.5, 0.5);
-                this._heartList.push(heart);
+                PlayerVisualsManager._heartList.push(heart);
             }
         }
     }
+    PlayerVisualsManager._heartList = [];
     UiManagers.PlayerVisualsManager = PlayerVisualsManager;
 })(UiManagers = exports.UiManagers || (exports.UiManagers = {}));
 //# sourceMappingURL=uimanagers.js.map

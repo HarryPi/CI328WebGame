@@ -89,7 +89,7 @@ class TankWorldFactory {
             new HealthComponent(),
             new TankComponent(data_config_1.DataConfig.tank)]);
         player.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-        player.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(100000); //DataConfig.playerMaxHealth);
+        player.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(data_config_1.DataConfig.playerMaxHealth);
         player.getComponent(GameConstants_1.ComponentType.CAMERA).setFocus(player.sprite);
         player.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics();

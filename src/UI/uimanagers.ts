@@ -3,8 +3,8 @@ import {
   UIComponents
 } from '../constants/GameConstants';
 import Vector from '../util/vector';
-import { DataConfig } from '../config/data.config';
-import { MenuConfig } from '../config/menu.config';
+import {DataConfig} from '../config/data.config';
+import {MenuConfig} from '../config/menu.config';
 
 export namespace UiManagers {
   export class MenuManager {
@@ -15,6 +15,7 @@ export namespace UiManagers {
     private static _animationTime: number = 333;
     private static _buttonHeight: number = 50;
     private static _buttonLength: number = 100;
+
     /**
      * @description
      * Draws the loading screen at state passed
@@ -77,6 +78,7 @@ export namespace UiManagers {
       }
       return arr;
     }
+
     /**
      * @description
      * Draws Tick button and Cross button at provided location
@@ -109,6 +111,7 @@ export namespace UiManagers {
       });
       return arr;
     }
+
     /**
      * @description
      * Use to draw the main menu at selected state
@@ -167,6 +170,7 @@ export namespace UiManagers {
       return config;
 
     }
+
     /**
      * @description
      * Fades out passed sprites and then destroys them
@@ -191,6 +195,7 @@ export namespace UiManagers {
         }
       });
     }
+
     /**
      * @description
      * Function to draw preferences options on current state
@@ -247,6 +252,7 @@ export namespace UiManagers {
       });
       return config;
     }
+
     /**
      * @description
      * Function to draw the player options of tank choices
@@ -268,7 +274,7 @@ export namespace UiManagers {
         new Vector(centerX, centerY),
         new Vector(centerX + this._buttonLength, centerY),
         new Vector(centerX + this._buttonLength * 2, centerY),
-        new Vector(centerX , centerY + this._buttonLength),
+        new Vector(centerX, centerY + this._buttonLength),
         new Vector(centerX + this._buttonLength, centerY + this._buttonLength)
       ];
 
@@ -321,6 +327,7 @@ export namespace UiManagers {
 
       return config;
     }
+
     public static drawDifficulty(state: Phaser.State) {
       let centerX = state.game.world.centerX;
       let centerY = state.game.world.centerY;
@@ -329,7 +336,7 @@ export namespace UiManagers {
       let loc = [
         new Vector(centerX, centerY - this._buttonHeight * 2),
         new Vector(centerX, centerY - this._buttonHeight),
-        new Vector(centerX, centerY ),
+        new Vector(centerX, centerY),
         new Vector(centerX, centerY + this._buttonHeight)
       ];
 
@@ -338,7 +345,7 @@ export namespace UiManagers {
         state,
         difficulties);
 
-      arr.forEach( (sprite: Phaser.Sprite, index: number) => {
+      arr.forEach((sprite: Phaser.Sprite, index: number) => {
         state.game.add.tween(sprite.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
         switch (index) {
           case 0:
@@ -390,6 +397,7 @@ export namespace UiManagers {
 
       return config;
     }
+
     /**
      * @description
      * Will Generate the available levels the player can choose from
@@ -443,6 +451,7 @@ export namespace UiManagers {
 
       return config;
     }
+
     public static drawGameOver(state: Phaser.State) {
       let map: Phaser.Tilemap;
       if (this._fakeMapExists) {
@@ -467,45 +476,55 @@ export namespace UiManagers {
       this.drawBoxes(1, loc, state, ['Main Menu']).forEach((value: Phaser.Sprite, index) => {
         state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
         state.game.camera.focusOn(value);
-        value.events.onInputDown.add( () => {
+        value.events.onInputDown.add(() => {
           this.drawMainMenu(state);
         });
       });
-      let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', {font: '22px Arial', fill: '#ff0044'});
+      let gameOver = state.game.add.text(centerX - 145, centerY + 110, 'You lost :( your score was ... todo!', {
+        font: '22px Arial',
+        fill: '#ff0044'
+      });
       gameOver.scale.setTo(0.0, 0.0);
       state.game.add.tween(gameOver.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
     }
 
   }
+
   export class PlayerVisualsManager {
 
     private _state: Phaser.State;
-    private _heartList: Array<Phaser.Sprite> = [];
+    private static _heartList: Array<Phaser.Sprite> = [];
 
-    constructor(state: Phaser.State) {
+    constructor(state?: Phaser.State) {
       this._state = state;
     }
-    public displayPlayerMaxHealth(){
-      this.drawHearts(DataConfig.playerMaxHealth / 2, this._state.game.world.left + 50, this._state.game.world.top + 20 , UIComponents.FULL_HEART);
+
+    public displayPlayerMaxHealth() {
+      this.drawHearts(DataConfig.playerMaxHealth / 2, this._state.game.world.left + 50, this._state.game.world.top + 20, UIComponents.FULL_HEART);
     }
+
     public removeHeartByDamage(damage: number) {
-      for (let i = damage; i >= 0; i--) {
-        let heart = this._heartList.reverse().find( (heart: Phaser.Sprite) => {
-          return heart.frameName === UIComponents.FULL_HEART || heart.frameName === UIComponents.HALF_HEART;
+      for (let i = damage; i > 0; i--) {
+        let heart = PlayerVisualsManager._heartList.reverse().find((heartSprite: Phaser.Sprite) => { // we reverse the array to get the last heart
+          return heartSprite.frameName === UIComponents.FULL_HEART || heartSprite.frameName === UIComponents.HALF_HEART;
         });
-        if (heart.frameName === UIComponents.HALF_HEART) {
-          heart.frame = UIComponents.EMPTY_HEART;
-        } else {
-          heart.frame = UIComponents.HALF_HEART;
+        if (heart) { // if two consecutive bullets hit the player on the same frame, the game doesnt have a chance to call game over and hearts are undefined
+          if (heart.frameName === UIComponents.HALF_HEART) {
+            heart.frameName = UIComponents.EMPTY_HEART;
+          } else {
+            heart.frameName = UIComponents.HALF_HEART;
+          }
+          PlayerVisualsManager._heartList.reverse(); // ensure array returns to its original form
         }
       }
     }
+
     public addHeartByHealingReceived(healing: number) {
       for (let i = healing; i >= 0; i--) {
-        let heart = this._heartList.find( (heart: Phaser.Sprite) => {
-          return heart.frameName === UIComponents.EMPTY_HEART || heart.frameName === UIComponents.HALF_HEART;
+        let heart = PlayerVisualsManager._heartList.find((heart: Phaser.Sprite) => {
+          return heart.frame === UIComponents.EMPTY_HEART || heart.frame === UIComponents.HALF_HEART;
         });
-        if (heart.frameName === UIComponents.HALF_HEART) {
+        if (heart.frame === UIComponents.HALF_HEART) {
           heart.frame = UIComponents.FULL_HEART;
         } else {
           heart.frame = UIComponents.FULL_HEART;
@@ -515,14 +534,12 @@ export namespace UiManagers {
 
     private drawHearts(no: number, x: number, y: number, kindOfHeart: UIComponents.HALF_HEART | UIComponents.FULL_HEART | UIComponents.EMPTY_HEART) {
       const heartWidth = 128;
-      console.log(no);
       for (let i = 0; i < no; i++) {
         console.log(i);
         let heart = this._state.add.sprite(x + (heartWidth / 2) * i, y, UIComponents.PLAYER_VISUALS_SPRITESHEET, kindOfHeart);
         heart.fixedToCamera = true;
         heart.scale = new Phaser.Point(0.5, 0.5);
-        this._heartList.push(heart);
-
+        PlayerVisualsManager._heartList.push(heart);
       }
     }
   }

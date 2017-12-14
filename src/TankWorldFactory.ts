@@ -113,7 +113,7 @@ export default class TankWorldFactory {
     player.getComponent<LayerComponent>(ComponentType.LAYER).addAnimation(
       Action.EXPLODE,
       Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
-    player.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(100000); //DataConfig.playerMaxHealth);
+    player.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(DataConfig.playerMaxHealth);
 
     player.getComponent<CameraComponent>(ComponentType.CAMERA).setFocus(player.sprite);
     player.getComponent<PhysicsComponent>(ComponentType.PHYSICS)

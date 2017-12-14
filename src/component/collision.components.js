@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
 const data_config_1 = require("../config/data.config");
+const uimanagers_1 = require("../UI/uimanagers");
 var CollisionComponents;
 (function (CollisionComponents) {
+    var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class CollisionsComponent extends component_1.Component {
         constructor() {
             super(GameConstants_1.ComponentType.COLLISION);
@@ -32,18 +34,20 @@ var CollisionComponents;
                     case GameConstants_1.Action.DAMAGE:
                         // Each bullet does the same damage regardless of type
                         // Bullet damage depends on difficulty level
-                        let aiComp = this.target.getComponent(GameConstants_1.ComponentType.AI);
-                        let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
-                        if (aiComp) {
+                        const aiComp = this.target.getComponent(GameConstants_1.ComponentType.AI);
+                        const healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+                        const tankComp = this.target.getComponent(GameConstants_1.ComponentType.TANK);
+                        if (!aiComp && tankComp) {
                             body.collides(collidesWith, () => {
-                                healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
-                            }, this);
-                        }
-                        else {
-                            body.collides(collidesWith, () => {
+                                let heartManager = new PlayerVisualsManager();
+                                heartManager.removeHeartByDamage(data_config_1.DataConfig.enemyDamage);
                                 healthComp.dealDamage(data_config_1.DataConfig.enemyDamage);
                             });
+                            break;
                         }
+                        body.collides(collidesWith, () => {
+                            healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
+                        });
                         break;
                     default:
                         break;
