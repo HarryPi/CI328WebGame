@@ -1,6 +1,7 @@
 import {Levels, TankLayout, TileLayers} from '../../constants/GameConstants';
 import {MathUtil} from '../../util/math.util';
 import Vector from '../../util/vector';
+import {Subject} from 'rxjs/Subject';
 
 export namespace TankGameLevels {
   export abstract class TankLevel {
@@ -15,10 +16,10 @@ export namespace TankGameLevels {
     protected _capEnemies: number;
     protected _enemiesCount: number; // total of enemies the level will have
     protected _enemiesSpawnTime: number;
-    private _randomDisasterSpawnTime: number; // time in ms
+    protected _randomDisasterSpawnTime: number; // time in ms
     protected _totalEnemies: number;
     protected _enemyTankKind: Array<TankLayout>;
-
+    protected _whenStageCleared: Subject<void>;
     constructor(game: Phaser.Game) {
       this._game = game;
     }
@@ -29,14 +30,14 @@ export namespace TankGameLevels {
     /**
      * @description
      * Use to clear any variables that should not exist globally once a level has finished e.g. tilemap
-     * */
+     */
     public abstract destroy(): void;
 
     /**
      * @description
      * Gets total enemies that will ever exist on current level
      * @return {number} this._totalEnemies
-     * */
+     */
     get totalEnemies(): number {
       return this._totalEnemies;
     }
@@ -45,7 +46,7 @@ export namespace TankGameLevels {
      * @description
      * Gets how many enemies currently are alive at a level
      * @return {number} this._enemiesCount
-     * */
+     */
     get enemiesCount(): number {
       return this._enemiesCount;
     }
@@ -54,7 +55,7 @@ export namespace TankGameLevels {
      * @description
      * Sets how many enemies currently are alive at a level
      * @param {number} value
-     * */
+     */
     set enemiesCount(value: number) {
       this._enemiesCount = value;
     }
@@ -74,12 +75,14 @@ export namespace TankGameLevels {
     get enemyStartPos(): Vector {
       return this._enemyStartPos;
     }
-
+    get whenStageCleared(): Subject<void> {
+      return this._whenStageCleared;
+    }
     /**
      * @description
      * Return the bodies of the ground layer
      * @return {Phaser.Physics.P2.Body[]} this._collisionLayer
-     * */
+     */
     get collisionLayer(): Array<Phaser.Physics.P2.Body> {
       return this._collisionLayer;
     }
@@ -89,7 +92,7 @@ export namespace TankGameLevels {
      * Total of enemies a level can have at a time
      * @return {number} this._capEnemies
      *
-     * */
+     */
     get capEnemies(): number {
       return this._capEnemies;
     }
@@ -132,6 +135,11 @@ export namespace TankGameLevels {
       this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath', true);
 
       this._map = map;
+
+      // Setup game winning condition
+      if (this._totalEnemies === 0) {
+        this._whenStageCleared.next();
+      }
     }
 
     public destroy(): void {
@@ -150,6 +158,11 @@ export namespace TankGameLevels {
       this._totalEnemies = 30;
       this._enemyTankKind = [TankLayout.GREY_LIGHT, TankLayout.GREY_RECON, TankLayout.GREY_HUNTER, TankLayout.GREY_FORTRESS, TankLayout.GREY_ARTILERY];
       this._randomDisasterSpawnTime = 5000;
+
+      if (this._totalEnemies === 0) {
+        this._whenStageCleared.next();
+      }
+
     }
 
     init(): void {

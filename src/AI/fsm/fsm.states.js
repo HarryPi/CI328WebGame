@@ -11,7 +11,6 @@ var FsmStates;
         }
     }
     FsmStates.State = State;
-    // todo: rename to pursing state
     class PursuingState extends State {
         enter() {
         }

@@ -49,7 +49,7 @@ class AssetLoader {
     /**
      * @description
      * Loads the pre-requisites for the loading screen
-     * */
+     */
     loadBoot() {
         try {
             this.loader.image(GameConstants_1.UIComponents.PROGRESS_BAR, this._progressBarUrl);
@@ -62,7 +62,7 @@ class AssetLoader {
     /**
      * @description
      * Loads all assets into the cached memory **Note this doesnt include loading screen assets see {@link AssetLoader#loadBoot}
-     * */
+     */
     loadAll() {
         this.loader.tilemap(GameConstants_1.Levels.LEVEL_ONE, this._levelOneUrl, null, Phaser.Tilemap.TILED_JSON);
         this.loader.tilemap(GameConstants_1.Levels.LEVEL_TWO, this._levelTwoUrl, null, Phaser.Tilemap.TILED_JSON);

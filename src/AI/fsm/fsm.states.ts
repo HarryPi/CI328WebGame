@@ -31,7 +31,6 @@ export namespace FsmStates {
     }
   }
 
-  // todo: rename to pursing state
   export class PursuingState extends State {
     enter(): void {
     }

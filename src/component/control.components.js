@@ -22,7 +22,6 @@ var ControlComponents;
     }
     ControlComponents.DisasterComponent = DisasterComponent;
     class BulletComponent extends component_1.Component {
-        // todo: Should this be on the PhysicsComponent?
         constructor(game) {
             super(GameConstants_1.ComponentType.BULLET);
             this._game = game;

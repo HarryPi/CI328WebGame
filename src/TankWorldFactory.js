@@ -26,7 +26,6 @@ var MovableComponent = action_components_1.ActionComponents.MovableComponent;
 var ShootComponent = action_components_1.ActionComponents.ShootComponent;
 var SuicideState = fsm_states_1.FsmStates.SuicideState;
 const math_util_1 = require("./util/math.util");
-const vector_1 = require("./util/vector");
 var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = require("./component/state.component");
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
@@ -39,13 +38,13 @@ var DisasterComponent = control_components_1.ControlComponents.DisasterComponent
  * create a new enemy {@link TankWorldFactory#newEnemy}
  * start spawning enemies {@Link TankWorldFactory#spawnEnemies}
  * All of the above are dependant on the information passed to the factory by what {@link TankLevel} is loaded
- * */
+ */
 class TankWorldFactory {
     /**
      * @constructor
      * @param {Phaser.Game} game
      * @param state - Current conditions
-     * */
+     */
     constructor(game, state) {
         this._entitiesSubscriptions = []; // Keep a record of the subscriptions to remove later
         // Arrays
@@ -56,7 +55,7 @@ class TankWorldFactory {
     /**
      * Initializes the factory
      * @param {Array<Phaser.Physics.P2.Body>} levelCollisionLayer - The current level collision layer so that tank factory objects can collide with it
-     * */
+     */
     init(levelCollisionLayer) {
         // init collision groups
         this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
@@ -80,9 +79,9 @@ class TankWorldFactory {
     /**
      * @description
      * Creates a new player based on the loaded level {@link TankLevel#playerStartPos}
-     * */
-    newPlayer() {
-        let player = new entity_1.Entity(this._game, this._currentLevel.playerStartPos.x, this._currentLevel.playerStartPos.y)
+     */
+    newPlayer(x, y) {
+        let player = new entity_1.Entity(this._game, x, y)
             .withComponent([new MovableComponent(),
             new CameraComponent(this._game),
             new PhysicsComponent(this._game),
@@ -106,30 +105,16 @@ class TankWorldFactory {
         this._player.sprite.data = {
             tag: guid_1.Guid.newGuid()
         };
-        let sub = player.whenDestroyed.subscribe(() => {
-            this._game.state.start(GameConstants_1.States.GAMEOVER_SATE, true, false);
-            sub.unsubscribe();
-        });
         return player;
     }
     /**
      * @description
      * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
-     * */
+     */
     newEnemy(kindOfenemy, x, y, subFunction) {
         let kindOfTank = kindOfenemy; // As each level can have many random enemies
         // Get one store it and use it where appropriate
-        const startingPost = new vector_1.default();
-        const random = math_util_1.MathUtil.randomIntFromInterval(0, 1);
-        if (random === 1) {
-            startingPost.x = this.currentLevel.playerStartPos.x;
-            startingPost.y = this.currentLevel.playerStartPos.y;
-        }
-        else {
-            startingPost.x = this.currentLevel.enemyStartPos.x;
-            startingPost.y = this.currentLevel.enemyStartPos.y;
-        }
-        let enemy = new entity_1.Entity(this._game, startingPost.x, startingPost.y, null)
+        let enemy = new entity_1.Entity(this._game, x, y, null)
             .withComponent([
             new MovableComponent(),
             new PhysicsComponent(this._game),
@@ -170,7 +155,6 @@ class TankWorldFactory {
             subFunction();
             const index = this._entities.indexOf(enemy);
             this._entities.splice(index, 1);
-            this._currentLevel.enemiesCount--;
             sub.unsubscribe();
         });
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
@@ -250,6 +234,8 @@ class TankWorldFactory {
                         return GameConstants_1.TankLayout.BULLET_FOUR;
                     case 4:
                         return GameConstants_1.TankLayout.BULLET_FIVE;
+                    default:
+                        break;
                 }
             };
             return tankLayout();

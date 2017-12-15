@@ -13,7 +13,7 @@ var TankGameLevels;
          * @description
          * Gets total enemies that will ever exist on current level
          * @return {number} this._totalEnemies
-         * */
+         */
         get totalEnemies() {
             return this._totalEnemies;
         }
@@ -21,7 +21,7 @@ var TankGameLevels;
          * @description
          * Gets how many enemies currently are alive at a level
          * @return {number} this._enemiesCount
-         * */
+         */
         get enemiesCount() {
             return this._enemiesCount;
         }
@@ -29,7 +29,7 @@ var TankGameLevels;
          * @description
          * Sets how many enemies currently are alive at a level
          * @param {number} value
-         * */
+         */
         set enemiesCount(value) {
             this._enemiesCount = value;
         }
@@ -45,11 +45,14 @@ var TankGameLevels;
         get enemyStartPos() {
             return this._enemyStartPos;
         }
+        get whenStageCleared() {
+            return this._whenStageCleared;
+        }
         /**
          * @description
          * Return the bodies of the ground layer
          * @return {Phaser.Physics.P2.Body[]} this._collisionLayer
-         * */
+         */
         get collisionLayer() {
             return this._collisionLayer;
         }
@@ -58,7 +61,7 @@ var TankGameLevels;
          * Total of enemies a level can have at a time
          * @return {number} this._capEnemies
          *
-         * */
+         */
         get capEnemies() {
             return this._capEnemies;
         }
@@ -94,6 +97,10 @@ var TankGameLevels;
             map.createLayer('GroundPrimary').resizeWorld();
             this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath', true);
             this._map = map;
+            // Setup game winning condition
+            if (this._totalEnemies === 0) {
+                this._whenStageCleared.next();
+            }
         }
         destroy() {
             this._map.destroy();
@@ -111,6 +118,9 @@ var TankGameLevels;
             this._totalEnemies = 30;
             this._enemyTankKind = [GameConstants_1.TankLayout.GREY_LIGHT, GameConstants_1.TankLayout.GREY_RECON, GameConstants_1.TankLayout.GREY_HUNTER, GameConstants_1.TankLayout.GREY_FORTRESS, GameConstants_1.TankLayout.GREY_ARTILERY];
             this._randomDisasterSpawnTime = 5000;
+            if (this._totalEnemies === 0) {
+                this._whenStageCleared.next();
+            }
         }
         init() {
             let map = this._game.add.tilemap(GameConstants_1.Levels.LEVEL_TWO);

@@ -45,7 +45,7 @@ var GameStates;
         preload() {
         }
         create() {
-            MenuManager.drawGameOver(this);
+            MenuManager.drawGameOver(this, this._args.score);
         }
         update() {
         }
@@ -67,15 +67,25 @@ var GameStates;
             this._levels.set(GameConstants_1.Levels.LEVEL_ONE, new LevelOne(this.game));
             this._levels.set(GameConstants_1.Levels.LEVEL_TWO, new LevelTwo(this.game));
             this._activeLevel = data_config_1.DataConfig.level;
+            this._levels.get(this._activeLevel).init();
             this._factory = new TankWorldFactory_1.default(this.game, this);
             this._factory.init(this._levels.get(this._activeLevel).collisionLayer); // Initialise collision groups
         }
         create() {
             const playerUIBuilder = new PlayerVisualsManager(this);
+            const activeLevel = this._levels.get(this._activeLevel);
+            // Subscribe to game winning condition
             // Input
-            this._player = this._factory.newPlayer();
+            this._player = this._factory.newPlayer(activeLevel.playerStartPos.x, activeLevel.playerStartPos.y);
+            let sub = this._player.whenDestroyed.subscribe(() => {
+                this.game.state.start(GameConstants_1.States.GAMEOVER_SATE, true, false, { score: this._score });
+                sub.unsubscribe();
+            });
             playerUIBuilder.displayPlayerMaxHealth();
             MenuManager.drawPauseMenu(this);
+            let gamewon = activeLevel.whenStageCleared.subscribe(() => {
+                MenuManager.drawYouWonMenu();
+            });
             const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
@@ -128,7 +138,7 @@ var GameStates;
         }
         canSpawnEnemy() {
             let activeLevel = this._levels.get(this._activeLevel);
-            if (activeLevel.enemiesCount < activeLevel.capEnemies) {
+            if (activeLevel.enemiesCount < activeLevel.capEnemies && activeLevel.totalEnemies !== 0) {
                 if (Date.now() - this._timer > activeLevel.enemiesSpawnTime * 1000) {
                     return true;
                 }
@@ -138,16 +148,24 @@ var GameStates;
         spawnEnemies() {
             const activeLevel = this._levels.get(this._activeLevel);
             const enemyKind = activeLevel.getRandomEnemy();
-            const spawningPoint = new Phaser.Point(activeLevel.enemyStartPos.x, activeLevel.enemyStartPos.y);
+            let random = math_util_1.MathUtil.randomIntFromInterval(0, 1);
+            const spawningPoint = new Phaser.Point(getSpawningPointX(), getSpawningPointY());
             this._factory.newEnemy(enemyKind, spawningPoint.x, spawningPoint.y, () => {
+                activeLevel.enemiesCount--;
                 this._score += 100;
                 this._scoreText.setText(`Score: ${this._score}`);
             });
             this._timer = Date.now();
+            function getSpawningPointX() {
+                return random === 0 ? activeLevel.playerStartPos.x : activeLevel.enemyStartPos.x;
+            }
+            function getSpawningPointY() {
+                return random === 0 ? activeLevel.playerStartPos.y : activeLevel.enemyStartPos.y;
+            }
         }
         canSpawnDisaster() {
             const activeLevel = this._levels.get(this._activeLevel);
-            if (Date.now() - activeLevel.randomDisasterSpawnTime > 5000) {
+            if (Date.now() - this._disasterTimer > activeLevel.randomDisasterSpawnTime) {
                 return true;
             }
         }
@@ -192,7 +210,6 @@ var GameStates;
             this.game.physics.p2.setBoundsToWorld(true, true, false, true);
         }
         create() {
-            // todo: Set main menu instead of level one
             this.game.state.start(GameConstants_1.States.MAIN_MENU_STATE, true, false, this._args);
         }
         update() {

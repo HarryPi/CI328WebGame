@@ -35,7 +35,6 @@ export namespace ControlComponents {
   export class BulletComponent extends Component {
     private _game: Phaser.Game;
 
-    // todo: Should this be on the PhysicsComponent?
     constructor(game: Phaser.Game) {
       super(ComponentType.BULLET);
       this._game = game;
