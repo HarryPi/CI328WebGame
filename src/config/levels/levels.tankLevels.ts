@@ -19,7 +19,7 @@ export namespace TankGameLevels {
     protected _randomDisasterSpawnTime: number; // time in ms
     protected _totalEnemies: number;
     protected _enemyTankKind: Array<TankLayout>;
-    protected _whenStageCleared: Subject<void>;
+    protected _whenStageCleared: Subject<void> = new Subject();
     constructor(game: Phaser.Game) {
       this._game = game;
     }

@@ -1797,7 +1797,7 @@ exports.default = TankWorldFactory;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = __webpack_require__(0);
-const Subject_1 = __webpack_require__(8);
+const Subject_1 = __webpack_require__(5);
 /**
  * @class Entity
  * @description
@@ -2727,7 +2727,7 @@ exports.default = StateMachine;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const Subject_1 = __webpack_require__(8);
+const Subject_1 = __webpack_require__(5);
 class Input {
     constructor() {
         this._map = new Map();
@@ -2760,10 +2760,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = __webpack_require__(0);
 const math_util_1 = __webpack_require__(3);
 const vector_1 = __webpack_require__(14);
+const Subject_1 = __webpack_require__(5);
 var TankGameLevels;
 (function (TankGameLevels) {
     class TankLevel {
         constructor(game) {
+            this._whenStageCleared = new Subject_1.Subject();
             this._game = game;
         }
         /**

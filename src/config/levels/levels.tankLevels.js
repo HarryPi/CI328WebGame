@@ -3,10 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../../constants/GameConstants");
 const math_util_1 = require("../../util/math.util");
 const vector_1 = require("../../util/vector");
+const Subject_1 = require("rxjs/Subject");
 var TankGameLevels;
 (function (TankGameLevels) {
     class TankLevel {
         constructor(game) {
+            this._whenStageCleared = new Subject_1.Subject();
             this._game = game;
         }
         /**
