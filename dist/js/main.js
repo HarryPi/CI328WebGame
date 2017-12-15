@@ -1154,12 +1154,12 @@ var GameStates;
             playerUIBuilder.displayPlayerMaxHealth();
             MenuManager.drawPauseMenu(this);
             let gamewon = activeLevel.whenStageCleared.subscribe(() => {
-                MenuManager.drawYouWonMenu();
+                // this.game.state.start(States.STAGE_CLEAR_STATE);
             });
             const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
-            this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), GameConstants_1.InputType.SHOOT);
+            this._input.add(this.game.input.activePointer.leftButton, GameConstants_1.InputType.SHOOT);
             // Subscribe to inputs
             this._inputSubscription = this._input.emitter.subscribe((input) => {
                 if (input !== GameConstants_1.InputType.SHOOT.toString()) {
@@ -2265,13 +2265,13 @@ var ControlComponents;
             let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
             const ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
             let aiComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.AI);
-            let aiAngle;
-            ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
+            /*let aiAngle: number;
+            ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;*/
             aiComponent
-                ? obj1.body.velocity.x = calculateVelocityX(true, velocity, aiAngle)
+                ? obj1.body.velocity.x = calculateVelocityX(true, velocity, angle)
                 : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
             aiComponent
-                ? obj1.body.velocity.y = calculateVelocityY(true, velocity, aiAngle)
+                ? obj1.body.velocity.y = calculateVelocityY(true, velocity, angle)
                 : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
             function calculateVelocityX(isAi = true, tankSpeed, angle) {
                 return velocity * Math.cos(angle);

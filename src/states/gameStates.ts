@@ -122,14 +122,14 @@ export namespace GameStates {
       MenuManager.drawPauseMenu(this);
 
       let gamewon = activeLevel.whenStageCleared.subscribe(() => {
-        MenuManager.drawYouWonMenu();
+        // this.game.state.start(States.STAGE_CLEAR_STATE);
       });
 
 
       const physicsComponent = this._player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), InputType.LEFT_INPUT);
-      this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR), InputType.SHOOT);
+      this._input.add(this.game.input.activePointer.leftButton, InputType.SHOOT);
 
       // Subscribe to inputs
       this._inputSubscription = this._input.emitter.subscribe((input: InputType) => {
