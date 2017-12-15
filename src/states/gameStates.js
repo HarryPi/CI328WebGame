@@ -66,15 +66,16 @@ var GameStates;
             // As we have generated our own world bounds we need to reset them and tell phaser we have them in a group, which rests in factort
             this._levels.set(GameConstants_1.Levels.LEVEL_ONE, new LevelOne(this.game));
             this._levels.set(GameConstants_1.Levels.LEVEL_TWO, new LevelTwo(this.game));
+            this._activeLevel = data_config_1.DataConfig.level;
             this._factory = new TankWorldFactory_1.default(this.game, this);
-            this._factory.currentLevel = this._levels.get(data_config_1.DataConfig.level);
-            this._factory.init(); // Initialise collision groups
+            this._factory.init(this._levels.get(this._activeLevel).collisionLayer); // Initialise collision groups
         }
         create() {
             const playerUIBuilder = new PlayerVisualsManager(this);
             // Input
             this._player = this._factory.newPlayer();
             playerUIBuilder.displayPlayerMaxHealth();
+            MenuManager.drawPauseMenu(this);
             const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
@@ -126,23 +127,27 @@ var GameStates;
             }
         }
         canSpawnEnemy() {
-            if (this._factory.currentLevel.enemiesCount < this._factory.currentLevel.capEnemies) {
-                if (Date.now() - this._timer > this._factory.currentLevel.enemiesSpawnTime * 1000) {
+            let activeLevel = this._levels.get(this._activeLevel);
+            if (activeLevel.enemiesCount < activeLevel.capEnemies) {
+                if (Date.now() - this._timer > activeLevel.enemiesSpawnTime * 1000) {
                     return true;
                 }
             }
             return false;
         }
         spawnEnemies() {
-            this._factory.newEnemy(() => {
+            const activeLevel = this._levels.get(this._activeLevel);
+            const enemyKind = activeLevel.getRandomEnemy();
+            const spawningPoint = new Phaser.Point(activeLevel.enemyStartPos.x, activeLevel.enemyStartPos.y);
+            this._factory.newEnemy(enemyKind, spawningPoint.x, spawningPoint.y, () => {
                 this._score += 100;
                 this._scoreText.setText(`Score: ${this._score}`);
             });
-            this._factory.currentLevel.enemiesCount++;
             this._timer = Date.now();
         }
         canSpawnDisaster() {
-            if (Date.now() - this._disasterTimer > 5000) {
+            const activeLevel = this._levels.get(this._activeLevel);
+            if (Date.now() - activeLevel.randomDisasterSpawnTime > 5000) {
                 return true;
             }
         }
@@ -156,9 +161,9 @@ var GameStates;
         }
         create() {
             let config = MenuManager.drawMainMenu(this);
-            this.game.camera.unfollow();
+            this.game.camera.unfollow(); // stop following the main menu
             config.allSprites.forEach((sprite) => {
-                // This is when the game restars
+                // This is when the game restart
                 // The sprites must be set to top and visible otherwise will be hidden
                 sprite.bringToTop();
                 sprite.visible = true;

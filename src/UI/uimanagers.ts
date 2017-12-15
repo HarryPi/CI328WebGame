@@ -5,6 +5,7 @@ import {
 import Vector from '../util/vector';
 import {DataConfig} from '../config/data.config';
 import {MenuConfig} from '../config/menu.config';
+import {Entity} from '../entities/entity';
 
 export namespace UiManagers {
   export class MenuManager {
@@ -118,8 +119,8 @@ export namespace UiManagers {
      * @return {MenuConfig} config
      * returns the config file with the sprites
      * */
-    public static drawMainMenu(state: Phaser.State): MenuConfig {
-      if (state.key === States.GAMEOVER_SATE) {
+    public static drawMainMenu(state: Phaser.State, restartGame: boolean = false): MenuConfig {
+      if (state.key === States.GAMEOVER_SATE || restartGame) {
         state.game.state.start(States.BOOT_STATE, true, true);
         this._fakeMapExists = false;
         this._fakeMap = null;
@@ -452,7 +453,7 @@ export namespace UiManagers {
       return config;
     }
 
-    public static drawGameOver(state: Phaser.State) {
+    public static drawGameOver(state: Phaser.State): void {
       let map: Phaser.Tilemap;
       if (this._fakeMapExists) {
         this._fakeMapExists = false;
@@ -488,6 +489,53 @@ export namespace UiManagers {
       state.game.add.tween(gameOver.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
     }
 
+    public static drawPauseMenu(state: Phaser.State): void {
+      const buttonWidth = 130;
+
+      let pauseMenu = state.add.sprite(state.game.world.right - buttonWidth, state.game.world.top, UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
+      let toAttach = state.game.add.text(0, 0, 'Pause', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: pauseMenu.width, align: 'center'});
+
+      toAttach.anchor.setTo(-1, -0.35);
+      pauseMenu.addChild(toAttach);
+      pauseMenu.scale = new Phaser.Point(0.7, 0.7);
+      pauseMenu.inputEnabled = true;
+      pauseMenu.fixedToCamera = true;
+
+      pauseMenu.events.onInputDown.add( () => {
+
+        if (state.game.paused === true) { // if game is already pause do not recreate pause menu
+          return;
+        }
+
+        state.game.paused = true;
+
+        let mainMenuBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2) , state.game.camera.y + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
+        let backBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2) , state.game.camera.y - (buttonWidth / 2) + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
+
+        let mainMenuTxt = state.add.text(0, 0, 'Main Menu', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: mainMenuBtn.width, align: 'center'});
+        let resumeTxt = state.add.text(0, 0, 'Resume', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: backBtn.width, align: 'center'});
+
+        mainMenuTxt.anchor.setTo(-0.4, -0.35);
+        resumeTxt.anchor.setTo(-0.65, -0.35);
+
+        mainMenuBtn.addChild(mainMenuTxt);
+        backBtn.addChild(resumeTxt);
+
+        mainMenuBtn.inputEnabled = true;
+        backBtn.inputEnabled = true;
+
+        mainMenuBtn.events.onInputDown.add( () => {
+          state.game.paused = false;
+          this.drawMainMenu(state, true);
+        });
+
+        backBtn.events.onInputDown.add( () => {
+          state.game.paused = false;
+          mainMenuBtn.destroy();
+          backBtn.destroy();
+        });
+      });
+    }
   }
 
   export class PlayerVisualsManager {
@@ -535,7 +583,6 @@ export namespace UiManagers {
     private drawHearts(no: number, x: number, y: number, kindOfHeart: UIComponents.HALF_HEART | UIComponents.FULL_HEART | UIComponents.EMPTY_HEART) {
       const heartWidth = 128;
       for (let i = 0; i < no; i++) {
-        console.log(i);
         let heart = this._state.add.sprite(x + (heartWidth / 2) * i, y, UIComponents.PLAYER_VISUALS_SPRITESHEET, kindOfHeart);
         heart.fixedToCamera = true;
         heart.scale = new Phaser.Point(0.5, 0.5);

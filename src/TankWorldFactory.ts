@@ -1,14 +1,14 @@
-import { Entity } from './entities/entity';
+import {Entity} from './entities/entity';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import { Guid } from './util/guid';
-import { DataConfig } from './config/data.config';
-import { Action, ComponentType, FsmStateName, States, TankLayout } from './constants/GameConstants';
-import { FsmStates } from './AI/fsm/fsm.states';
-import { CollisionComponents } from './component/collision.components';
-import { ControlComponents } from './component/control.components';
-import { DataComponents } from './component/data.components';
-import { ActionComponents } from './component/action.components';
-import { TankGameLevels } from './config/levels/levels.tankLevels';
+import {Guid} from './util/guid';
+import {DataConfig} from './config/data.config';
+import {Action, ComponentType, FsmStateName, States, TankLayout} from './constants/GameConstants';
+import {FsmStates} from './AI/fsm/fsm.states';
+import {CollisionComponents} from './component/collision.components';
+import {ControlComponents} from './component/control.components';
+import {DataComponents} from './component/data.components';
+import {ActionComponents} from './component/action.components';
+import {TankGameLevels} from './config/levels/levels.tankLevels';
 
 import IdleState = FsmStates.IdleState;
 import PursuingState = FsmStates.PursuingState;
@@ -27,10 +27,10 @@ import MovableComponent = ActionComponents.MovableComponent;
 import ShootComponent = ActionComponents.ShootComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import SuicideState = FsmStates.SuicideState;
-import { MathUtil } from './util/math.util';
+import {MathUtil} from './util/math.util';
 import Vector from './util/vector';
 import EvadeState = FsmStates.EvadeState;
-import { StateComponent } from './component/state.component';
+import {StateComponent} from './component/state.component';
 import DisasterComponent = ControlComponents.DisasterComponent;
 
 /**
@@ -49,8 +49,6 @@ export default class TankWorldFactory {
   private _player: Entity;
   private _entitiesSubscriptions = []; // Keep a record of the subscriptions to remove later
   private _currentState: Phaser.State;
-  // Levels
-  private _currentLevel: TankLevel;
 
   // Arrays
   private _entities: Array<Entity> = [];
@@ -67,21 +65,24 @@ export default class TankWorldFactory {
    * @param {Phaser.Game} game
    * @param state - Current conditions
    * */
-    constructor(game: Phaser.Game, state: Phaser.State) {
+  constructor(game: Phaser.Game, state: Phaser.State) {
     this._game = game;
     this._currentState = state;
   }
 
-  public init() {
+  /**
+   * Initializes the factory
+   * @param {Array<Phaser.Physics.P2.Body>} levelCollisionLayer - The current level collision layer so that tank factory objects can collide with it
+   * */
+  public init(levelCollisionLayer: Array<Phaser.Physics.P2.Body>): void {
     // init collision groups
-    this._currentLevel.init();
     this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._playerBulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
     // Have to do this here as we cannot enforce layer to be Entity to attach component
-    this._currentLevel.collisionLayer.forEach((layer) => {
+    levelCollisionLayer.forEach((layer) => {
       layer.setCollisionGroup(this._groundCollisionGroup);
       layer.collides([
         this._tankCollisionGroup,
@@ -94,6 +95,7 @@ export default class TankWorldFactory {
     // Force all groups to collide with world bounds
     this._game.physics.p2.updateBoundsCollisionGroup();
   }
+
   /**
    * @description
    * Creates a new player based on the loaded level {@link TankLevel#playerStartPos}
@@ -132,7 +134,7 @@ export default class TankWorldFactory {
     this._player.sprite.data = {
       tag: Guid.newGuid()
     };
-   let sub = player.whenDestroyed.subscribe(() => {
+    let sub = player.whenDestroyed.subscribe(() => {
       this._game.state.start(States.GAMEOVER_SATE, true, false);
       sub.unsubscribe();
     });
@@ -143,9 +145,9 @@ export default class TankWorldFactory {
    * @description
    * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
    * */
-  public newEnemy(subFunction?: () => void ) {
-    let kindOfTank: TankLayout = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
-                                                                    // Get one store it and use it where appropriate
+  public newEnemy(kindOfenemy: TankLayout, x: number, y: number, subFunction?: () => void) {
+    let kindOfTank: TankLayout = kindOfenemy; // As each level can have many random enemies
+    // Get one store it and use it where appropriate
     const startingPost = new Vector();
     const random = MathUtil.randomIntFromInterval(0, 1);
 
@@ -166,12 +168,12 @@ export default class TankWorldFactory {
           new LayerComponent(),
           new CollisionsComponent(),
           new StateComponent(),
-          new AiComponent(this._player, this._entities.filter( (entity: Entity) => {
-           return entity.hasComponent(ComponentType.AI);
+          new AiComponent(this._player, this._entities.filter((entity: Entity) => {
+            return entity.hasComponent(ComponentType.AI);
           })),
           new HealthComponent(),
           new TankComponent(kindOfTank)
-  ]);
+        ]);
 
     enemy.getComponent<LayerComponent>(ComponentType.LAYER).addAnimation(
       Action.EXPLODE,
@@ -256,7 +258,8 @@ export default class TankWorldFactory {
     return bullet;
 
   }
-  public newDisaster(x: number , y: number) {
+
+  public newDisaster(x: number, y: number) {
     let disaster = new Entity(this._game, x, y)
       .withComponent([
         new PhysicsComponent(this._game),
@@ -281,8 +284,6 @@ export default class TankWorldFactory {
       .setCollisionGroup(this._enemyBulletsCollisionGroup)
       .collidesWith(this._tankCollisionGroup, [Action.DAMAGE])
       .collidesWith(this._groundCollisionGroup, [Action.DAMAGE]);
-
-
 
 
     this._entities.push(disaster);
@@ -314,13 +315,13 @@ export default class TankWorldFactory {
     }
   }
 
-  public cleanUp(){
-    this._currentLevel.destroy();
+  public cleanUp() {
     this._entities = null;
-    this._entitiesSubscriptions.forEach( (e) => {
+    this._entitiesSubscriptions.forEach((e) => {
       e.unsubscribe();
     });
   }
+
   get entities(): Array<Entity> {
     return this._entities;
 
@@ -331,13 +332,6 @@ export default class TankWorldFactory {
       return this._playerBulletCollisionGroup;
     }
     return this._enemyBulletsCollisionGroup;
-  }
-  get currentLevel(): TankLevel {
-    return this._currentLevel;
-  }
-
-  set currentLevel(value: TankLevel) {
-    this._currentLevel = value;
   }
 }
 

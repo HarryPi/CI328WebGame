@@ -62,8 +62,12 @@ var TankGameLevels;
         get capEnemies() {
             return this._capEnemies;
         }
+        get randomDisasterSpawnTime() {
+            return this._randomDisasterSpawnTime;
+        }
         getRandomEnemy() {
             let toReturn = this._enemyTankKind[math_util_1.MathUtil.randomIntFromInterval(0, 4)];
+            this._enemiesCount++;
             return toReturn;
         }
     }

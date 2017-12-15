@@ -83,8 +83,8 @@ var UiManagers;
          * @return {MenuConfig} config
          * returns the config file with the sprites
          * */
-        static drawMainMenu(state) {
-            if (state.key === GameConstants_1.States.GAMEOVER_SATE) {
+        static drawMainMenu(state, restartGame = false) {
+            if (state.key === GameConstants_1.States.GAMEOVER_SATE || restartGame) {
                 state.game.state.start(GameConstants_1.States.BOOT_STATE, true, true);
                 this._fakeMapExists = false;
                 this._fakeMap = null;
@@ -403,6 +403,41 @@ var UiManagers;
             gameOver.scale.setTo(0.0, 0.0);
             state.game.add.tween(gameOver.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
         }
+        static drawPauseMenu(state) {
+            const buttonWidth = 130;
+            let pauseMenu = state.add.sprite(state.game.world.right - buttonWidth, state.game.world.top, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
+            let toAttach = state.game.add.text(0, 0, 'Pause', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: pauseMenu.width, align: 'center' });
+            toAttach.anchor.setTo(-1, -0.35);
+            pauseMenu.addChild(toAttach);
+            pauseMenu.scale = new Phaser.Point(0.7, 0.7);
+            pauseMenu.inputEnabled = true;
+            pauseMenu.fixedToCamera = true;
+            pauseMenu.events.onInputDown.add(() => {
+                if (state.game.paused === true) {
+                    return;
+                }
+                state.game.paused = true;
+                let mainMenuBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y + (state.game.height / 2), GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
+                let backBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y - (buttonWidth / 2) + (state.game.height / 2), GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
+                let mainMenuTxt = state.add.text(0, 0, 'Main Menu', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: mainMenuBtn.width, align: 'center' });
+                let resumeTxt = state.add.text(0, 0, 'Resume', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: backBtn.width, align: 'center' });
+                mainMenuTxt.anchor.setTo(-0.4, -0.35);
+                resumeTxt.anchor.setTo(-0.65, -0.35);
+                mainMenuBtn.addChild(mainMenuTxt);
+                backBtn.addChild(resumeTxt);
+                mainMenuBtn.inputEnabled = true;
+                backBtn.inputEnabled = true;
+                mainMenuBtn.events.onInputDown.add(() => {
+                    state.game.paused = false;
+                    this.drawMainMenu(state, true);
+                });
+                backBtn.events.onInputDown.add(() => {
+                    state.game.paused = false;
+                    mainMenuBtn.destroy();
+                    backBtn.destroy();
+                });
+            });
+        }
     }
     // Class Global vars
     MenuManager._fakeMapExists = false;
@@ -449,7 +484,6 @@ var UiManagers;
         drawHearts(no, x, y, kindOfHeart) {
             const heartWidth = 128;
             for (let i = 0; i < no; i++) {
-                console.log(i);
                 let heart = this._state.add.sprite(x + (heartWidth / 2) * i, y, GameConstants_1.UIComponents.PLAYER_VISUALS_SPRITESHEET, kindOfHeart);
                 heart.fixedToCamera = true;
                 heart.scale = new Phaser.Point(0.5, 0.5);

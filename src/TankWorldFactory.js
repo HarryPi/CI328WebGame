@@ -53,16 +53,19 @@ class TankWorldFactory {
         this._game = game;
         this._currentState = state;
     }
-    init() {
+    /**
+     * Initializes the factory
+     * @param {Array<Phaser.Physics.P2.Body>} levelCollisionLayer - The current level collision layer so that tank factory objects can collide with it
+     * */
+    init(levelCollisionLayer) {
         // init collision groups
-        this._currentLevel.init();
         this._tankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._playerBulletCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
         // Have to do this here as we cannot enforce layer to be Entity to attach component
-        this._currentLevel.collisionLayer.forEach((layer) => {
+        levelCollisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);
             layer.collides([
                 this._tankCollisionGroup,
@@ -113,8 +116,8 @@ class TankWorldFactory {
      * @description
      * Creates a new enemy based on the loaded level {@link TankLevel#enemyStartPos}
      * */
-    newEnemy(subFunction) {
-        let kindOfTank = this.currentLevel.getRandomEnemy(); // As each level can have many random enemies
+    newEnemy(kindOfenemy, x, y, subFunction) {
+        let kindOfTank = kindOfenemy; // As each level can have many random enemies
         // Get one store it and use it where appropriate
         const startingPost = new vector_1.default();
         const random = math_util_1.MathUtil.randomIntFromInterval(0, 1);
@@ -253,7 +256,6 @@ class TankWorldFactory {
         }
     }
     cleanUp() {
-        this._currentLevel.destroy();
         this._entities = null;
         this._entitiesSubscriptions.forEach((e) => {
             e.unsubscribe();
@@ -267,12 +269,6 @@ class TankWorldFactory {
             return this._playerBulletCollisionGroup;
         }
         return this._enemyBulletsCollisionGroup;
-    }
-    get currentLevel() {
-        return this._currentLevel;
-    }
-    set currentLevel(value) {
-        this._currentLevel = value;
     }
 }
 exports.default = TankWorldFactory;

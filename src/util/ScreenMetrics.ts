@@ -6,6 +6,7 @@ export declare let MAX_GAME_HEIGHT: number;
 export declare let SCALE_MODE: string;
 
 /*
+    All credits for this class belong to http://sbcgamesdev.blogspot.co.uk/2015/04/phaser-tutorial-manage-different-screen.html
     The Screen[...] classes are modified versions of the classes in an article I found.
     Author: Tomáš Rychnovský
     Article: http://sbcgamesdev.blogspot.ca/2015/04/phaser-tutorial-manage-different-screen.html

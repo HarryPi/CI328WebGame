@@ -15,7 +15,7 @@ export namespace TankGameLevels {
     protected _capEnemies: number;
     protected _enemiesCount: number; // total of enemies the level will have
     protected _enemiesSpawnTime: number;
-    protected _randomDisasterSpawnTime: number; // time in ms
+    private _randomDisasterSpawnTime: number; // time in ms
     protected _totalEnemies: number;
     protected _enemyTankKind: Array<TankLayout>;
 
@@ -94,8 +94,14 @@ export namespace TankGameLevels {
       return this._capEnemies;
     }
 
+
+    get randomDisasterSpawnTime(): number {
+      return this._randomDisasterSpawnTime;
+    }
+
     getRandomEnemy(): TankLayout {
       let toReturn = this._enemyTankKind[MathUtil.randomIntFromInterval(0, 4)];
+      this._enemiesCount++;
       return toReturn;
     }
   }
