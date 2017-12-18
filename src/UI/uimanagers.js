@@ -672,8 +672,8 @@ var UiManagers;
             moveLeftBtn.fixedToCamera = true;
             moveRight.fixedToCamera = true;
             // fireBtn.fixedToCamera = true;
-            input.add(moveLeftBtn.events.onInputDown.add(() => {
-            }), GameConstants_1.InputType.LEFT_INPUT);
+            input.add(), GameConstants_1.InputType.LEFT_INPUT;
+            ;
         }
     }
     PlayerVisualsManager._heartList = [];

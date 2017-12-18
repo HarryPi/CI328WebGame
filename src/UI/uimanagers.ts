@@ -804,9 +804,7 @@ export namespace UiManagers {
       moveRight.fixedToCamera = true;
       // fireBtn.fixedToCamera = true;
 
-      input.add(moveLeftBtn.events.onInputDown.add(() => {
-
-      }), InputType.LEFT_INPUT);
+      input.add(), InputType.LEFT_INPUT);
     }
   }
 }

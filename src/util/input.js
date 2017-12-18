@@ -11,8 +11,6 @@ class Input {
     }
     run() {
         this._map.forEach((value, key) => {
-            if (key instanceof Phaser.SignalBinding) {
-            }
             if (key.isDown) {
                 this._emitter.next(value);
             }
@@ -23,4 +21,10 @@ class Input {
     }
 }
 exports.default = Input;
+class InputFunction {
+    isDown(fun) {
+        return fun();
+    }
+}
+exports.InputFunction = InputFunction;
 //# sourceMappingURL=input.js.map
