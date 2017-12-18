@@ -30,6 +30,8 @@ var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = require("./component/state.component");
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
+const groupMananger_1 = require("./groups/groupMananger");
+var GroupMananger = groupMananger_1.Groups.GroupMananger;
 /**
  * @class TankWorldFactory
  * @description
@@ -65,6 +67,7 @@ class TankWorldFactory {
         this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
+        GroupMananger.setGroup(groupMananger_1.Groups.GroupName.GAME_LAYER, this._game.add.group());
         // Have to do this here as we cannot enforce layer to be Entity to attach component
         levelCollisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);

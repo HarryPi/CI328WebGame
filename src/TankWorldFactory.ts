@@ -32,6 +32,8 @@ import EvadeState = FsmStates.EvadeState;
 import { StateComponent } from './component/state.component';
 import DisasterComponent = ControlComponents.DisasterComponent;
 import PowerUpComponent = ActionComponents.PowerUpComponent;
+import {Groups} from './groups/groupMananger';
+import GroupMananger = Groups.GroupMananger;
 
 /**
  * @class TankWorldFactory
@@ -82,6 +84,8 @@ export default class TankWorldFactory {
     this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
+
+    GroupMananger.setGroup(Groups.GroupName.GAME_LAYER, this._game.add.group());
     // Have to do this here as we cannot enforce layer to be Entity to attach component
     levelCollisionLayer.forEach((layer) => {
       layer.setCollisionGroup(this._groundCollisionGroup);

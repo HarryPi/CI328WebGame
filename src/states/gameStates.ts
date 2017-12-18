@@ -167,6 +167,7 @@ export namespace GameStates {
         fill: '#ff0044'
       });
       this._scoreText.fixedToCamera = true;
+      playerUIBuilder.buildControlButtons(this._input);
     }
 
     update() {

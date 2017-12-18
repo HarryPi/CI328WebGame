@@ -653,6 +653,28 @@ var UiManagers;
             PlayerVisualsManager._heartList = [];
             PlayerVisualsManager._repairIcon = undefined;
         }
+        buildControlButtons(input) {
+            const paneWidth = 100;
+            const paneHeight = 100;
+            const paddingHeight = 15;
+            const paddingWidth = 100;
+            const bottomLeft = new vector_1.default(this._state.game.world.left, this._state.game.world.bottom / 2);
+            const bottomRight = new vector_1.default(this._state.game.world.right, this._state.game.world.bottom / 2);
+            const moveLeftBtn = this._state.game.add.sprite(bottomLeft.x + paddingWidth / 4, bottomLeft.y, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.PANEL);
+            const moveRight = this._state.game.add.sprite(bottomRight.x - paddingWidth, bottomRight.y, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.PANEL);
+            // const fireBtn = this._state.game.add.sprite(bottomRight.x, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
+            moveLeftBtn.alpha = 0.6;
+            moveRight.alpha = 0.6;
+            // fireBtn.alpha = 0.6;
+            moveLeftBtn.inputEnabled = true;
+            moveRight.inputEnabled = true;
+            // fireBtn.inputEnabled = true;
+            moveLeftBtn.fixedToCamera = true;
+            moveRight.fixedToCamera = true;
+            // fireBtn.fixedToCamera = true;
+            input.add(moveLeftBtn.events.onInputDown.add(() => {
+            }), GameConstants_1.InputType.LEFT_INPUT);
+        }
     }
     PlayerVisualsManager._heartList = [];
     UiManagers.PlayerVisualsManager = PlayerVisualsManager;

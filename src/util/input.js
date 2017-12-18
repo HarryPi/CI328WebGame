@@ -11,6 +11,8 @@ class Input {
     }
     run() {
         this._map.forEach((value, key) => {
+            if (key instanceof Phaser.SignalBinding) {
+            }
             if (key.isDown) {
                 this._emitter.next(value);
             }

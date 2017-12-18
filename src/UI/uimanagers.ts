@@ -1,14 +1,15 @@
 import {
   ComponentType, CrateName,
-  Difficulty, Levels, MainMenuButtons, States, TankLayout, TileLayers,
+  Difficulty, InputType, Levels, MainMenuButtons, States, TankLayout, TileLayers,
   UIComponents
 } from '../constants/GameConstants';
 import Vector from '../util/vector';
-import { DataConfig } from '../config/data.config';
-import { MenuConfig } from '../config/menu.config';
-import { Entity } from '../entities/entity';
-import { DataComponents } from '../component/data.components';
+import {DataConfig} from '../config/data.config';
+import {MenuConfig} from '../config/menu.config';
+import {Entity} from '../entities/entity';
+import {DataComponents} from '../component/data.components';
 import TankComponent = DataComponents.TankComponent;
+import Input from '../util/input';
 
 export namespace UiManagers {
 
@@ -310,8 +311,8 @@ export namespace UiManagers {
       const selectedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y - boxHeight, selectedTankString, style);
       const speedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y, selectedTankSpeedString, style);
       const selectedTankBulletSpeedTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y + boxHeight, selectedTankBulletSpeedString, style);
-      const selectedTankDamageTxt = state.game.add.text(firstSprite.x - boxWidth , firstSprite.y + boxHeight * 2, selectedTankDamageString, style);
-      const extraInfoTxt = state.game.add.text(firstSprite.x - boxWidth , state.game.world.bottom  + boxHeight * 2, extraInfoString, style);
+      const selectedTankDamageTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y + boxHeight * 2, selectedTankDamageString, style);
+      const extraInfoTxt = state.game.add.text(firstSprite.x - boxWidth, state.game.world.bottom + boxHeight * 2, extraInfoString, style);
 
       const fakeEntity: Entity = new Entity(state.game, 0, 0);
       fakeEntity.withComponent([new TankComponent(DataConfig.tank)]);
@@ -350,7 +351,7 @@ export namespace UiManagers {
 
       bArr[0].events.onInputDown.add(() => {
         DataConfig.applyChanges();
-        spriteTxtList.forEach( (sprite: Phaser.Sprite) => {
+        spriteTxtList.forEach((sprite: Phaser.Sprite) => {
           sprite.destroy();
         });
         this.fadeoutSprites(state, bArr);
@@ -360,7 +361,7 @@ export namespace UiManagers {
       });
       bArr[1].events.onInputDown.add(() => {
         this.fadeoutSprites(state, bArr);
-        spriteTxtList.forEach( (sprite: Phaser.Sprite) => {
+        spriteTxtList.forEach((sprite: Phaser.Sprite) => {
           sprite.destroy();
         });
         DataConfig.revertChanges();
@@ -684,11 +685,13 @@ export namespace UiManagers {
       state.game.add.tween(gameOver.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
     }
   }
+
   export class PlayerVisualsManager {
 
     private _state: Phaser.State;
     private static _heartList: Array<Phaser.Sprite> = [];
     private static _repairIcon: Phaser.Sprite;
+
     constructor(state?: Phaser.State) {
       this._state = state;
     }
@@ -733,7 +736,7 @@ export namespace UiManagers {
 
     public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
       const paddingHeight = 80;
-      const paddingWidth = 15 ;
+      const paddingWidth = 15;
       const repairIconLocation: Vector = new Vector(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
 
       switch (powerUpKind) {
@@ -744,13 +747,14 @@ export namespace UiManagers {
             }
             break;
           }
-          PlayerVisualsManager._repairIcon = this._state.game.add.sprite(repairIconLocation.x , repairIconLocation.y, TankLayout.TANK_SPRITESHEET, TankLayout.CRATE_REPAIR);
+          PlayerVisualsManager._repairIcon = this._state.game.add.sprite(repairIconLocation.x, repairIconLocation.y, TankLayout.TANK_SPRITESHEET, TankLayout.CRATE_REPAIR);
           PlayerVisualsManager._repairIcon.fixedToCamera = true;
           break;
         default:
           break;
       }
     }
+
     public removePowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
       switch (powerUpKind) {
         case TankLayout.CRATE_REPAIR:
@@ -770,9 +774,39 @@ export namespace UiManagers {
         PlayerVisualsManager._heartList.push(heart);
       }
     }
-    public static cleanUp(){
+
+    public static cleanUp() {
       PlayerVisualsManager._heartList = [];
       PlayerVisualsManager._repairIcon = undefined;
+    }
+
+    public buildControlButtons(input: Input) {
+      const paneWidth = 100;
+      const paneHeight = 100;
+      const paddingHeight = 15;
+      const paddingWidth = 100;
+      const bottomLeft = new Vector(this._state.game.world.left, this._state.game.world.bottom / 2);
+      const bottomRight = new Vector(this._state.game.world.right, this._state.game.world.bottom / 2);
+
+      const moveLeftBtn = this._state.game.add.sprite(bottomLeft.x + paddingWidth / 4, bottomLeft.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
+      const moveRight = this._state.game.add.sprite(bottomRight.x  - paddingWidth, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
+      // const fireBtn = this._state.game.add.sprite(bottomRight.x, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
+
+      moveLeftBtn.alpha = 0.6;
+      moveRight.alpha = 0.6;
+      // fireBtn.alpha = 0.6;
+
+      moveLeftBtn.inputEnabled = true;
+      moveRight.inputEnabled = true;
+      // fireBtn.inputEnabled = true;
+
+      moveLeftBtn.fixedToCamera = true;
+      moveRight.fixedToCamera = true;
+      // fireBtn.fixedToCamera = true;
+
+      input.add(moveLeftBtn.events.onInputDown.add(() => {
+
+      }), InputType.LEFT_INPUT);
     }
   }
 }
