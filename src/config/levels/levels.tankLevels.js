@@ -3,12 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../../constants/GameConstants");
 const math_util_1 = require("../../util/math.util");
 const vector_1 = require("../../util/vector");
-const Subject_1 = require("rxjs/Subject");
 var TankGameLevels;
 (function (TankGameLevels) {
     class TankLevel {
         constructor(game) {
-            this._whenStageCleared = new Subject_1.Subject();
             this._game = game;
         }
         /**
@@ -47,8 +45,8 @@ var TankGameLevels;
         get enemyStartPos() {
             return this._enemyStartPos;
         }
-        get whenStageCleared() {
-            return this._whenStageCleared;
+        get powerUpSpawnTime() {
+            return this._powerUpSpawnTime;
         }
         /**
          * @description
@@ -73,6 +71,7 @@ var TankGameLevels;
         getRandomEnemy() {
             let toReturn = this._enemyTankKind[math_util_1.MathUtil.randomIntFromInterval(0, 4)];
             this._enemiesCount++;
+            this._totalEnemies--;
             return toReturn;
         }
     }
@@ -80,14 +79,18 @@ var TankGameLevels;
     class LevelOne extends TankLevel {
         constructor(game) {
             super(game);
+            this._powerUpSpawnTime = 10;
             this._enemiesCount = 0;
             this._enemiesSpawnTime = 3;
             this._playerStartPos = new vector_1.default(this._game.world.bounds.left, this._game.world.centerY + 100);
             this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
             this._capEnemies = 3;
             this._totalEnemies = 30;
-            this._randomDisasterSpawnTime = 5000;
+            this._randomDisasterSpawnTime = 7000;
             this._enemyTankKind = [GameConstants_1.TankLayout.DARK_RECON, GameConstants_1.TankLayout.DARK_ARTILLERY, GameConstants_1.TankLayout.DARK_FORTRESS, GameConstants_1.TankLayout.DARK_LIGHT, GameConstants_1.TankLayout.DARK_HUNTER];
+        }
+        isCleared() {
+            return this._totalEnemies === 0 && this._enemiesCount === 0;
         }
         init() {
             let map = this._game.add.tilemap(GameConstants_1.Levels.LEVEL_ONE);
@@ -99,10 +102,6 @@ var TankGameLevels;
             map.createLayer('GroundPrimary').resizeWorld();
             this._collisionLayer = this._game.physics.p2.convertCollisionObjects(map, 'GroundPath', true);
             this._map = map;
-            // Setup game winning condition
-            if (this._totalEnemies === 0) {
-                this._whenStageCleared.next();
-            }
         }
         destroy() {
             this._map.destroy();
@@ -112,17 +111,18 @@ var TankGameLevels;
     class LevelTwo extends TankLevel {
         constructor(game) {
             super(game);
+            this._powerUpSpawnTime = 10;
             this._enemiesCount = 0;
             this._enemiesSpawnTime = 3;
             this._playerStartPos = new vector_1.default(this._game.world.bounds.left, this._game.world.centerY + 100);
             this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
             this._capEnemies = 3;
             this._totalEnemies = 30;
-            this._enemyTankKind = [GameConstants_1.TankLayout.GREY_LIGHT, GameConstants_1.TankLayout.GREY_RECON, GameConstants_1.TankLayout.GREY_HUNTER, GameConstants_1.TankLayout.GREY_FORTRESS, GameConstants_1.TankLayout.GREY_ARTILERY];
+            this._enemyTankKind = [GameConstants_1.TankLayout.GREY_LIGHT, GameConstants_1.TankLayout.GREY_RECON, GameConstants_1.TankLayout.GREY_HUNTER, GameConstants_1.TankLayout.GREY_FORTRESS, GameConstants_1.TankLayout.GREY_ARTILLERY];
             this._randomDisasterSpawnTime = 5000;
-            if (this._totalEnemies === 0) {
-                this._whenStageCleared.next();
-            }
+        }
+        isCleared() {
+            return this._totalEnemies === 0 && this._enemiesCount === 0;
         }
         init() {
             let map = this._game.add.tilemap(GameConstants_1.Levels.LEVEL_TWO);

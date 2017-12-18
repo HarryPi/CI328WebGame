@@ -1,16 +1,16 @@
 /** Imports */
-import { ActionComponents } from '../component/action.components';
+import {ActionComponents} from '../component/action.components';
 import AssetsUtils from '../UI/Assets';
-import { ComponentType, InputType, Levels, States } from '../constants/GameConstants';
+import {ComponentType, InputType, Levels, States} from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
 import Input from '../util/input';
-import { DataConfig } from '../config/data.config';
-import { Entity } from '../entities/entity';
-import { MenuConfig } from '../config/menu.config';
-import { TankGameLevels } from '../config/levels/levels.tankLevels';
-import { CollisionComponents } from '../component/collision.components';
-import { MathUtil } from '../util/math.util';
-import { UiManagers } from '../UI/uimanagers';
+import {DataConfig} from '../config/data.config';
+import {Entity} from '../entities/entity';
+import {MenuConfig} from '../config/menu.config';
+import {TankGameLevels} from '../config/levels/levels.tankLevels';
+import {CollisionComponents} from '../component/collision.components';
+import {MathUtil} from '../util/math.util';
+import {UiManagers} from '../UI/uimanagers';
 
 import ShootComponent = ActionComponents.ShootComponent;
 import MovableComponent = ActionComponents.MovableComponent;
@@ -38,7 +38,7 @@ export namespace GameStates {
     }
 
     init(args) {
-      this._args = args;
+      this._args = {};
     }
 
     preload(): void {
@@ -53,6 +53,26 @@ export namespace GameStates {
     create(): void {
       this.game.stage.backgroundColor = '#FFF';
       this.game.state.start(States.PRELOAD_STATE, true, false, this._args);
+    }
+  }
+
+  export class StageClearState extends GameState {
+    private _args;
+
+    init(args) {
+      this._args = args;
+    }
+
+    preload() {
+
+    }
+
+    create() {
+      MenuManager.drawYouWonMenu(this, this._args.score);
+    }
+
+    update() {
+
     }
   }
 
@@ -81,12 +101,13 @@ export namespace GameStates {
     private _inputSubscription;
     private _factory: TankWorldFactory;
     private _levels: Map<Levels, TankLevel>;
-    private _score: number = 0;
+    private _score: number;
     // keep record of spawn time in miliseconds
     private _timer: number = 0;
     private _scoreText: Phaser.Text;
     private _player: Entity;
     private _disasterTimer: number = 0;
+    private _powerUpTimer: number = 0;
     private _activeDisasters: number = 0;
     private _activeLevel: Levels;
 
@@ -104,6 +125,7 @@ export namespace GameStates {
       this._levels.get(this._activeLevel).init();
       this._factory = new TankWorldFactory(this.game, this);
       this._factory.init(this._levels.get(this._activeLevel).collisionLayer); // Initialise collision groups
+      this._score = 0;
     }
 
     create() {
@@ -112,7 +134,7 @@ export namespace GameStates {
 
       // Subscribe to game winning condition
       // Input
-      this._player = this._factory.newPlayer(activeLevel.playerStartPos.x, activeLevel.playerStartPos.y);
+      this._player = this._factory.newPlayer(activeLevel.playerStartPos.x, activeLevel.playerStartPos.y, this);
       let sub = this._player.whenDestroyed.subscribe(() => {
         this.game.state.start(States.GAMEOVER_SATE, true, false, {score: this._score});
         sub.unsubscribe();
@@ -120,11 +142,6 @@ export namespace GameStates {
 
       playerUIBuilder.displayPlayerMaxHealth();
       MenuManager.drawPauseMenu(this);
-
-      let gamewon = activeLevel.whenStageCleared.subscribe(() => {
-        // this.game.state.start(States.STAGE_CLEAR_STATE);
-      });
-
 
       const physicsComponent = this._player.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
       this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), InputType.RIGHT_INPUT);
@@ -153,10 +170,18 @@ export namespace GameStates {
     }
 
     update() {
-      if (this.canSpawnDisaster()) {
+      const activeLevel = this._levels.get(this._activeLevel);
+
+      if (this.canSpawnPowerUp(activeLevel)) {
+        this.spawnPowerUp();
+      }
+      if (activeLevel.isCleared()) {
+        this.game.state.start(States.STAGE_CLEAR_STATE, true, false, {score: this._score});
+      }
+      if (this.canSpawnDisaster(activeLevel)) {
         this.spawnDisaster();
       }
-      if (this.canSpawnEnemy()) {
+      if (this.canSpawnEnemy(activeLevel)) {
         this.spawnEnemies();
       }
       this._input.run();
@@ -170,10 +195,32 @@ export namespace GameStates {
       this._inputSubscription.unsubscribe();
       this._factory.cleanUp();
 
+      // Clean UI static values
+      PlayerVisualsManager.cleanUp();
+
 
     }
+
+    private spawnPowerUp() {
+      let getRandomX = () => {
+
+        let x =  this._player.sprite.x * MathUtil.randomIntFromInterval(-5, 5);
+        if (this.game.world.bounds.x < x){
+          x = this.game.world.bounds.x - 100;
+        }
+        return x;
+      };
+      // check if within world boundaries
+      this._powerUpTimer = Date.now();
+      let randomLocation = new Vector(getRandomX(), this.game.world.top);
+      this._factory.spawnPowerUp(randomLocation.x, randomLocation.y);
+    }
+    private canSpawnPowerUp(activeLevel: TankLevel) {
+        return Date.now() - this._powerUpTimer > activeLevel.powerUpSpawnTime * 1000;
+    }
+
     private spawnDisaster() {
-      this._factory.newDisaster(this._player.sprite.x  + 100 * MathUtil.randomIntFromInterval(-10, 10), this.game.world.top);
+      this._factory.newDisaster(this._player.sprite.x + 100 * MathUtil.randomIntFromInterval(-10, 10), this.game.world.top);
       this._activeDisasters++;
       if (this._activeDisasters >= 7) {
         this._disasterTimer = Date.now();
@@ -181,8 +228,8 @@ export namespace GameStates {
       }
 
     }
-    private canSpawnEnemy(): boolean {
-      let activeLevel: TankLevel = this._levels.get(this._activeLevel);
+
+    private canSpawnEnemy(activeLevel: TankLevel): boolean {
       if (activeLevel.enemiesCount < activeLevel.capEnemies && activeLevel.totalEnemies !== 0) {
         if (Date.now() - this._timer > activeLevel.enemiesSpawnTime * 1000) {
           return true;
@@ -207,14 +254,14 @@ export namespace GameStates {
       function getSpawningPointX(): number {
         return random === 0 ? activeLevel.playerStartPos.x : activeLevel.enemyStartPos.x;
       }
+
       function getSpawningPointY(): number {
         return random === 0 ? activeLevel.playerStartPos.y : activeLevel.enemyStartPos.y;
       }
     }
 
-    private canSpawnDisaster() {
-      const activeLevel = this._levels.get(this._activeLevel);
-      if (Date.now() - this._disasterTimer >  activeLevel.randomDisasterSpawnTime) {
+    private canSpawnDisaster(activeLevel: TankLevel) {
+      if (Date.now() - this._disasterTimer > activeLevel.randomDisasterSpawnTime) {
         return true;
       }
     }

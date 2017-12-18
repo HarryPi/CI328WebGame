@@ -29,6 +29,7 @@ const math_util_1 = require("./util/math.util");
 var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = require("./component/state.component");
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
+var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
 /**
  * @class TankWorldFactory
  * @description
@@ -63,6 +64,7 @@ class TankWorldFactory {
         this._groundCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
+        this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
         // Have to do this here as we cannot enforce layer to be Entity to attach component
         levelCollisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);
@@ -70,7 +72,8 @@ class TankWorldFactory {
                 this._tankCollisionGroup,
                 this._playerBulletCollisionGroup,
                 this._enemyBulletsCollisionGroup,
-                this._enemyTankCollisionGroup
+                this._enemyTankCollisionGroup,
+                this._enviromentCollisionGroup
             ]);
         });
         // Force all groups to collide with world bounds
@@ -80,7 +83,7 @@ class TankWorldFactory {
      * @description
      * Creates a new player based on the loaded level {@link TankLevel#playerStartPos}
      */
-    newPlayer(x, y) {
+    newPlayer(x, y, state) {
         let player = new entity_1.Entity(this._game, x, y)
             .withComponent([new MovableComponent(),
             new CameraComponent(this._game),
@@ -88,7 +91,8 @@ class TankWorldFactory {
             new ShootComponent(this._game, this),
             new LayerComponent(),
             new CollisionsComponent(),
-            new HealthComponent(),
+            new HealthComponent(this._game, this._currentState),
+            new PowerUpComponent(state, this._player),
             new TankComponent(data_config_1.DataConfig.tank)]);
         player.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         player.getComponent(GameConstants_1.ComponentType.HEALTH).setHealth(data_config_1.DataConfig.playerMaxHealth);
@@ -99,7 +103,8 @@ class TankWorldFactory {
         player.getComponent(GameConstants_1.ComponentType.COLLISION)
             .setCollisionGroup(this._tankCollisionGroup)
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING])
-            .collidesWith(this._enemyBulletsCollisionGroup, [GameConstants_1.Action.DAMAGE]);
+            .collidesWith(this._enemyBulletsCollisionGroup, [GameConstants_1.Action.DAMAGE])
+            .collidesWith(this._enviromentCollisionGroup, [GameConstants_1.Action.POWER_UP]);
         this._entities.push(player);
         this._player = player;
         this._player.sprite.data = {
@@ -125,7 +130,7 @@ class TankWorldFactory {
             new AiComponent(this._player, this._entities.filter((entity) => {
                 return entity.hasComponent(GameConstants_1.ComponentType.AI);
             })),
-            new HealthComponent(),
+            new HealthComponent(this._game, this._currentState),
             new TankComponent(kindOfTank)
         ]);
         enemy.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
@@ -167,7 +172,7 @@ class TankWorldFactory {
             new LayerComponent(),
             new BulletComponent(this._game),
             new CollisionsComponent(),
-            new HealthComponent(),
+            new HealthComponent(this._game, this._currentState),
             new OwnerComponent()
         ]);
         bullet.getComponent(GameConstants_1.ComponentType.OWNER).owner = owner;
@@ -179,7 +184,7 @@ class TankWorldFactory {
         bullet.getComponent(GameConstants_1.ComponentType.BULLET)
             .bulletInit();
         bullet.getComponent(GameConstants_1.ComponentType.COLLISION)
-            .setCollisionGroup(this.setBulletColisionGroup(owner))
+            .setCollisionGroup(this.setBulletCollisionGroup(owner))
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.DAMAGE])
             .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.DAMAGE])
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.DAMAGE]);
@@ -191,6 +196,9 @@ class TankWorldFactory {
             sub.unsubscribe();
         });
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
+        bullet.sprite.data = {
+            tag: guid_1.Guid.newGuid()
+        };
         return bullet;
     }
     newDisaster(x, y) {
@@ -200,7 +208,7 @@ class TankWorldFactory {
             new LayerComponent(),
             new CollisionsComponent(),
             new DisasterComponent(),
-            new HealthComponent()
+            new HealthComponent(this._game, this._currentState)
         ]);
         disaster.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics(false);
@@ -219,6 +227,9 @@ class TankWorldFactory {
             sub.unsubscribe();
         });
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
+        disaster.sprite.data = {
+            tag: guid_1.Guid.newGuid()
+        };
         return disaster;
         function getRandomLayout() {
             let random = math_util_1.MathUtil.randomIntFromInterval(0, 5);
@@ -241,16 +252,59 @@ class TankWorldFactory {
             return tankLayout();
         }
     }
+    spawnPowerUp(x, y) {
+        let powerUp = new entity_1.Entity(this._game, x, y)
+            .withComponent([
+            new PhysicsComponent(this._game),
+            new LayerComponent(),
+            new CollisionsComponent()
+        ]);
+        powerUp.getComponent(GameConstants_1.ComponentType.PHYSICS)
+            .addPhysics(false);
+        powerUp.getComponent(GameConstants_1.ComponentType.LAYER)
+            .addLayer(getRandomPowerUp());
+        powerUp.getComponent(GameConstants_1.ComponentType.COLLISION)
+            .setCollisionGroup(this._enviromentCollisionGroup)
+            .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.NOTHING])
+            .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.NOTHING]);
+        this._entities.push(powerUp);
+        let sub = powerUp.whenDestroyed.subscribe(() => {
+            const index = this._entities.indexOf(powerUp);
+            this._entities.splice(index, 1);
+            sub.unsubscribe();
+        });
+        this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
+        powerUp.sprite.data = {
+            tag: guid_1.Guid.newGuid()
+        };
+        return powerUp;
+        function getRandomPowerUp() {
+            let random = math_util_1.MathUtil.randomIntFromInterval(0, 1);
+            let tankLayout = () => {
+                switch (random) {
+                    case 0:
+                    case 1:
+                        return GameConstants_1.TankLayout.CRATE_REPAIR;
+                }
+            };
+            return tankLayout();
+        }
+    }
     cleanUp() {
         this._entities = null;
         this._entitiesSubscriptions.forEach((e) => {
             e.unsubscribe();
         });
     }
+    getEntityFromTag(tag) {
+        return this._entities.find((e) => {
+            return e.sprite.data.tag === tag;
+        });
+    }
     get entities() {
         return this._entities;
     }
-    setBulletColisionGroup(owner) {
+    setBulletCollisionGroup(owner) {
         if (owner.sprite.data.tag === this._player.sprite.data.tag) {
             return this._playerBulletCollisionGroup;
         }

@@ -1,6 +1,5 @@
 'use strict';
 
-
 /** Imports */
 require('pixi');
 require('p2');
@@ -17,6 +16,7 @@ import PreloadState = GameStates.PreloadState;
 import GameState = GameStates.MainGameState;
 import MainMenuState = GameStates.MainMenuState;
 import GameoverState = GameStates.GameoverState;
+import StageClearState = GameStates.StageClearState;
 
 // The main class of our application
 export class App extends Phaser.Game {
@@ -27,6 +27,7 @@ export class App extends Phaser.Game {
     this.state.add(States.GAME_STATE, GameState);
     this.state.add(States.MAIN_MENU_STATE, MainMenuState);
     this.state.add(States.GAMEOVER_SATE, GameoverState);
+    this.state.add(States.STAGE_CLEAR_STATE, StageClearState);
     this.state.start(States.BOOT_STATE);
   }
 }

@@ -22,7 +22,7 @@ export abstract class Component {
     this._target = target;
   }
 
-  public validateComponentRequirments(){
+  public validateComponentRequirements(){
     let errorString: string = '';
     this._requiredComponents.forEach((comp: ComponentType) => {
       if (!this._target.getComponent(comp)) {
@@ -33,5 +33,5 @@ export abstract class Component {
       throw new Error(errorString);
     }
   }
-  public update(params?: any): void {}
+  public update(): void {}
 }

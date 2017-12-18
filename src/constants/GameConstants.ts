@@ -1,4 +1,5 @@
 export enum States {
+  STAGE_CLEAR_STATE = 'stage_clear_state',
   GAMEOVER_SATE = 'gameover_state',
   MAIN_MENU_STATE = 'main_menu_state',
   BOOT_STATE = 'boot_state',
@@ -19,21 +20,39 @@ export enum Difficulty {
 }
 
 export enum TankLayout {
-  GREEN_FORTRESS = 'tanks_tankGreen1.png', GREEN_ARTILERY = 'tanks_tankGreen2.png',
-  GREEN_HUNTER = 'tanks_tankGreen3.png', GREEN_RECON = 'tanks_tankGreen4.png',
+  GREEN_ARTILLERY = 'tanks_tankGreen1.png',
+  GREEN_HUNTER = 'tanks_tankGreen2.png',
+  GREEN_FORTRESS = 'tanks_tankGreen3.png',
+  GREEN_RECON = 'tanks_tankGreen4.png',
   GREEN_LIGHT = 'tanks_tankGreen5.png',
-  GREY_FORTRESS = 'tanks_tankGrey1.png', GREY_ARTILERY = 'tanks_tankGrey2.png',
-  GREY_HUNTER = 'tanks_tankGrey3.png', GREY_RECON = 'tanks_tankGrey4.png',
+
+  GREY_ARTILLERY = 'tanks_tankGrey1.png',
+  GREY_HUNTER = 'tanks_tankGrey2.png',
+  GREY_FORTRESS = 'tanks_tankGrey3.png',
+  GREY_RECON = 'tanks_tankGrey4.png',
   GREY_LIGHT = 'tanks_tankGrey5.png',
-  CANDY_FORTRESS = 'tanks_tankDesert1.png', CANDY_ARTILLERY = 'tanks_tankDesert2.png',
-  CANDY_HUNTER = 'tanks_tankDesert3.png', CANDY_RECON = 'tanks_tankDesert4.png',
+
+  CANDY_ARTILLERY = 'tanks_tankDesert1.png',
+  CANDY_HUNTER = 'tanks_tankDesert2.png',
+  CANDY_FORTRESS = 'tanks_tankDesert3.png',
+  CANDY_RECON = 'tanks_tankDesert4.png',
   CANDY_LIGHT = 'tanks_tankDesert5.png',
-  DARK_FORTRESS = 'tanks_tankNavy1.png', DARK_ARTILLERY = 'tanks_tankNavy2.png',
-  DARK_HUNTER = 'tanks_tankNavy3.png', DARK_RECON = 'tanks_tankNavy4.png',
+
+  DARK_ARTILLERY = 'tanks_tankNavy1.png',
+  DARK_HUNTER = 'tanks_tankNavy2.png',
+  DARK_FORTRESS = 'tanks_tankNavy3.png',
+  DARK_RECON = 'tanks_tankNavy4.png',
   DARK_LIGHT = 'tanks_tankNavy5.png',
-  BULLET_ONE = 'tank_bullet1.png', BULLET_TWO = 'tank_bullet2.png',
-  BULLET_THREE = 'tank_bullet3.png', BULLET_FOUR = 'tank_bullet4.png',
-  BULLET_FIVE = 'tank_bullet5.png', BULLET_SIX = 'tank_bullet6.png',
+
+  BULLET_ONE = 'tank_bullet1.png',
+  BULLET_TWO = 'tank_bullet2.png',
+  BULLET_THREE = 'tank_bullet3.png',
+  BULLET_FOUR = 'tank_bullet4.png',
+  BULLET_FIVE = 'tank_bullet5.png',
+  BULLET_SIX = 'tank_bullet6.png',
+
+  CRATE_REPAIR = 'tanks_crateRepair.png',
+
   EXPLOSION_ONE = 'tank_explosion1.png',
   EXPLOSION_TWO = 'tank_explosion2.png',
   EXPLOSION_THREE = 'tank_explosion3.png',
@@ -50,6 +69,7 @@ export enum TankLayout {
 }
 
 export enum ComponentType {
+  POWER_UP = 'power_up_component',
   DISASTER = 'disaster_component',
   HEALTH = 'health_component',
   TANK = 'tank_component',
@@ -98,6 +118,7 @@ export enum InputType {
 }
 
 export enum Action {
+  POWER_UP = 'power_up',
   EXPLODE = 'explode_action',
   DAMAGE = 'damage_action',
   NOTHING = 'no_action'
@@ -130,4 +151,8 @@ export enum AIConstant {
   CLOSE,
   CANNOT_HIT,
   CAN_HIT_ENEMY
+}
+
+export enum CrateName {
+  REPAIR_CRATE
 }

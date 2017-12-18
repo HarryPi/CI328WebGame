@@ -13,6 +13,7 @@ var PreloadState = gameStates_1.GameStates.PreloadState;
 var GameState = gameStates_1.GameStates.MainGameState;
 var MainMenuState = gameStates_1.GameStates.MainMenuState;
 var GameoverState = gameStates_1.GameStates.GameoverState;
+var StageClearState = gameStates_1.GameStates.StageClearState;
 // The main class of our application
 class App extends Phaser.Game {
     constructor(config) {
@@ -22,6 +23,7 @@ class App extends Phaser.Game {
         this.state.add(GameConstants_1.States.GAME_STATE, GameState);
         this.state.add(GameConstants_1.States.MAIN_MENU_STATE, MainMenuState);
         this.state.add(GameConstants_1.States.GAMEOVER_SATE, GameoverState);
+        this.state.add(GameConstants_1.States.STAGE_CLEAR_STATE, StageClearState);
         this.state.start(GameConstants_1.States.BOOT_STATE);
     }
 }

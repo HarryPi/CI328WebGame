@@ -2,8 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = require("../constants/GameConstants");
 const component_1 = require("./component");
+const uimanagers_1 = require("../UI/uimanagers");
 var ActionComponents;
 (function (ActionComponents) {
+    var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class ShootComponent extends component_1.Component {
         constructor(game, factory) {
             super(GameConstants_1.ComponentType.SHOOT);
@@ -54,7 +56,6 @@ var ActionComponents;
             this.target.sprite.body.velocity.x = -(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         update() {
-            let physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
             switch (this._direction) {
                 case GameConstants_1.InputType.LEFT_INPUT:
                     this.moveLeft();
@@ -78,5 +79,27 @@ var ActionComponents;
         }
     }
     ActionComponents.MovableComponent = MovableComponent;
+    class PowerUpComponent extends component_1.Component {
+        constructor(state, tank) {
+            super(GameConstants_1.ComponentType.POWER_UP);
+            this._tank = tank;
+            this._state = state;
+        }
+        update() {
+            const healthComponent = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+            if (this._currentCrate === GameConstants_1.TankLayout.CRATE_REPAIR) {
+                healthComponent.restoreHealth();
+                this._currentCrate = null;
+            }
+        }
+        loadCrate(kindOfCrate) {
+            this._currentCrate = kindOfCrate;
+            if (kindOfCrate === GameConstants_1.TankLayout.CRATE_REPAIR) {
+                let playerUIManager = new PlayerVisualsManager(this._state);
+                playerUIManager.addPowerUpIcon(GameConstants_1.TankLayout.CRATE_REPAIR);
+            }
+        }
+    }
+    ActionComponents.PowerUpComponent = PowerUpComponent;
 })(ActionComponents = exports.ActionComponents || (exports.ActionComponents = {}));
 //# sourceMappingURL=action.components.js.map

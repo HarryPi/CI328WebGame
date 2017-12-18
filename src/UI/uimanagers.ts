@@ -1,12 +1,17 @@
 import {
+  ComponentType, CrateName,
   Difficulty, Levels, MainMenuButtons, States, TankLayout, TileLayers,
   UIComponents
 } from '../constants/GameConstants';
 import Vector from '../util/vector';
 import { DataConfig } from '../config/data.config';
 import { MenuConfig } from '../config/menu.config';
+import { Entity } from '../entities/entity';
+import { DataComponents } from '../component/data.components';
+import TankComponent = DataComponents.TankComponent;
 
 export namespace UiManagers {
+
   export class MenuManager {
     // Class Global vars
     private static _fakeMapExists: boolean = false;
@@ -260,8 +265,12 @@ export namespace UiManagers {
      * @return config
      */
     public static drawPlayerChoice(state: Phaser.State): MenuConfig {
-      let centerX = state.game.world.centerX;
-      let centerY = state.game.world.centerY;
+      const centerX = state.game.world.centerX;
+      const centerY = state.game.world.centerY;
+      let style = {font: '22px Calibri', fill: '#19ff7b'};
+      const boxWidth = 350;
+      const boxHeight = 25;
+
       let config: MenuConfig = new MenuConfig();
       let tanks = [
         UIComponents.CANDY_RECON_IMG,
@@ -289,29 +298,61 @@ export namespace UiManagers {
       arr.forEach((value, index) => {
         state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
         config.setSprite(UIComponents[tanks[index].toUpperCase().replace(' ', '_')], value);
-        // Gives the change of scenery effect
       });
+      const firstSprite: Phaser.Sprite = arr[0];
+
+      const selectedTankString = 'Selected Tank: ';
+      const selectedTankSpeedString = 'Speed: ';
+      const selectedTankBulletSpeedString = 'Bullet Speed: ';
+      const selectedTankDamageString = 'Damage: ';
+      const extraInfoString = '* Damage is proportional to difficulty';
+
+      const selectedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y - boxHeight, selectedTankString, style);
+      const speedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y, selectedTankSpeedString, style);
+      const selectedTankBulletSpeedTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y + boxHeight, selectedTankBulletSpeedString, style);
+      const selectedTankDamageTxt = state.game.add.text(firstSprite.x - boxWidth , firstSprite.y + boxHeight * 2, selectedTankDamageString, style);
+      const extraInfoTxt = state.game.add.text(firstSprite.x - boxWidth , state.game.world.bottom  + boxHeight * 2, extraInfoString, style);
+
+      const fakeEntity: Entity = new Entity(state.game, 0, 0);
+      fakeEntity.withComponent([new TankComponent(DataConfig.tank)]);
+      const tankComponent = fakeEntity.getComponent<TankComponent>(ComponentType.TANK);
+      const spriteTxtList = [selectedTankTxt, speedTankTxt, selectedTankBulletSpeedTxt, selectedTankDamageTxt, extraInfoTxt];
 
       config.getSprite(UIComponents.CANDY_ARTILLERY_IMG).events.onInputDown.add(() => {
-        DataConfig.tank = TankLayout.CANDY_ARTILLERY;
+        tankComponent.tankKind = DataConfig.tank = TankLayout.CANDY_ARTILLERY;
+        clearTankAttributes();
+        displayTankAttributes();
       });
       config.getSprite(UIComponents.CANDY_FORTRESS_IMG).events.onInputDown.add(() => {
-        DataConfig.tank = TankLayout.CANDY_FORTRESS;
+        tankComponent.tankKind = DataConfig.tank = TankLayout.CANDY_FORTRESS;
+        clearTankAttributes();
+        displayTankAttributes();
       });
       config.getSprite(UIComponents.CANDY_HUNTER_IMG).events.onInputDown.add(() => {
-        DataConfig.tank = TankLayout.CANDY_HUNTER;
+        tankComponent.tankKind = DataConfig.tank = TankLayout.CANDY_HUNTER;
+        clearTankAttributes();
+        displayTankAttributes();
       });
       config.getSprite(UIComponents.CANDY_LIGHT_IMG).events.onInputDown.add(() => {
-        DataConfig.tank = TankLayout.CANDY_LIGHT;
+        tankComponent.tankKind = DataConfig.tank = TankLayout.CANDY_LIGHT;
+        clearTankAttributes();
+        displayTankAttributes();
       });
       config.getSprite(UIComponents.CANDY_RECON_IMG).events.onInputDown.add(() => {
-        DataConfig.tank = TankLayout.CANDY_RECON;
+        tankComponent.tankKind = DataConfig.tank = TankLayout.CANDY_RECON;
+        clearTankAttributes();
+        displayTankAttributes();
       });
 
-      let lastSprite = arr[arr.length - 2];
+      const lastSprite = arr[arr.length - 2];
+
       let bArr = this.drawAcceptCancelButtons(new Vector(lastSprite.x - 30, lastSprite.y + 100), new Vector(lastSprite.x + 10, lastSprite.y + 100), state);
+
       bArr[0].events.onInputDown.add(() => {
-        DataConfig.applyCahnges();
+        DataConfig.applyChanges();
+        spriteTxtList.forEach( (sprite: Phaser.Sprite) => {
+          sprite.destroy();
+        });
         this.fadeoutSprites(state, bArr);
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
@@ -319,6 +360,9 @@ export namespace UiManagers {
       });
       bArr[1].events.onInputDown.add(() => {
         this.fadeoutSprites(state, bArr);
+        spriteTxtList.forEach( (sprite: Phaser.Sprite) => {
+          sprite.destroy();
+        });
         DataConfig.revertChanges();
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
@@ -326,6 +370,30 @@ export namespace UiManagers {
       });
 
       return config;
+
+      function clearTankAttributes() {
+        selectedTankDamageTxt.text = selectedTankDamageString;
+        speedTankTxt.text = selectedTankSpeedString;
+        selectedTankBulletSpeedTxt.text = selectedTankBulletSpeedString;
+        selectedTankTxt.text = selectedTankString;
+        extraInfoTxt.text = '';
+      }
+
+      function displayTankAttributes() {
+
+
+        updateTxtSpriteWithText(selectedTankTxt, tankComponent.tankKindName);
+        updateTxtSpriteWithText(speedTankTxt, tankComponent.speed.toString());
+        updateTxtSpriteWithText(selectedTankBulletSpeedTxt, tankComponent.bulletSpeed.toString());
+        updateTxtSpriteWithText(selectedTankDamageTxt, (tankComponent.bulletDmg * DataConfig.playerDamage).toString() + '*');
+        updateTxtSpriteWithText(extraInfoTxt, extraInfoString);
+
+      }
+
+      function updateTxtSpriteWithText(txtSprite: Phaser.Text, updatedTxt: string): void {
+        let curString = txtSprite.text;
+        txtSprite.setText(curString + updatedTxt);
+      }
     }
 
     public static drawDifficulty(state: Phaser.State) {
@@ -344,6 +412,14 @@ export namespace UiManagers {
         loc,
         state,
         difficulties);
+
+      const paddingWidth = 95;
+      const paddingHeight = 45;
+      const style = {font: '22px Calibri', fill: '#19ff7b'};
+      const selectedDifficulty = 'Selected difficulty: ';
+      let lastSprite = arr[arr.length - 1];
+
+      const selectedLevelTxt: Phaser.Text = state.game.add.text(lastSprite.x - paddingWidth, lastSprite.y + paddingHeight, selectedDifficulty, style);
 
       arr.forEach((sprite: Phaser.Sprite, index: number) => {
         state.game.add.tween(sprite.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
@@ -367,21 +443,25 @@ export namespace UiManagers {
 
       config.getSprite(Difficulty.EASY).events.onInputDown.add(() => {
         DataConfig.difficulty = Difficulty.EASY;
+        selectedLevelTxt.text = selectedDifficulty + 'Easy';
       });
       config.getSprite(Difficulty.NORMAL).events.onInputDown.add(() => {
         DataConfig.difficulty = Difficulty.NORMAL;
+        selectedLevelTxt.text = selectedDifficulty + 'Normal';
       });
       config.getSprite(Difficulty.HARD).events.onInputDown.add(() => {
         DataConfig.difficulty = Difficulty.HARD;
+        selectedLevelTxt.text = selectedDifficulty + 'Hard';
       });
       config.getSprite(Difficulty.INSANE).events.onInputDown.add(() => {
         DataConfig.difficulty = Difficulty.INSANE;
+        selectedLevelTxt.text = selectedDifficulty + 'Insane';
       });
 
-      let lastSprite = arr[arr.length - 1];
       let bArr = this.drawAcceptCancelButtons(new Vector(lastSprite.x - 30, lastSprite.y + 100), new Vector(lastSprite.x + 10, lastSprite.y + 100), state);
       bArr[0].events.onInputDown.add(() => {
-        DataConfig.applyCahnges();
+        selectedLevelTxt.destroy();
+        DataConfig.applyChanges();
         this.fadeoutSprites(state, bArr);
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
@@ -389,6 +469,7 @@ export namespace UiManagers {
       });
       bArr[1].events.onInputDown.add(() => {
         this.fadeoutSprites(state, bArr);
+        selectedLevelTxt.destroy();
         DataConfig.revertChanges();
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
@@ -408,6 +489,10 @@ export namespace UiManagers {
       let centerY = state.game.world.centerY;
       let config: MenuConfig = new MenuConfig();
       let levels = [UIComponents.LEVEL_ONE_IMAGE, UIComponents.LEVEL_TWO_IMAGE];
+      let style = {font: '22px Calibri', fill: '#19ff7b'};
+
+      const paddingWidth = 350;
+      const paddingHeight = 25;
 
       let arr = this.drawBoxes(2,
         [
@@ -417,6 +502,10 @@ export namespace UiManagers {
         levels, true,
         UIComponents.PANEL);
 
+      const firstSprite = arr[0];
+      const selectedLevelString = `Selected Level: `;
+      const selectedLevelTxt: Phaser.Text = state.game.add.text(firstSprite.x - paddingWidth, firstSprite.y - paddingHeight, selectedLevelString, style);
+
       arr.forEach((value, index) => {
         state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
         let name = UIComponents[levels[index].toUpperCase().replace(' ', '_')];
@@ -425,8 +514,10 @@ export namespace UiManagers {
           let lName = name.toString();
           if (lName.includes('one')) {
             DataConfig.level = Levels.LEVEL_ONE;
+            selectedLevelTxt.text = selectedLevelString + 'Grass Level';
           } else if (lName.includes('two')) {
             DataConfig.level = Levels.LEVEL_TWO;
+            selectedLevelTxt.text = selectedLevelString + 'Candy Level';
           }
         });
       });
@@ -435,8 +526,9 @@ export namespace UiManagers {
       let lastSprite = arr[arr.length - 1];
       let bArr = this.drawAcceptCancelButtons(new Vector(lastSprite.x - arr.length * 50, lastSprite.y + 100), new Vector(lastSprite.x - (arr.length - 1) * 50, lastSprite.y + 100), state);
       bArr[0].events.onInputDown.add(() => {
-        DataConfig.applyCahnges();
+        DataConfig.applyChanges();
         this.fadeoutSprites(state, bArr);
+        selectedLevelTxt.destroy();
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
         });
@@ -444,6 +536,7 @@ export namespace UiManagers {
       bArr[1].events.onInputDown.add(() => {
         this.fadeoutSprites(state, bArr);
         DataConfig.revertChanges();
+        selectedLevelTxt.destroy();
         this.fadeoutSprites(state, arr).then(() => {
           this.drawPreferences(state);
         });
@@ -492,7 +585,13 @@ export namespace UiManagers {
       const buttonWidth = 130;
 
       let pauseMenu = state.add.sprite(state.game.world.right - buttonWidth, state.game.world.top, UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
-      let toAttach = state.game.add.text(0, 0, 'Pause', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: pauseMenu.width, align: 'center'});
+      let toAttach = state.game.add.text(0, 0, 'Pause', {
+        font: '22px Arial',
+        fill: '#ff0044',
+        wordWrap: true,
+        wordWrapWidth: pauseMenu.width,
+        align: 'center'
+      });
 
       toAttach.anchor.setTo(-1, -0.35);
       pauseMenu.addChild(toAttach);
@@ -500,7 +599,7 @@ export namespace UiManagers {
       pauseMenu.inputEnabled = true;
       pauseMenu.fixedToCamera = true;
 
-      pauseMenu.events.onInputDown.add( () => {
+      pauseMenu.events.onInputDown.add(() => {
 
         if (state.game.paused === true) { // if game is already pause do not recreate pause menu
           return;
@@ -508,11 +607,23 @@ export namespace UiManagers {
 
         state.game.paused = true;
 
-        let mainMenuBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2) , state.game.camera.y + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
-        let backBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2) , state.game.camera.y - (buttonWidth / 2) + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
+        let mainMenuBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
+        let backBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y - (buttonWidth / 2) + (state.game.height / 2), UIComponents.UI_SPRITESHEET, UIComponents.FULL_BUTTON);
 
-        let mainMenuTxt = state.add.text(0, 0, 'Main Menu', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: mainMenuBtn.width, align: 'center'});
-        let resumeTxt = state.add.text(0, 0, 'Resume', {font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: backBtn.width, align: 'center'});
+        let mainMenuTxt = state.add.text(0, 0, 'Main Menu', {
+          font: '22px Arial',
+          fill: '#ff0044',
+          wordWrap: true,
+          wordWrapWidth: mainMenuBtn.width,
+          align: 'center'
+        });
+        let resumeTxt = state.add.text(0, 0, 'Resume', {
+          font: '22px Arial',
+          fill: '#ff0044',
+          wordWrap: true,
+          wordWrapWidth: backBtn.width,
+          align: 'center'
+        });
 
         mainMenuTxt.anchor.setTo(-0.4, -0.35);
         resumeTxt.anchor.setTo(-0.65, -0.35);
@@ -523,12 +634,12 @@ export namespace UiManagers {
         mainMenuBtn.inputEnabled = true;
         backBtn.inputEnabled = true;
 
-        mainMenuBtn.events.onInputDown.add( () => {
+        mainMenuBtn.events.onInputDown.add(() => {
           state.game.paused = false;
           this.drawMainMenu(state, true);
         });
 
-        backBtn.events.onInputDown.add( () => {
+        backBtn.events.onInputDown.add(() => {
           state.game.paused = false;
           mainMenuBtn.destroy();
           backBtn.destroy();
@@ -536,16 +647,48 @@ export namespace UiManagers {
       });
     }
 
-    public static drawYouWonMenu() {
+    public static drawYouWonMenu(state: Phaser.State, score: number) {
+      let map: Phaser.Tilemap;
+      if (this._fakeMapExists) {
+        this._fakeMapExists = false;
+        this._fakeMap.destroy();
+      }
+      map = state.game.add.tilemap(Levels.LEVEL_ONE);
+      map.addTilesetImage(TileLayers.GRASS_LAYER, TileLayers.GRASS_LAYER);
+      map.addTilesetImage(TileLayers.BACKGROUND, TileLayers.BACKGROUND);
 
+      map.createLayer('SkyPrimary').resizeWorld();
+      map.createLayer('GroundSecondary').resizeWorld();
+      map.createLayer('GroundPrimary').resizeWorld();
+
+      this._fakeMapExists = true;
+      this._fakeMap = map;
+
+      state.game.camera.unfollow();
+      let centerX = state.game.world.centerX;
+      let centerY = state.game.world.centerY;
+      let loc = [new Vector(centerX, centerY)];
+
+      this.drawBoxes(1, loc, state, ['Main Menu']).forEach((value: Phaser.Sprite, index) => {
+        state.game.add.tween(value.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
+        state.game.camera.focusOn(value);
+        value.events.onInputDown.add(() => {
+          this.drawMainMenu(state);
+        });
+      });
+      let gameOver = state.game.add.text(centerX - 250, centerY + 110, `You Won! You cleared the stage :) your score was ${score}!`, {
+        font: '22px Arial',
+        fill: '#ff0044'
+      });
+      gameOver.scale.setTo(0.0, 0.0);
+      state.game.add.tween(gameOver.scale).to({x: 1.0, y: 1.0}, this._animationTime, Phaser.Easing.Bounce.Out, true);
     }
   }
-
   export class PlayerVisualsManager {
 
     private _state: Phaser.State;
     private static _heartList: Array<Phaser.Sprite> = [];
-
+    private static _repairIcon: Phaser.Sprite;
     constructor(state?: Phaser.State) {
       this._state = state;
     }
@@ -559,11 +702,11 @@ export namespace UiManagers {
         let heart = PlayerVisualsManager._heartList.reverse().find((heartSprite: Phaser.Sprite) => { // we reverse the array to get the last heart
           return heartSprite.frameName === UIComponents.FULL_HEART || heartSprite.frameName === UIComponents.HALF_HEART;
         });
-        if (heart) { // if two consecutive bullets hit the player on the same frame, the game doesnt have a chance to call game over and hearts are undefined
+        if (heart) { // if two consecutive bullets hit the player on the same frame, the game doesnt have a chance to call game over state thus hearts are undefined and throws error
           if (heart.frameName === UIComponents.HALF_HEART) {
             heart.frameName = UIComponents.EMPTY_HEART;
           } else {
-          heart.frameName = UIComponents.HALF_HEART;
+            heart.frameName = UIComponents.HALF_HEART;
           }
           PlayerVisualsManager._heartList.reverse(); // ensure array returns to its original form
         }
@@ -573,13 +716,48 @@ export namespace UiManagers {
     public addHeartByHealingReceived(healing: number) {
       for (let i = healing; i >= 0; i--) {
         let heart = PlayerVisualsManager._heartList.find((heart: Phaser.Sprite) => {
-          return heart.frame === UIComponents.EMPTY_HEART || heart.frame === UIComponents.HALF_HEART;
+          return heart.frameName === UIComponents.EMPTY_HEART || heart.frameName === UIComponents.HALF_HEART;
         });
-        if (heart.frame === UIComponents.HALF_HEART) {
-          heart.frame = UIComponents.FULL_HEART;
-        } else {
-          heart.frame = UIComponents.FULL_HEART;
+        if (heart) {
+          if (heart.frameName === UIComponents.HALF_HEART) {
+            heart.frameName = UIComponents.FULL_HEART;
+          } else if (heart.frameName === UIComponents.FULL_HEART) {
+            // do nothing
+            // This means all hearts are full
+          } else {
+            heart.frameName = UIComponents.FULL_HEART;
+          }
         }
+      }
+    }
+
+    public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
+      const paddingHeight = 80;
+      const paddingWidth = 15 ;
+      const repairIconLocation: Vector = new Vector(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
+
+      switch (powerUpKind) {
+        case TankLayout.CRATE_REPAIR:
+          if (PlayerVisualsManager._repairIcon) {
+            if (!PlayerVisualsManager._repairIcon.alive) {
+              PlayerVisualsManager._repairIcon.reset(repairIconLocation.x, repairIconLocation.y);
+            }
+            break;
+          }
+          PlayerVisualsManager._repairIcon = this._state.game.add.sprite(repairIconLocation.x , repairIconLocation.y, TankLayout.TANK_SPRITESHEET, TankLayout.CRATE_REPAIR);
+          PlayerVisualsManager._repairIcon.fixedToCamera = true;
+          break;
+        default:
+          break;
+      }
+    }
+    public removePowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
+      switch (powerUpKind) {
+        case TankLayout.CRATE_REPAIR:
+          PlayerVisualsManager._repairIcon.kill();
+          break;
+        default:
+          break;
       }
     }
 
@@ -591,6 +769,10 @@ export namespace UiManagers {
         heart.scale = new Phaser.Point(0.5, 0.5);
         PlayerVisualsManager._heartList.push(heart);
       }
+    }
+    public static cleanUp(){
+      PlayerVisualsManager._heartList = [];
+      PlayerVisualsManager._repairIcon = undefined;
     }
   }
 }

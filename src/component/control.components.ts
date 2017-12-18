@@ -27,7 +27,7 @@ export namespace ControlComponents {
       const animation = layoutComponent.getCurrentAnimation();
       if (!animation.isPlaying) {
           this.target.sprite.angle = 45;
-          this.target.sprite.body.velocity.y = 200 * (5 - DataConfig.difficulty) ;
+          this.target.sprite.body.velocity.y = 200 * (5 - DataConfig.difficulty);
           this.target.sprite.body.velocity.x = 100;
       }
     }

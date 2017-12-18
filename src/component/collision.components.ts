@@ -1,24 +1,28 @@
 import {Component} from './component';
-import {Action, ComponentType} from '../constants/GameConstants';
+import {Action, ComponentType, TankLayout} from '../constants/GameConstants';
 import {DataConfig} from '../config/data.config';
 import {DataComponents} from './data.components';
 
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import HealthComponent = DataComponents.HealthComponent;
 import {UiManagers} from '../UI/uimanagers';
+import {ActionComponents} from './action.components';
 
 export namespace CollisionComponents {
 
   import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
   import TankComponent = DataComponents.TankComponent;
+  import PowerUpComponent = ActionComponents.PowerUpComponent;
 
   export class CollisionsComponent extends Component {
+    private _state: Phaser.State;
 
-    constructor() {
+    constructor(state?: Phaser.State) {
       super(ComponentType.COLLISION);
       this._requiredComponents = [
         ComponentType.PHYSICS
       ];
+      this._state = state;
     }
 
     public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
@@ -53,17 +57,35 @@ export namespace CollisionComponents {
 
             if (!aiComp && tankComp) {
               body.collides(collidesWith, () => {
-                let heartManager = new PlayerVisualsManager();
-                heartManager.removeHeartByDamage(DataConfig.enemyDamage);
-                healthComp.dealDamage(DataConfig.enemyDamage);
+                const heartManager = new PlayerVisualsManager();
+                const damage = tankComp.bulletDmg * DataConfig.enemyDamage;
+
+                heartManager.removeHeartByDamage(damage);
+                healthComp.dealDamage(damage);
               });
               break;
             }
             body.collides(collidesWith, () => {
-              healthComp.dealDamage(DataConfig.playerDamage);
+              const damage = tankComp ? DataConfig.playerDamage * tankComp.bulletDmg : DataConfig.playerDamage;
+              healthComp.dealDamage(damage);
             });
             break;
+          case Action.POWER_UP:
+            const powerUpComponent = this.target.getComponent<PowerUpComponent>(ComponentType.POWER_UP);
+            const healthComponent = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
 
+            body.collides(collidesWith, (tank: Phaser.Physics.P2.Body, powerup: Phaser.Physics.P2.Body) => {
+
+              if (!healthComponent.pendingHeal()) {
+                let frameName = powerup.sprite.frameName;
+                if (frameName.includes(TankLayout.CRATE_REPAIR.toString())) {
+                  powerUpComponent.loadCrate(TankLayout.CRATE_REPAIR);
+                  powerup.sprite.visible = false;
+                  powerup.data.shapes[0].sensor = true;
+                }
+              }
+            });
+            break;
           default:
             break;
         }

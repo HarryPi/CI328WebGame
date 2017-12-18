@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var States;
 (function (States) {
+    States["STAGE_CLEAR_STATE"] = "stage_clear_state";
     States["GAMEOVER_SATE"] = "gameover_state";
     States["MAIN_MENU_STATE"] = "main_menu_state";
     States["BOOT_STATE"] = "boot_state";
@@ -22,24 +23,24 @@ var Difficulty;
 })(Difficulty = exports.Difficulty || (exports.Difficulty = {}));
 var TankLayout;
 (function (TankLayout) {
-    TankLayout["GREEN_FORTRESS"] = "tanks_tankGreen1.png";
-    TankLayout["GREEN_ARTILERY"] = "tanks_tankGreen2.png";
-    TankLayout["GREEN_HUNTER"] = "tanks_tankGreen3.png";
+    TankLayout["GREEN_ARTILLERY"] = "tanks_tankGreen1.png";
+    TankLayout["GREEN_HUNTER"] = "tanks_tankGreen2.png";
+    TankLayout["GREEN_FORTRESS"] = "tanks_tankGreen3.png";
     TankLayout["GREEN_RECON"] = "tanks_tankGreen4.png";
     TankLayout["GREEN_LIGHT"] = "tanks_tankGreen5.png";
-    TankLayout["GREY_FORTRESS"] = "tanks_tankGrey1.png";
-    TankLayout["GREY_ARTILERY"] = "tanks_tankGrey2.png";
-    TankLayout["GREY_HUNTER"] = "tanks_tankGrey3.png";
+    TankLayout["GREY_ARTILLERY"] = "tanks_tankGrey1.png";
+    TankLayout["GREY_HUNTER"] = "tanks_tankGrey2.png";
+    TankLayout["GREY_FORTRESS"] = "tanks_tankGrey3.png";
     TankLayout["GREY_RECON"] = "tanks_tankGrey4.png";
     TankLayout["GREY_LIGHT"] = "tanks_tankGrey5.png";
-    TankLayout["CANDY_FORTRESS"] = "tanks_tankDesert1.png";
-    TankLayout["CANDY_ARTILLERY"] = "tanks_tankDesert2.png";
-    TankLayout["CANDY_HUNTER"] = "tanks_tankDesert3.png";
+    TankLayout["CANDY_ARTILLERY"] = "tanks_tankDesert1.png";
+    TankLayout["CANDY_HUNTER"] = "tanks_tankDesert2.png";
+    TankLayout["CANDY_FORTRESS"] = "tanks_tankDesert3.png";
     TankLayout["CANDY_RECON"] = "tanks_tankDesert4.png";
     TankLayout["CANDY_LIGHT"] = "tanks_tankDesert5.png";
-    TankLayout["DARK_FORTRESS"] = "tanks_tankNavy1.png";
-    TankLayout["DARK_ARTILLERY"] = "tanks_tankNavy2.png";
-    TankLayout["DARK_HUNTER"] = "tanks_tankNavy3.png";
+    TankLayout["DARK_ARTILLERY"] = "tanks_tankNavy1.png";
+    TankLayout["DARK_HUNTER"] = "tanks_tankNavy2.png";
+    TankLayout["DARK_FORTRESS"] = "tanks_tankNavy3.png";
     TankLayout["DARK_RECON"] = "tanks_tankNavy4.png";
     TankLayout["DARK_LIGHT"] = "tanks_tankNavy5.png";
     TankLayout["BULLET_ONE"] = "tank_bullet1.png";
@@ -48,6 +49,7 @@ var TankLayout;
     TankLayout["BULLET_FOUR"] = "tank_bullet4.png";
     TankLayout["BULLET_FIVE"] = "tank_bullet5.png";
     TankLayout["BULLET_SIX"] = "tank_bullet6.png";
+    TankLayout["CRATE_REPAIR"] = "tanks_crateRepair.png";
     TankLayout["EXPLOSION_ONE"] = "tank_explosion1.png";
     TankLayout["EXPLOSION_TWO"] = "tank_explosion2.png";
     TankLayout["EXPLOSION_THREE"] = "tank_explosion3.png";
@@ -64,6 +66,7 @@ var TankLayout;
 })(TankLayout = exports.TankLayout || (exports.TankLayout = {}));
 var ComponentType;
 (function (ComponentType) {
+    ComponentType["POWER_UP"] = "power_up_component";
     ComponentType["DISASTER"] = "disaster_component";
     ComponentType["HEALTH"] = "health_component";
     ComponentType["TANK"] = "tank_component";
@@ -114,6 +117,7 @@ var InputType;
 })(InputType = exports.InputType || (exports.InputType = {}));
 var Action;
 (function (Action) {
+    Action["POWER_UP"] = "power_up";
     Action["EXPLODE"] = "explode_action";
     Action["DAMAGE"] = "damage_action";
     Action["NOTHING"] = "no_action";
@@ -148,4 +152,8 @@ var AIConstant;
     AIConstant[AIConstant["CANNOT_HIT"] = 2] = "CANNOT_HIT";
     AIConstant[AIConstant["CAN_HIT_ENEMY"] = 3] = "CAN_HIT_ENEMY";
 })(AIConstant = exports.AIConstant || (exports.AIConstant = {}));
+var CrateName;
+(function (CrateName) {
+    CrateName[CrateName["REPAIR_CRATE"] = 0] = "REPAIR_CRATE";
+})(CrateName = exports.CrateName || (exports.CrateName = {}));
 //# sourceMappingURL=GameConstants.js.map

@@ -1,7 +1,6 @@
-import {Levels, TankLayout, TileLayers} from '../../constants/GameConstants';
-import {MathUtil} from '../../util/math.util';
+import { Levels, TankLayout, TileLayers } from '../../constants/GameConstants';
+import { MathUtil } from '../../util/math.util';
 import Vector from '../../util/vector';
-import {Subject} from 'rxjs/Subject';
 
 export namespace TankGameLevels {
   export abstract class TankLevel {
@@ -19,7 +18,8 @@ export namespace TankGameLevels {
     protected _randomDisasterSpawnTime: number; // time in ms
     protected _totalEnemies: number;
     protected _enemyTankKind: Array<TankLayout>;
-    protected _whenStageCleared: Subject<void> = new Subject();
+    protected _powerUpSpawnTime: number;
+
     constructor(game: Phaser.Game) {
       this._game = game;
     }
@@ -32,6 +32,8 @@ export namespace TankGameLevels {
      * Use to clear any variables that should not exist globally once a level has finished e.g. tilemap
      */
     public abstract destroy(): void;
+
+    public abstract isCleared(): boolean;
 
     /**
      * @description
@@ -75,9 +77,10 @@ export namespace TankGameLevels {
     get enemyStartPos(): Vector {
       return this._enemyStartPos;
     }
-    get whenStageCleared(): Subject<void> {
-      return this._whenStageCleared;
+    get powerUpSpawnTime(): number {
+      return this._powerUpSpawnTime;
     }
+
     /**
      * @description
      * Return the bodies of the ground layer
@@ -105,6 +108,7 @@ export namespace TankGameLevels {
     getRandomEnemy(): TankLayout {
       let toReturn = this._enemyTankKind[MathUtil.randomIntFromInterval(0, 4)];
       this._enemiesCount++;
+      this._totalEnemies--;
       return toReturn;
     }
   }
@@ -112,14 +116,20 @@ export namespace TankGameLevels {
   export class LevelOne extends TankLevel {
     constructor(game: Phaser.Game) {
       super(game);
+
+      this._powerUpSpawnTime = 10;
       this._enemiesCount = 0;
       this._enemiesSpawnTime = 3;
       this._playerStartPos = new Vector(this._game.world.bounds.left, this._game.world.centerY + 100);
       this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
       this._capEnemies = 3;
       this._totalEnemies = 30;
-      this._randomDisasterSpawnTime = 5000;
+      this._randomDisasterSpawnTime = 7000;
       this._enemyTankKind = [TankLayout.DARK_RECON, TankLayout.DARK_ARTILLERY, TankLayout.DARK_FORTRESS, TankLayout.DARK_LIGHT, TankLayout.DARK_HUNTER];
+    }
+
+    public isCleared(): boolean {
+      return this._totalEnemies === 0 && this._enemiesCount === 0;
     }
 
     public init(): void {
@@ -136,10 +146,6 @@ export namespace TankGameLevels {
 
       this._map = map;
 
-      // Setup game winning condition
-      if (this._totalEnemies === 0) {
-        this._whenStageCleared.next();
-      }
     }
 
     public destroy(): void {
@@ -148,21 +154,24 @@ export namespace TankGameLevels {
   }
 
   export class LevelTwo extends TankLevel {
+
     constructor(game: Phaser.Game) {
       super(game);
+
+      this._powerUpSpawnTime = 10;
       this._enemiesCount = 0;
       this._enemiesSpawnTime = 3;
       this._playerStartPos = new Vector(this._game.world.bounds.left, this._game.world.centerY + 100);
       this._enemyStartPos = new Vector(this._game.world.bounds.right, this._game.world.centerY);
       this._capEnemies = 3;
       this._totalEnemies = 30;
-      this._enemyTankKind = [TankLayout.GREY_LIGHT, TankLayout.GREY_RECON, TankLayout.GREY_HUNTER, TankLayout.GREY_FORTRESS, TankLayout.GREY_ARTILERY];
+      this._enemyTankKind = [TankLayout.GREY_LIGHT, TankLayout.GREY_RECON, TankLayout.GREY_HUNTER, TankLayout.GREY_FORTRESS, TankLayout.GREY_ARTILLERY];
       this._randomDisasterSpawnTime = 5000;
 
-      if (this._totalEnemies === 0) {
-        this._whenStageCleared.next();
-      }
+    }
 
+    public isCleared(): boolean {
+      return this._totalEnemies === 0 && this._enemiesCount === 0;
     }
 
     init(): void {

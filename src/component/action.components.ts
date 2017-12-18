@@ -1,32 +1,30 @@
-import { ComponentType, FsmStateName, InputType } from '../constants/GameConstants';
+import { ComponentType, CrateName, InputType, TankLayout } from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
 import { Component } from './component';
-import StateMachine from '../AI/fsm/stateMachine';
-import { FsmStates } from '../AI/fsm/fsm.states';
 import { DataComponents } from './data.components';
 
-import State = FsmStates.State;
 import TankComponent = DataComponents.TankComponent;
-import {MathUtil} from '../util/math.util';
-import {ControlComponents} from './control.components';
-import {DataConfig} from '../config/data.config';
-import {CollisionComponents} from './collision.components';
+import { CollisionComponents } from './collision.components';
+import { UiManagers } from '../UI/uimanagers';
+import { Entity } from '../entities/entity';
 
 export namespace ActionComponents {
 
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
+  import HealthComponent = DataComponents.HealthComponent;
+  import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
 
-  export class ShootComponent extends Component{
+  export class ShootComponent extends Component {
     private _canShoot: boolean = false;
     private _factory: TankWorldFactory;
     private _timer = 0;
 
-    constructor(game: Phaser.Game, factory: TankWorldFactory){
+    constructor(game: Phaser.Game, factory: TankWorldFactory) {
       super(ComponentType.SHOOT);
       this._factory = factory;
     }
 
-    update(){
+    update() {
       if (this._canShoot) {
         this._canShoot = false;
         if (Date.now() - this._timer > 1500) {
@@ -34,14 +32,16 @@ export namespace ActionComponents {
         }
       }
     }
+
     set canShoot(value: boolean) {
       this._canShoot = value;
     }
 
-    private shootBullet(){
-      this._factory.newBullet(this.target.sprite.x + 50 , this.target.sprite.y - 20, this.target);
+    private shootBullet() {
+      this._factory.newBullet(this.target.sprite.x + 50, this.target.sprite.y - 20, this.target);
       this._timer = Date.now();
     }
+
     public get rangeOfProjectile(): number {
       const tankComponent: TankComponent = this.target.getComponent<TankComponent>(ComponentType.TANK);
       const physicsComponent: PhysicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
@@ -57,6 +57,7 @@ export namespace ActionComponents {
   export class MovableComponent extends Component {
 
     private _direction: InputType;
+
     constructor() {
       super(ComponentType.MOVABLE);
     }
@@ -73,11 +74,12 @@ export namespace ActionComponents {
     private moveRight(): void {
       this.target.sprite.body.velocity.x = (this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
+
     private moveLeft(): void {
       this.target.sprite.body.velocity.x = -(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
-    public update(){
-      let physicsComponent = this.target.getComponent<PhysicsComponent>(ComponentType.PHYSICS);
+
+    public update() {
 
       switch (this._direction) {
         case InputType.LEFT_INPUT:
@@ -94,12 +96,44 @@ export namespace ActionComponents {
           break;
       }
     }
+
     get direction(): InputType {
       return this._direction;
     }
 
     set direction(value: InputType) {
       this._direction = value;
+    }
+  }
+
+  export class PowerUpComponent extends Component {
+
+    private _currentCrate: TankLayout.CRATE_REPAIR;
+    private _tank: Entity;
+    private _state: Phaser.State;
+
+    constructor(state: Phaser.State, tank: Entity) {
+      super(ComponentType.POWER_UP);
+      this._tank = tank;
+      this._state = state;
+    }
+
+    update() {
+      const healthComponent = this.target.getComponent<HealthComponent>(ComponentType.HEALTH);
+
+      if (this._currentCrate === TankLayout.CRATE_REPAIR) {
+        healthComponent.restoreHealth();
+        this._currentCrate = null;
+      }
+    }
+
+    public loadCrate(kindOfCrate: TankLayout.CRATE_REPAIR) {
+      this._currentCrate = kindOfCrate;
+
+      if (kindOfCrate === TankLayout.CRATE_REPAIR) {
+          let playerUIManager = new PlayerVisualsManager(this._state);
+          playerUIManager.addPowerUpIcon(TankLayout.CRATE_REPAIR);
+      }
     }
   }
 }

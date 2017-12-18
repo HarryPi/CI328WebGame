@@ -10,6 +10,7 @@ const math_util_1 = require("../util/math.util");
 const uimanagers_1 = require("../UI/uimanagers");
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
+const vector_1 = require("../util/vector");
 var GameStates;
 (function (GameStates) {
     var MenuManager = uimanagers_1.UiManagers.MenuManager;
@@ -22,7 +23,7 @@ var GameStates;
             super();
         }
         init(args) {
-            this._args = args;
+            this._args = {};
         }
         preload() {
             Assets_1.default.init(this.load);
@@ -38,6 +39,19 @@ var GameStates;
         }
     }
     GameStates.BootState = BootState;
+    class StageClearState extends GameState {
+        init(args) {
+            this._args = args;
+        }
+        preload() {
+        }
+        create() {
+            MenuManager.drawYouWonMenu(this, this._args.score);
+        }
+        update() {
+        }
+    }
+    GameStates.StageClearState = StageClearState;
     class GameoverState extends GameState {
         init(args) {
             this._args = args;
@@ -54,10 +68,10 @@ var GameStates;
     class MainGameState extends GameState {
         constructor() {
             super();
-            this._score = 0;
             // keep record of spawn time in miliseconds
             this._timer = 0;
             this._disasterTimer = 0;
+            this._powerUpTimer = 0;
             this._activeDisasters = 0;
             this._input = new input_1.default();
             this._levels = new Map();
@@ -70,22 +84,20 @@ var GameStates;
             this._levels.get(this._activeLevel).init();
             this._factory = new TankWorldFactory_1.default(this.game, this);
             this._factory.init(this._levels.get(this._activeLevel).collisionLayer); // Initialise collision groups
+            this._score = 0;
         }
         create() {
             const playerUIBuilder = new PlayerVisualsManager(this);
             const activeLevel = this._levels.get(this._activeLevel);
             // Subscribe to game winning condition
             // Input
-            this._player = this._factory.newPlayer(activeLevel.playerStartPos.x, activeLevel.playerStartPos.y);
+            this._player = this._factory.newPlayer(activeLevel.playerStartPos.x, activeLevel.playerStartPos.y, this);
             let sub = this._player.whenDestroyed.subscribe(() => {
                 this.game.state.start(GameConstants_1.States.GAMEOVER_SATE, true, false, { score: this._score });
                 sub.unsubscribe();
             });
             playerUIBuilder.displayPlayerMaxHealth();
             MenuManager.drawPauseMenu(this);
-            let gamewon = activeLevel.whenStageCleared.subscribe(() => {
-                // this.game.state.start(States.STAGE_CLEAR_STATE);
-            });
             const physicsComponent = this._player.getComponent(GameConstants_1.ComponentType.PHYSICS);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT), GameConstants_1.InputType.RIGHT_INPUT);
             this._input.add(this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT), GameConstants_1.InputType.LEFT_INPUT);
@@ -112,10 +124,17 @@ var GameStates;
             this._scoreText.fixedToCamera = true;
         }
         update() {
-            if (this.canSpawnDisaster()) {
+            const activeLevel = this._levels.get(this._activeLevel);
+            if (this.canSpawnPowerUp(activeLevel)) {
+                this.spawnPowerUp();
+            }
+            if (activeLevel.isCleared()) {
+                this.game.state.start(GameConstants_1.States.STAGE_CLEAR_STATE, true, false, { score: this._score });
+            }
+            if (this.canSpawnDisaster(activeLevel)) {
                 this.spawnDisaster();
             }
-            if (this.canSpawnEnemy()) {
+            if (this.canSpawnEnemy(activeLevel)) {
                 this.spawnEnemies();
             }
             this._input.run();
@@ -127,6 +146,24 @@ var GameStates;
             // Ensure no memory leaks
             this._inputSubscription.unsubscribe();
             this._factory.cleanUp();
+            // Clean UI static values
+            PlayerVisualsManager.cleanUp();
+        }
+        spawnPowerUp() {
+            let getRandomX = () => {
+                let x = this._player.sprite.x * math_util_1.MathUtil.randomIntFromInterval(-5, 5);
+                if (this.game.world.bounds.x < x) {
+                    x = this.game.world.bounds.x - 100;
+                }
+                return x;
+            };
+            // check if within world boundaries
+            this._powerUpTimer = Date.now();
+            let randomLocation = new vector_1.default(getRandomX(), this.game.world.top);
+            this._factory.spawnPowerUp(randomLocation.x, randomLocation.y);
+        }
+        canSpawnPowerUp(activeLevel) {
+            return Date.now() - this._powerUpTimer > activeLevel.powerUpSpawnTime * 1000;
         }
         spawnDisaster() {
             this._factory.newDisaster(this._player.sprite.x + 100 * math_util_1.MathUtil.randomIntFromInterval(-10, 10), this.game.world.top);
@@ -136,8 +173,7 @@ var GameStates;
                 this._activeDisasters = 0;
             }
         }
-        canSpawnEnemy() {
-            let activeLevel = this._levels.get(this._activeLevel);
+        canSpawnEnemy(activeLevel) {
             if (activeLevel.enemiesCount < activeLevel.capEnemies && activeLevel.totalEnemies !== 0) {
                 if (Date.now() - this._timer > activeLevel.enemiesSpawnTime * 1000) {
                     return true;
@@ -163,8 +199,7 @@ var GameStates;
                 return random === 0 ? activeLevel.playerStartPos.y : activeLevel.enemyStartPos.y;
             }
         }
-        canSpawnDisaster() {
-            const activeLevel = this._levels.get(this._activeLevel);
+        canSpawnDisaster(activeLevel) {
             if (Date.now() - this._disasterTimer > activeLevel.randomDisasterSpawnTime) {
                 return true;
             }

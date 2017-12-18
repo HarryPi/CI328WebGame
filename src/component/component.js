@@ -14,7 +14,7 @@ class Component {
     set target(target) {
         this._target = target;
     }
-    validateComponentRequirments() {
+    validateComponentRequirements() {
         let errorString = '';
         this._requiredComponents.forEach((comp) => {
             if (!this._target.getComponent(comp)) {
@@ -25,7 +25,7 @@ class Component {
             throw new Error(errorString);
         }
     }
-    update(params) { }
+    update() { }
 }
 exports.Component = Component;
 //# sourceMappingURL=component.js.map

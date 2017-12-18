@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class TankUtil {
     static isArtilleryTank(tankKind) {
-        return tankKind.toString().includes('2');
-    }
-    static isFortressTank(tankKind) {
         return tankKind.toString().includes('1');
     }
-    static isHunterTank(tankKind) {
+    static isFortressTank(tankKind) {
         return tankKind.toString().includes('3');
+    }
+    static isHunterTank(tankKind) {
+        return tankKind.toString().includes('2');
     }
     static isLightTank(tankKind) {
         return tankKind.toString().includes('5');

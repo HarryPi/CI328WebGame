@@ -4,6 +4,9 @@ const GameConstants_1 = require("../constants/GameConstants");
 const vector_1 = require("../util/vector");
 const data_config_1 = require("../config/data.config");
 const menu_config_1 = require("../config/menu.config");
+const entity_1 = require("../entities/entity");
+const data_components_1 = require("../component/data.components");
+var TankComponent = data_components_1.DataComponents.TankComponent;
 var UiManagers;
 (function (UiManagers) {
     class MenuManager {
@@ -207,8 +210,11 @@ var UiManagers;
          * @return config
          */
         static drawPlayerChoice(state) {
-            let centerX = state.game.world.centerX;
-            let centerY = state.game.world.centerY;
+            const centerX = state.game.world.centerX;
+            const centerY = state.game.world.centerY;
+            let style = { font: '22px Calibri', fill: '#19ff7b' };
+            const boxWidth = 350;
+            const boxHeight = 25;
             let config = new menu_config_1.MenuConfig();
             let tanks = [
                 GameConstants_1.UIComponents.CANDY_RECON_IMG,
@@ -228,27 +234,54 @@ var UiManagers;
             arr.forEach((value, index) => {
                 state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
                 config.setSprite(GameConstants_1.UIComponents[tanks[index].toUpperCase().replace(' ', '_')], value);
-                // Gives the change of scenery effect
             });
+            const firstSprite = arr[0];
+            const selectedTankString = 'Selected Tank: ';
+            const selectedTankSpeedString = 'Speed: ';
+            const selectedTankBulletSpeedString = 'Bullet Speed: ';
+            const selectedTankDamageString = 'Damage: ';
+            const extraInfoString = '* Damage is proportional to difficulty';
+            const selectedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y - boxHeight, selectedTankString, style);
+            const speedTankTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y, selectedTankSpeedString, style);
+            const selectedTankBulletSpeedTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y + boxHeight, selectedTankBulletSpeedString, style);
+            const selectedTankDamageTxt = state.game.add.text(firstSprite.x - boxWidth, firstSprite.y + boxHeight * 2, selectedTankDamageString, style);
+            const extraInfoTxt = state.game.add.text(firstSprite.x - boxWidth, state.game.world.bottom + boxHeight * 2, extraInfoString, style);
+            const fakeEntity = new entity_1.Entity(state.game, 0, 0);
+            fakeEntity.withComponent([new TankComponent(data_config_1.DataConfig.tank)]);
+            const tankComponent = fakeEntity.getComponent(GameConstants_1.ComponentType.TANK);
+            const spriteTxtList = [selectedTankTxt, speedTankTxt, selectedTankBulletSpeedTxt, selectedTankDamageTxt, extraInfoTxt];
             config.getSprite(GameConstants_1.UIComponents.CANDY_ARTILLERY_IMG).events.onInputDown.add(() => {
-                data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_ARTILLERY;
+                tankComponent.tankKind = data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_ARTILLERY;
+                clearTankAttributes();
+                displayTankAttributes();
             });
             config.getSprite(GameConstants_1.UIComponents.CANDY_FORTRESS_IMG).events.onInputDown.add(() => {
-                data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_FORTRESS;
+                tankComponent.tankKind = data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_FORTRESS;
+                clearTankAttributes();
+                displayTankAttributes();
             });
             config.getSprite(GameConstants_1.UIComponents.CANDY_HUNTER_IMG).events.onInputDown.add(() => {
-                data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_HUNTER;
+                tankComponent.tankKind = data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_HUNTER;
+                clearTankAttributes();
+                displayTankAttributes();
             });
             config.getSprite(GameConstants_1.UIComponents.CANDY_LIGHT_IMG).events.onInputDown.add(() => {
-                data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_LIGHT;
+                tankComponent.tankKind = data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_LIGHT;
+                clearTankAttributes();
+                displayTankAttributes();
             });
             config.getSprite(GameConstants_1.UIComponents.CANDY_RECON_IMG).events.onInputDown.add(() => {
-                data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_RECON;
+                tankComponent.tankKind = data_config_1.DataConfig.tank = GameConstants_1.TankLayout.CANDY_RECON;
+                clearTankAttributes();
+                displayTankAttributes();
             });
-            let lastSprite = arr[arr.length - 2];
+            const lastSprite = arr[arr.length - 2];
             let bArr = this.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - 30, lastSprite.y + 100), new vector_1.default(lastSprite.x + 10, lastSprite.y + 100), state);
             bArr[0].events.onInputDown.add(() => {
-                data_config_1.DataConfig.applyCahnges();
+                data_config_1.DataConfig.applyChanges();
+                spriteTxtList.forEach((sprite) => {
+                    sprite.destroy();
+                });
                 this.fadeoutSprites(state, bArr);
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
@@ -256,12 +289,33 @@ var UiManagers;
             });
             bArr[1].events.onInputDown.add(() => {
                 this.fadeoutSprites(state, bArr);
+                spriteTxtList.forEach((sprite) => {
+                    sprite.destroy();
+                });
                 data_config_1.DataConfig.revertChanges();
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
                 });
             });
             return config;
+            function clearTankAttributes() {
+                selectedTankDamageTxt.text = selectedTankDamageString;
+                speedTankTxt.text = selectedTankSpeedString;
+                selectedTankBulletSpeedTxt.text = selectedTankBulletSpeedString;
+                selectedTankTxt.text = selectedTankString;
+                extraInfoTxt.text = '';
+            }
+            function displayTankAttributes() {
+                updateTxtSpriteWithText(selectedTankTxt, tankComponent.tankKindName);
+                updateTxtSpriteWithText(speedTankTxt, tankComponent.speed.toString());
+                updateTxtSpriteWithText(selectedTankBulletSpeedTxt, tankComponent.bulletSpeed.toString());
+                updateTxtSpriteWithText(selectedTankDamageTxt, (tankComponent.bulletDmg * data_config_1.DataConfig.playerDamage).toString() + '*');
+                updateTxtSpriteWithText(extraInfoTxt, extraInfoString);
+            }
+            function updateTxtSpriteWithText(txtSprite, updatedTxt) {
+                let curString = txtSprite.text;
+                txtSprite.setText(curString + updatedTxt);
+            }
         }
         static drawDifficulty(state) {
             let centerX = state.game.world.centerX;
@@ -275,6 +329,12 @@ var UiManagers;
                 new vector_1.default(centerX, centerY + this._buttonHeight)
             ];
             let arr = this.drawBoxes(4, loc, state, difficulties);
+            const paddingWidth = 95;
+            const paddingHeight = 45;
+            const style = { font: '22px Calibri', fill: '#19ff7b' };
+            const selectedDifficulty = 'Selected difficulty: ';
+            let lastSprite = arr[arr.length - 1];
+            const selectedLevelTxt = state.game.add.text(lastSprite.x - paddingWidth, lastSprite.y + paddingHeight, selectedDifficulty, style);
             arr.forEach((sprite, index) => {
                 state.game.add.tween(sprite.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
                 switch (index) {
@@ -296,20 +356,24 @@ var UiManagers;
             });
             config.getSprite(GameConstants_1.Difficulty.EASY).events.onInputDown.add(() => {
                 data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.EASY;
+                selectedLevelTxt.text = selectedDifficulty + 'Easy';
             });
             config.getSprite(GameConstants_1.Difficulty.NORMAL).events.onInputDown.add(() => {
                 data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.NORMAL;
+                selectedLevelTxt.text = selectedDifficulty + 'Normal';
             });
             config.getSprite(GameConstants_1.Difficulty.HARD).events.onInputDown.add(() => {
                 data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.HARD;
+                selectedLevelTxt.text = selectedDifficulty + 'Hard';
             });
             config.getSprite(GameConstants_1.Difficulty.INSANE).events.onInputDown.add(() => {
                 data_config_1.DataConfig.difficulty = GameConstants_1.Difficulty.INSANE;
+                selectedLevelTxt.text = selectedDifficulty + 'Insane';
             });
-            let lastSprite = arr[arr.length - 1];
             let bArr = this.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - 30, lastSprite.y + 100), new vector_1.default(lastSprite.x + 10, lastSprite.y + 100), state);
             bArr[0].events.onInputDown.add(() => {
-                data_config_1.DataConfig.applyCahnges();
+                selectedLevelTxt.destroy();
+                data_config_1.DataConfig.applyChanges();
                 this.fadeoutSprites(state, bArr);
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
@@ -317,6 +381,7 @@ var UiManagers;
             });
             bArr[1].events.onInputDown.add(() => {
                 this.fadeoutSprites(state, bArr);
+                selectedLevelTxt.destroy();
                 data_config_1.DataConfig.revertChanges();
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
@@ -334,10 +399,16 @@ var UiManagers;
             let centerY = state.game.world.centerY;
             let config = new menu_config_1.MenuConfig();
             let levels = [GameConstants_1.UIComponents.LEVEL_ONE_IMAGE, GameConstants_1.UIComponents.LEVEL_TWO_IMAGE];
+            let style = { font: '22px Calibri', fill: '#19ff7b' };
+            const paddingWidth = 350;
+            const paddingHeight = 25;
             let arr = this.drawBoxes(2, [
                 new vector_1.default(centerX, centerY),
                 new vector_1.default(centerX + this._buttonLength, centerY)
             ], state, levels, true, GameConstants_1.UIComponents.PANEL);
+            const firstSprite = arr[0];
+            const selectedLevelString = `Selected Level: `;
+            const selectedLevelTxt = state.game.add.text(firstSprite.x - paddingWidth, firstSprite.y - paddingHeight, selectedLevelString, style);
             arr.forEach((value, index) => {
                 state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
                 let name = GameConstants_1.UIComponents[levels[index].toUpperCase().replace(' ', '_')];
@@ -346,9 +417,11 @@ var UiManagers;
                     let lName = name.toString();
                     if (lName.includes('one')) {
                         data_config_1.DataConfig.level = GameConstants_1.Levels.LEVEL_ONE;
+                        selectedLevelTxt.text = selectedLevelString + 'Grass Level';
                     }
                     else if (lName.includes('two')) {
                         data_config_1.DataConfig.level = GameConstants_1.Levels.LEVEL_TWO;
+                        selectedLevelTxt.text = selectedLevelString + 'Candy Level';
                     }
                 });
             });
@@ -356,8 +429,9 @@ var UiManagers;
             let lastSprite = arr[arr.length - 1];
             let bArr = this.drawAcceptCancelButtons(new vector_1.default(lastSprite.x - arr.length * 50, lastSprite.y + 100), new vector_1.default(lastSprite.x - (arr.length - 1) * 50, lastSprite.y + 100), state);
             bArr[0].events.onInputDown.add(() => {
-                data_config_1.DataConfig.applyCahnges();
+                data_config_1.DataConfig.applyChanges();
                 this.fadeoutSprites(state, bArr);
+                selectedLevelTxt.destroy();
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
                 });
@@ -365,6 +439,7 @@ var UiManagers;
             bArr[1].events.onInputDown.add(() => {
                 this.fadeoutSprites(state, bArr);
                 data_config_1.DataConfig.revertChanges();
+                selectedLevelTxt.destroy();
                 this.fadeoutSprites(state, arr).then(() => {
                     this.drawPreferences(state);
                 });
@@ -406,7 +481,13 @@ var UiManagers;
         static drawPauseMenu(state) {
             const buttonWidth = 130;
             let pauseMenu = state.add.sprite(state.game.world.right - buttonWidth, state.game.world.top, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
-            let toAttach = state.game.add.text(0, 0, 'Pause', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: pauseMenu.width, align: 'center' });
+            let toAttach = state.game.add.text(0, 0, 'Pause', {
+                font: '22px Arial',
+                fill: '#ff0044',
+                wordWrap: true,
+                wordWrapWidth: pauseMenu.width,
+                align: 'center'
+            });
             toAttach.anchor.setTo(-1, -0.35);
             pauseMenu.addChild(toAttach);
             pauseMenu.scale = new Phaser.Point(0.7, 0.7);
@@ -419,8 +500,20 @@ var UiManagers;
                 state.game.paused = true;
                 let mainMenuBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y + (state.game.height / 2), GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
                 let backBtn = state.add.sprite(state.game.camera.x + (state.game.width / 2), state.game.camera.y - (buttonWidth / 2) + (state.game.height / 2), GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.FULL_BUTTON);
-                let mainMenuTxt = state.add.text(0, 0, 'Main Menu', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: mainMenuBtn.width, align: 'center' });
-                let resumeTxt = state.add.text(0, 0, 'Resume', { font: '22px Arial', fill: '#ff0044', wordWrap: true, wordWrapWidth: backBtn.width, align: 'center' });
+                let mainMenuTxt = state.add.text(0, 0, 'Main Menu', {
+                    font: '22px Arial',
+                    fill: '#ff0044',
+                    wordWrap: true,
+                    wordWrapWidth: mainMenuBtn.width,
+                    align: 'center'
+                });
+                let resumeTxt = state.add.text(0, 0, 'Resume', {
+                    font: '22px Arial',
+                    fill: '#ff0044',
+                    wordWrap: true,
+                    wordWrapWidth: backBtn.width,
+                    align: 'center'
+                });
                 mainMenuTxt.anchor.setTo(-0.4, -0.35);
                 resumeTxt.anchor.setTo(-0.65, -0.35);
                 mainMenuBtn.addChild(mainMenuTxt);
@@ -438,7 +531,37 @@ var UiManagers;
                 });
             });
         }
-        static drawYouWonMenu() {
+        static drawYouWonMenu(state, score) {
+            let map;
+            if (this._fakeMapExists) {
+                this._fakeMapExists = false;
+                this._fakeMap.destroy();
+            }
+            map = state.game.add.tilemap(GameConstants_1.Levels.LEVEL_ONE);
+            map.addTilesetImage(GameConstants_1.TileLayers.GRASS_LAYER, GameConstants_1.TileLayers.GRASS_LAYER);
+            map.addTilesetImage(GameConstants_1.TileLayers.BACKGROUND, GameConstants_1.TileLayers.BACKGROUND);
+            map.createLayer('SkyPrimary').resizeWorld();
+            map.createLayer('GroundSecondary').resizeWorld();
+            map.createLayer('GroundPrimary').resizeWorld();
+            this._fakeMapExists = true;
+            this._fakeMap = map;
+            state.game.camera.unfollow();
+            let centerX = state.game.world.centerX;
+            let centerY = state.game.world.centerY;
+            let loc = [new vector_1.default(centerX, centerY)];
+            this.drawBoxes(1, loc, state, ['Main Menu']).forEach((value, index) => {
+                state.game.add.tween(value.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
+                state.game.camera.focusOn(value);
+                value.events.onInputDown.add(() => {
+                    this.drawMainMenu(state);
+                });
+            });
+            let gameOver = state.game.add.text(centerX - 250, centerY + 110, `You Won! You cleared the stage :) your score was ${score}!`, {
+                font: '22px Arial',
+                fill: '#ff0044'
+            });
+            gameOver.scale.setTo(0.0, 0.0);
+            state.game.add.tween(gameOver.scale).to({ x: 1.0, y: 1.0 }, this._animationTime, Phaser.Easing.Bounce.Out, true);
         }
     }
     // Class Global vars
@@ -473,14 +596,48 @@ var UiManagers;
         addHeartByHealingReceived(healing) {
             for (let i = healing; i >= 0; i--) {
                 let heart = PlayerVisualsManager._heartList.find((heart) => {
-                    return heart.frame === GameConstants_1.UIComponents.EMPTY_HEART || heart.frame === GameConstants_1.UIComponents.HALF_HEART;
+                    return heart.frameName === GameConstants_1.UIComponents.EMPTY_HEART || heart.frameName === GameConstants_1.UIComponents.HALF_HEART;
                 });
-                if (heart.frame === GameConstants_1.UIComponents.HALF_HEART) {
-                    heart.frame = GameConstants_1.UIComponents.FULL_HEART;
+                if (heart) {
+                    if (heart.frameName === GameConstants_1.UIComponents.HALF_HEART) {
+                        heart.frameName = GameConstants_1.UIComponents.FULL_HEART;
+                    }
+                    else if (heart.frameName === GameConstants_1.UIComponents.FULL_HEART) {
+                        // do nothing
+                        // This means all hearts are full
+                    }
+                    else {
+                        heart.frameName = GameConstants_1.UIComponents.FULL_HEART;
+                    }
                 }
-                else {
-                    heart.frame = GameConstants_1.UIComponents.FULL_HEART;
-                }
+            }
+        }
+        addPowerUpIcon(powerUpKind) {
+            const paddingHeight = 80;
+            const paddingWidth = 15;
+            const repairIconLocation = new vector_1.default(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
+            switch (powerUpKind) {
+                case GameConstants_1.TankLayout.CRATE_REPAIR:
+                    if (PlayerVisualsManager._repairIcon) {
+                        if (!PlayerVisualsManager._repairIcon.alive) {
+                            PlayerVisualsManager._repairIcon.reset(repairIconLocation.x, repairIconLocation.y);
+                        }
+                        break;
+                    }
+                    PlayerVisualsManager._repairIcon = this._state.game.add.sprite(repairIconLocation.x, repairIconLocation.y, GameConstants_1.TankLayout.TANK_SPRITESHEET, GameConstants_1.TankLayout.CRATE_REPAIR);
+                    PlayerVisualsManager._repairIcon.fixedToCamera = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        removePowerUpIcon(powerUpKind) {
+            switch (powerUpKind) {
+                case GameConstants_1.TankLayout.CRATE_REPAIR:
+                    PlayerVisualsManager._repairIcon.kill();
+                    break;
+                default:
+                    break;
             }
         }
         drawHearts(no, x, y, kindOfHeart) {
@@ -491,6 +648,10 @@ var UiManagers;
                 heart.scale = new Phaser.Point(0.5, 0.5);
                 PlayerVisualsManager._heartList.push(heart);
             }
+        }
+        static cleanUp() {
+            PlayerVisualsManager._heartList = [];
+            PlayerVisualsManager._repairIcon = undefined;
         }
     }
     PlayerVisualsManager._heartList = [];

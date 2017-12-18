@@ -3,14 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = require("./component");
 const GameConstants_1 = require("../constants/GameConstants");
 const data_config_1 = require("../config/data.config");
+const uimanagers_1 = require("../UI/uimanagers");
 var CollisionComponents;
 (function (CollisionComponents) {
+    var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class CollisionsComponent extends component_1.Component {
-        constructor() {
+        constructor(state) {
             super(GameConstants_1.ComponentType.COLLISION);
             this._requiredComponents = [
                 GameConstants_1.ComponentType.PHYSICS
             ];
+            this._state = state;
         }
         setCollisionGroup(ownerCollisionGroup) {
             this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
@@ -32,18 +35,36 @@ var CollisionComponents;
                     case GameConstants_1.Action.DAMAGE:
                         // Each bullet does the same damage regardless of type
                         // Bullet damage depends on difficulty level
-                        let aiComp = this.target.getComponent(GameConstants_1.ComponentType.AI);
-                        let healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
-                        if (aiComp) {
+                        const aiComp = this.target.getComponent(GameConstants_1.ComponentType.AI);
+                        const healthComp = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+                        const tankComp = this.target.getComponent(GameConstants_1.ComponentType.TANK);
+                        if (!aiComp && tankComp) {
                             body.collides(collidesWith, () => {
-                                healthComp.dealDamage(data_config_1.DataConfig.playerDamage);
-                            }, this);
-                        }
-                        else {
-                            body.collides(collidesWith, () => {
-                                healthComp.dealDamage(data_config_1.DataConfig.enemyDamage);
+                                const heartManager = new PlayerVisualsManager();
+                                const damage = tankComp.bulletDmg * data_config_1.DataConfig.enemyDamage;
+                                heartManager.removeHeartByDamage(damage);
+                                healthComp.dealDamage(damage);
                             });
+                            break;
                         }
+                        body.collides(collidesWith, () => {
+                            const damage = tankComp ? data_config_1.DataConfig.playerDamage * tankComp.bulletDmg : data_config_1.DataConfig.playerDamage;
+                            healthComp.dealDamage(damage);
+                        });
+                        break;
+                    case GameConstants_1.Action.POWER_UP:
+                        const powerUpComponent = this.target.getComponent(GameConstants_1.ComponentType.POWER_UP);
+                        const healthComponent = this.target.getComponent(GameConstants_1.ComponentType.HEALTH);
+                        body.collides(collidesWith, (tank, powerup) => {
+                            if (!healthComponent.pendingHeal()) {
+                                let frameName = powerup.sprite.frameName;
+                                if (frameName.includes(GameConstants_1.TankLayout.CRATE_REPAIR.toString())) {
+                                    powerUpComponent.loadCrate(GameConstants_1.TankLayout.CRATE_REPAIR);
+                                    powerup.sprite.visible = false;
+                                    powerup.data.shapes[0].sensor = true;
+                                }
+                            }
+                        });
                         break;
                     default:
                         break;

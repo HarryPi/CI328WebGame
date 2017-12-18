@@ -1,25 +1,36 @@
-import {Component} from './component';
-import {Action, ComponentType, TankLayout} from '../constants/GameConstants';
-import {TankUtil} from '../UI/tank.util';
-import {Entity} from '../entities/entity';
-import {CollisionComponents} from './collision.components';
+import { Component } from './component';
+import { Action, ComponentType, Difficulty, TankLayout } from '../constants/GameConstants';
+import { TankUtil } from '../UI/tank.util';
+import { Entity } from '../entities/entity';
+import { CollisionComponents } from './collision.components';
 import PhysicsComponent = CollisionComponents.PhysicsComponent;
 import CollisionsComponent = CollisionComponents.CollisionsComponent;
+import { DataConfig } from '../config/data.config';
+import {UiManagers} from '../UI/uimanagers';
 
 export namespace DataComponents {
+
+  import Timer = NodeJS.Timer;
+
   export class HealthComponent extends Component {
     private _maxHealth: number;
-    constructor() {
+    private _healingTimeout: Timer;
+    private _game: Phaser.Game;
+    private _state: Phaser.State;
+
+    constructor(game: Phaser.Game, state: Phaser.State) {
       super(ComponentType.HEALTH);
       this._requiredComponents.push(ComponentType.LAYER);
       this._requiredComponents.push(ComponentType.PHYSICS);
+      this._game = game;
+      this._state = state;
     }
 
     /**
      * @description
      * Deals damage to target returns true if target is still alive after damage
      *
-     * */
+     */
     public dealDamage(damage: number) {
 
       // Check if the damage will kill the entity
@@ -34,14 +45,50 @@ export namespace DataComponents {
       }
     }
 
+    public pendingHeal(): boolean {
+      return !!this._healingTimeout;
+    }
+    public restoreHealth(): void {
+      const playerUi = new UiManagers.PlayerVisualsManager(this._state);
+      playerUi.addPowerUpIcon(TankLayout.CRATE_REPAIR);
+
+      const healingDone = () => {
+        if (DataConfig.difficulty === Difficulty.EASY || DataConfig.difficulty === Difficulty.NORMAL) {
+          return 4;
+        } else if (DataConfig.difficulty === Difficulty.HARD) {
+          return 2;
+        } else if (DataConfig.difficulty === Difficulty.INSANE) {
+          return 1;
+        } else {
+          return 1;
+        }
+      };
+
+      let heal = () => {
+        let toRestore = healingDone();
+
+        if (this.getCurrentHealth() + toRestore > this._maxHealth) {
+          toRestore = this._maxHealth - this.getCurrentHealth();
+        }
+        playerUi.addHeartByHealingReceived(toRestore);
+        playerUi.removePowerUpIcon(TankLayout.CRATE_REPAIR);
+        this.target.sprite.heal(toRestore);
+        clearTimeout(this._healingTimeout);
+        this._healingTimeout = null;
+      };
+      this._healingTimeout = setTimeout(heal, 5000);
+    }
+
     public setHealth(health: number) {
       this.target.sprite.health = health;
       this._maxHealth = health;
     }
+
     public getCurrentHealth(): number {
       return this.target.sprite.health;
     }
-    public getMaxHealth(): number{
+
+    public getMaxHealth(): number {
       return this._maxHealth;
     }
   }
@@ -65,6 +112,7 @@ export namespace DataComponents {
     public getAnimation(name: string): Phaser.Animation {
       return this.target.sprite.animations.getAnimation(name);
     }
+
     public getCurrentAnimation(): Phaser.Animation {
       return this.target.sprite.animations.currentAnim;
     }
@@ -94,12 +142,12 @@ export namespace DataComponents {
       | TankLayout.DARK_HUNTER
       | TankLayout.DARK_LIGHT
       | TankLayout.DARK_RECON
-      | TankLayout.GREEN_ARTILERY
+      | TankLayout.GREEN_ARTILLERY
       | TankLayout.GREEN_HUNTER
       | TankLayout.GREEN_LIGHT
       | TankLayout.GREEN_RECON
       | TankLayout.GREEN_FORTRESS
-      | TankLayout.GREY_ARTILERY
+      | TankLayout.GREY_ARTILLERY
       | TankLayout.GREY_FORTRESS
       | TankLayout.GREY_HUNTER
       | TankLayout.GREY_LIGHT
@@ -124,6 +172,23 @@ export namespace DataComponents {
         return 800;
       } else {
         throw new Error('NO TANK FOUND TO SET BULLET SPEED');
+      }
+    }
+
+    get bulletDmg(): number {
+      const bulletKind = this.bulletKind;
+      if (bulletKind === TankLayout.BULLET_ONE) {
+        return 1;
+      } else if (bulletKind === TankLayout.BULLET_TWO) {
+        return 1;
+      } else if (bulletKind === TankLayout.BULLET_THREE) {
+        return 1;
+      } else if (bulletKind === TankLayout.BULLET_FOUR) {
+        return 2;
+      } else if (bulletKind === TankLayout.BULLET_FIVE) {
+        return 2;
+      } else if (bulletKind === TankLayout.BULLET_SIX) {
+        return 2;
       }
     }
 
@@ -160,11 +225,74 @@ export namespace DataComponents {
       }
     }
 
+    get tankKindName(): string {
+      if (TankUtil.isFortressTank(this.tankKind)) {
+        return 'Fortress Tank';
+      }
+      if (TankUtil.isArtilleryTank(this.tankKind)) {
+        return 'Artillery Tank';
+      }
+      if (TankUtil.isHunterTank(this.tankKind)) {
+        return 'Hunter Tank';
+      }
+      if (TankUtil.isLightTank(this.tankKind)) {
+        return 'Light Tank';
+      }
+      if (TankUtil.isReconTank(this.tankKind)) {
+        return 'Recon Tank';
+      }
+    }
+
     get angle(): number {
       return 180;
     }
-    get tankKind(): TankLayout {
+
+    get tankKind(): TankLayout.CANDY_RECON
+      | TankLayout.CANDY_ARTILLERY
+      | TankLayout.CANDY_FORTRESS
+      | TankLayout.CANDY_HUNTER
+      | TankLayout.CANDY_LIGHT
+      | TankLayout.DARK_ARTILLERY
+      | TankLayout.DARK_FORTRESS
+      | TankLayout.DARK_HUNTER
+      | TankLayout.DARK_LIGHT
+      | TankLayout.DARK_RECON
+      | TankLayout.GREEN_ARTILLERY
+      | TankLayout.GREEN_HUNTER
+      | TankLayout.GREEN_LIGHT
+      | TankLayout.GREEN_RECON
+      | TankLayout.GREEN_FORTRESS
+      | TankLayout.GREY_ARTILLERY
+      | TankLayout.GREY_FORTRESS
+      | TankLayout.GREY_HUNTER
+      | TankLayout.GREY_LIGHT
+      | TankLayout.GREY_RECON {
       return this._tankKind;
+    }
+
+    set tankKind(value: TankLayout.CANDY_RECON
+      | TankLayout.CANDY_ARTILLERY
+      | TankLayout.CANDY_FORTRESS
+      | TankLayout.CANDY_HUNTER
+      | TankLayout.CANDY_LIGHT
+      | TankLayout.DARK_ARTILLERY
+      | TankLayout.DARK_FORTRESS
+      | TankLayout.DARK_HUNTER
+      | TankLayout.DARK_LIGHT
+      | TankLayout.DARK_RECON
+      | TankLayout.GREEN_ARTILLERY
+      | TankLayout.GREEN_HUNTER
+      | TankLayout.GREEN_LIGHT
+      | TankLayout.GREEN_RECON
+      | TankLayout.GREEN_FORTRESS
+      | TankLayout.GREY_ARTILLERY
+      | TankLayout.GREY_FORTRESS
+      | TankLayout.GREY_HUNTER
+      | TankLayout.GREY_LIGHT
+      | TankLayout.GREY_RECON) {
+
+      this._tankKind = value;
+
     }
 
   }

@@ -22,7 +22,7 @@ export class Entity {
     }
     this._sprite = game.add.sprite(x, y, TankLayout.TANK_SPRITESHEET);
     this._components.forEach((comp: Component) => {
-      comp.validateComponentRequirments();
+      comp.validateComponentRequirements();
     });
 
   }
@@ -68,10 +68,9 @@ export class Entity {
   public destroy(): void {
     try {
       this._components.clear();
-      this._sprite.destroy();
+      this._sprite.kill();
       this._whenDestroyed.next();
     } catch (e) {
-      this._whenDestroyed.error(e);
     }
   }
   public get whenDestroyed(): Subject<void> {

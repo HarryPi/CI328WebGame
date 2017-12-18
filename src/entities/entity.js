@@ -20,7 +20,7 @@ class Entity {
         }
         this._sprite = game.add.sprite(x, y, GameConstants_1.TankLayout.TANK_SPRITESHEET);
         this._components.forEach((comp) => {
-            comp.validateComponentRequirments();
+            comp.validateComponentRequirements();
         });
     }
     addComponent(component) {
@@ -62,11 +62,10 @@ class Entity {
     destroy() {
         try {
             this._components.clear();
-            this._sprite.destroy();
+            this._sprite.kill();
             this._whenDestroyed.next();
         }
         catch (e) {
-            this._whenDestroyed.error(e);
         }
     }
     get whenDestroyed() {
