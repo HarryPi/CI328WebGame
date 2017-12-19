@@ -613,8 +613,8 @@ var UiManagers;
             }
         }
         addPowerUpIcon(powerUpKind) {
-            const paddingHeight = 80;
-            const paddingWidth = 15;
+            const paddingHeight = 190;
+            const paddingWidth = 30;
             const repairIconLocation = new vector_1.default(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
             switch (powerUpKind) {
                 case GameConstants_1.TankLayout.CRATE_REPAIR:
@@ -672,8 +672,7 @@ var UiManagers;
             moveLeftBtn.fixedToCamera = true;
             moveRight.fixedToCamera = true;
             // fireBtn.fixedToCamera = true;
-            input.add(), GameConstants_1.InputType.LEFT_INPUT;
-            ;
+            return [moveLeftBtn, moveRight];
         }
     }
     PlayerVisualsManager._heartList = [];

@@ -110,6 +110,7 @@ export namespace GameStates {
     private _powerUpTimer: number = 0;
     private _activeDisasters: number = 0;
     private _activeLevel: Levels;
+    private _buttons: Phaser.Sprite[];
 
     constructor() {
       super();
@@ -167,11 +168,21 @@ export namespace GameStates {
         fill: '#ff0044'
       });
       this._scoreText.fixedToCamera = true;
-      playerUIBuilder.buildControlButtons(this._input);
+      this._buttons = playerUIBuilder.buildControlButtons(this._input);
     }
 
     update() {
       const activeLevel = this._levels.get(this._activeLevel);
+
+      if (this.game.input.activePointer.isDown && this._buttons[0].input.checkPointerOver(this.game.input.activePointer)) {
+        this._input.emitter.next(InputType.LEFT_INPUT); // For mobile design check if left button is clicked
+      }
+      if (this.game.input.activePointer.isDown && this._buttons[1].input.checkPointerOver(this.game.input.activePointer)) {
+        this._input.emitter.next(InputType.RIGHT_INPUT); // for mobile design check if right button is clicked
+      }
+      if (this.game.input.activePointer.isDown && !(this._buttons[1].input.checkPointerOver(this.game.input.activePointer) || this._buttons[0].input.checkPointerOver(this.game.input.activePointer))) {
+        this._input.emitter.next(InputType.SHOOT); // for mobile design check if touch but not on buttons
+      }
 
       if (this.canSpawnPowerUp(activeLevel)) {
         this.spawnPowerUp();

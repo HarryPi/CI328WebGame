@@ -735,8 +735,8 @@ export namespace UiManagers {
     }
 
     public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
-      const paddingHeight = 80;
-      const paddingWidth = 15;
+      const paddingHeight = 190;
+      const paddingWidth = 30;
       const repairIconLocation: Vector = new Vector(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
 
       switch (powerUpKind) {
@@ -804,7 +804,7 @@ export namespace UiManagers {
       moveRight.fixedToCamera = true;
       // fireBtn.fixedToCamera = true;
 
-      input.add(), InputType.LEFT_INPUT);
+      return [moveLeftBtn, moveRight];
     }
   }
 }
