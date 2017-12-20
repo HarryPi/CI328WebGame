@@ -1,7 +1,7 @@
 /** Imports */
 import {ActionComponents} from '../component/action.components';
 import AssetsUtils from '../UI/Assets';
-import {ComponentType, InputType, Levels, States} from '../constants/GameConstants';
+import {ComponentType, InputType, Levels, Sounds, States} from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
 import Input from '../util/input';
 import {DataConfig} from '../config/data.config';
@@ -18,6 +18,7 @@ import TankLevel = TankGameLevels.TankLevel;
 import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
 import Vector from '../util/vector';
+import {SoundPlayer} from '../UI/SoundPlayer';
 
 
 export namespace GameStates {
@@ -68,6 +69,8 @@ export namespace GameStates {
     }
 
     create() {
+      SoundPlayer.stopSound(Sounds.GAME_MUSIC);
+      SoundPlayer.playSound(Sounds.MAIN_MENU);
       MenuManager.drawYouWonMenu(this, this._args.score);
     }
 
@@ -81,6 +84,8 @@ export namespace GameStates {
 
     init(args) {
       this._args = args;
+      SoundPlayer.stopSound(Sounds.GAME_MUSIC);
+
     }
 
     preload() {
@@ -88,11 +93,15 @@ export namespace GameStates {
     }
 
     create() {
+      SoundPlayer.playSound(Sounds.MAIN_MENU);
       MenuManager.drawGameOver(this, this._args.score);
     }
 
     update() {
 
+    }
+    shutdown(){
+      SoundPlayer.stopSound(Sounds.MAIN_MENU);
     }
   }
 
@@ -130,6 +139,8 @@ export namespace GameStates {
     }
 
     create() {
+      SoundPlayer.stopSound(Sounds.MAIN_MENU);
+      SoundPlayer.playSound(Sounds.GAME_MUSIC);
       const playerUIBuilder = new PlayerVisualsManager(this);
       const activeLevel = this._levels.get(this._activeLevel);
 
@@ -163,7 +174,7 @@ export namespace GameStates {
         }
       });
 
-      this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {
+      this._scoreText = this.game.add.text(this.game.world.left + 60, this.game.world.top, `Score: ${this._score}`, {
         font: '22px Arial',
         fill: '#ff0044'
       });
@@ -206,6 +217,7 @@ export namespace GameStates {
       // Ensure no memory leaks
       this._inputSubscription.unsubscribe();
       this._factory.cleanUp();
+      SoundPlayer.stopSound(Sounds.GAME_MUSIC);
 
       // Clean UI static values
       PlayerVisualsManager.cleanUp();
@@ -284,13 +296,14 @@ export namespace GameStates {
 
     init(args) {
       this._args = args;
+      SoundPlayer.init(this.game);
     }
 
     preload() {
-
     }
 
     create() {
+      SoundPlayer.playSound(Sounds.MAIN_MENU);
       let config: MenuConfig = MenuManager.drawMainMenu(this);
       this.game.camera.unfollow(); // stop following the main menu
       config.allSprites.forEach((sprite: Phaser.Sprite) => {

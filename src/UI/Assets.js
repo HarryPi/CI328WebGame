@@ -9,7 +9,7 @@ class AssetLoader {
     /**
      * @constructor
      * Will generate all required paths for the assets
-     * */
+     */
     constructor() {
         // Since Webpack is running in build-time, it can't figure out which modules to bundle when the name is a dynamic variable.
         // Therefor all required targets must be hardcoded
@@ -37,12 +37,19 @@ class AssetLoader {
         this.uiBackgroundUrlXML = require('assets/spritesheet/UISpritesheet_xml.xml');
         this._playerVisualsSpritesheetUrl = require('assets/spritesheet/playerVisuals.png');
         this._playerVisualsSpritesheetUrlXML = require('assets/spritesheet/playerVisuals.xml');
+        // Sounds
+        this._missileFireUrl = require('assets/muisc/missile_fire.mp3');
+        this._missileFireUrlOGG = require('assets/muisc/missile_fire.ogg');
+        this._gameMusicUrl = require('assets/muisc/gameMusic.mp3');
+        this._gameMusicUrlOGG = require('assets/muisc/gameMusic.ogg');
+        this._mainMenuMusicUrl = require('assets/muisc/mainMenu.ogg');
+        this._mainMenuMusicUrlOGG = require('assets/muisc/mainMenu.mp3');
     }
     /**
      * Run once during Boot state to pass reference to loader.
      * @param {Phaser.Loader} loader   The phaser loader
      * @return {void}
-     **/
+     */
     init(loader) {
         this.loader = loader;
     }
@@ -79,6 +86,9 @@ class AssetLoader {
         this.loader.image(GameConstants_1.UIComponents.CANDY_LIGHT_IMG, this._tank5Url);
         this.loader.image(GameConstants_1.UIComponents.CANDY_FORTRESS_IMG, this._tank3Url);
         this.loader.image(GameConstants_1.UIComponents.CANDY_RECON_IMG, this._tank4Url);
+        // Music load
+        this.loader.audio(GameConstants_1.Sounds.MAIN_MENU, [this._mainMenuMusicUrl, this._mainMenuMusicUrlOGG]);
+        this.loader.audio(GameConstants_1.Sounds.GAME_MUSIC, [this._gameMusicUrl, this._gameMusicUrlOGG]);
     }
     /**
      * @description

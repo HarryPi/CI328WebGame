@@ -48,7 +48,7 @@ var CollisionComponents;
                             break;
                         }
                         body.collides(collidesWith, () => {
-                            const damage = tankComp ? data_config_1.DataConfig.playerDamage * tankComp.bulletDmg : data_config_1.DataConfig.playerDamage;
+                            const damage = tankComp ? data_config_1.DataConfig.playerDamage * tankComp.bulletDmg : data_config_1.DataConfig.playerDamage; // if its not bullet
                             healthComp.dealDamage(damage);
                         });
                         break;

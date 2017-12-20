@@ -7,7 +7,7 @@ var ActionComponents;
 (function (ActionComponents) {
     var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class ShootComponent extends component_1.Component {
-        constructor(game, factory) {
+        constructor(factory) {
             super(GameConstants_1.ComponentType.SHOOT);
             this._canShoot = false;
             this._timer = 0;

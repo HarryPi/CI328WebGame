@@ -66,7 +66,7 @@ export namespace CollisionComponents {
               break;
             }
             body.collides(collidesWith, () => {
-              const damage = tankComp ? DataConfig.playerDamage * tankComp.bulletDmg : DataConfig.playerDamage;
+              const damage = tankComp ? DataConfig.playerDamage * tankComp.bulletDmg : DataConfig.playerDamage; // if its not bullet
               healthComp.dealDamage(damage);
             });
             break;

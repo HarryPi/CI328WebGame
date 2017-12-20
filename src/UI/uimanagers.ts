@@ -735,9 +735,9 @@ export namespace UiManagers {
     }
 
     public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
-      const paddingHeight = 190;
-      const paddingWidth = 30;
-      const repairIconLocation: Vector = new Vector(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
+      const paddingHeight = - 60;
+      const paddingWidth = 20;
+      const repairIconLocation: Vector = new Vector(this._state.game.camera.x + paddingWidth, this._state.game.camera.y + paddingHeight);
 
       switch (powerUpKind) {
         case TankLayout.CRATE_REPAIR:
@@ -758,7 +758,11 @@ export namespace UiManagers {
     public removePowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
       switch (powerUpKind) {
         case TankLayout.CRATE_REPAIR:
-          PlayerVisualsManager._repairIcon.kill();
+          try {
+            PlayerVisualsManager._repairIcon.kill();
+          } catch (e){
+            console.warn(e.toString()); // do nothing
+          }
           break;
         default:
           break;

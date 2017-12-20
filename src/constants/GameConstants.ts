@@ -84,7 +84,11 @@ export enum ComponentType {
   CAMERA = 'camera_component',
   MOVABLE = 'movable_component'
 }
-
+export enum Sounds {
+  GAME_MUSIC = 'game_music',
+  MISSILE_FIRE = 'missile_fire',
+  MAIN_MENU = 'main_menu'
+}
 export enum UIComponents {
   PROGRESS_BAR = 'progresBar',
   LOGO = 'logo',

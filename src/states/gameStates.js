@@ -11,6 +11,7 @@ const uimanagers_1 = require("../UI/uimanagers");
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
 const vector_1 = require("../util/vector");
+const SoundPlayer_1 = require("../UI/SoundPlayer");
 var GameStates;
 (function (GameStates) {
     var MenuManager = uimanagers_1.UiManagers.MenuManager;
@@ -46,6 +47,8 @@ var GameStates;
         preload() {
         }
         create() {
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.GAME_MUSIC);
+            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MAIN_MENU);
             MenuManager.drawYouWonMenu(this, this._args.score);
         }
         update() {
@@ -55,13 +58,18 @@ var GameStates;
     class GameoverState extends GameState {
         init(args) {
             this._args = args;
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.GAME_MUSIC);
         }
         preload() {
         }
         create() {
+            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MAIN_MENU);
             MenuManager.drawGameOver(this, this._args.score);
         }
         update() {
+        }
+        shutdown() {
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.MAIN_MENU);
         }
     }
     GameStates.GameoverState = GameoverState;
@@ -87,6 +95,8 @@ var GameStates;
             this._score = 0;
         }
         create() {
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.MAIN_MENU);
+            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.GAME_MUSIC);
             const playerUIBuilder = new PlayerVisualsManager(this);
             const activeLevel = this._levels.get(this._activeLevel);
             // Subscribe to game winning condition
@@ -117,7 +127,7 @@ var GameStates;
                     this._player.getComponent(GameConstants_1.ComponentType.SHOOT).canShoot = true;
                 }
             });
-            this._scoreText = this.game.add.text(this.game.world.left + 50, this.game.world.top, `Score: ${this._score}`, {
+            this._scoreText = this.game.add.text(this.game.world.left + 60, this.game.world.top, `Score: ${this._score}`, {
                 font: '22px Arial',
                 fill: '#ff0044'
             });
@@ -156,6 +166,7 @@ var GameStates;
             // Ensure no memory leaks
             this._inputSubscription.unsubscribe();
             this._factory.cleanUp();
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.GAME_MUSIC);
             // Clean UI static values
             PlayerVisualsManager.cleanUp();
         }
@@ -219,10 +230,12 @@ var GameStates;
     class MainMenuState extends GameState {
         init(args) {
             this._args = args;
+            SoundPlayer_1.SoundPlayer.init(this.game);
         }
         preload() {
         }
         create() {
+            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MAIN_MENU);
             let config = MenuManager.drawMainMenu(this);
             this.game.camera.unfollow(); // stop following the main menu
             config.allSprites.forEach((sprite) => {

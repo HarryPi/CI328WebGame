@@ -91,7 +91,7 @@ class TankWorldFactory {
             .withComponent([new MovableComponent(),
             new CameraComponent(this._game),
             new PhysicsComponent(this._game),
-            new ShootComponent(this._game, this),
+            new ShootComponent(this),
             new LayerComponent(),
             new CollisionsComponent(),
             new HealthComponent(this._game, this._currentState),
@@ -126,7 +126,7 @@ class TankWorldFactory {
             .withComponent([
             new MovableComponent(),
             new PhysicsComponent(this._game),
-            new ShootComponent(this._game, this),
+            new ShootComponent(this),
             new LayerComponent(),
             new CollisionsComponent(),
             new state_component_1.StateComponent(),

@@ -81,6 +81,12 @@ var ComponentType;
     ComponentType["CAMERA"] = "camera_component";
     ComponentType["MOVABLE"] = "movable_component";
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
+var Sounds;
+(function (Sounds) {
+    Sounds["GAME_MUSIC"] = "game_music";
+    Sounds["MISSILE_FIRE"] = "missile_fire";
+    Sounds["MAIN_MENU"] = "main_menu";
+})(Sounds = exports.Sounds || (exports.Sounds = {}));
 var UIComponents;
 (function (UIComponents) {
     UIComponents["PROGRESS_BAR"] = "progresBar";

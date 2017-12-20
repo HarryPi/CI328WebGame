@@ -1,4 +1,4 @@
-import { ComponentType, CrateName, InputType, TankLayout } from '../constants/GameConstants';
+import { ComponentType, CrateName, InputType, Sounds, TankLayout } from '../constants/GameConstants';
 import TankWorldFactory from '../TankWorldFactory';
 import { Component } from './component';
 import { DataComponents } from './data.components';
@@ -19,7 +19,7 @@ export namespace ActionComponents {
     private _factory: TankWorldFactory;
     private _timer = 0;
 
-    constructor(game: Phaser.Game, factory: TankWorldFactory) {
+    constructor(factory: TankWorldFactory) {
       super(ComponentType.SHOOT);
       this._factory = factory;
     }
@@ -131,8 +131,8 @@ export namespace ActionComponents {
       this._currentCrate = kindOfCrate;
 
       if (kindOfCrate === TankLayout.CRATE_REPAIR) {
-          let playerUIManager = new PlayerVisualsManager(this._state);
-          playerUIManager.addPowerUpIcon(TankLayout.CRATE_REPAIR);
+        let playerUIManager = new PlayerVisualsManager(this._state);
+        playerUIManager.addPowerUpIcon(TankLayout.CRATE_REPAIR);
       }
     }
   }

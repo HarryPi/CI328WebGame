@@ -613,9 +613,9 @@ var UiManagers;
             }
         }
         addPowerUpIcon(powerUpKind) {
-            const paddingHeight = 190;
-            const paddingWidth = 30;
-            const repairIconLocation = new vector_1.default(this._state.game.world.left + paddingWidth, this._state.game.world.top + paddingHeight);
+            const paddingHeight = -60;
+            const paddingWidth = 20;
+            const repairIconLocation = new vector_1.default(this._state.game.camera.x + paddingWidth, this._state.game.camera.y + paddingHeight);
             switch (powerUpKind) {
                 case GameConstants_1.TankLayout.CRATE_REPAIR:
                     if (PlayerVisualsManager._repairIcon) {
@@ -634,7 +634,12 @@ var UiManagers;
         removePowerUpIcon(powerUpKind) {
             switch (powerUpKind) {
                 case GameConstants_1.TankLayout.CRATE_REPAIR:
-                    PlayerVisualsManager._repairIcon.kill();
+                    try {
+                        PlayerVisualsManager._repairIcon.kill();
+                    }
+                    catch (e) {
+                        console.warn(e.toString()); // do nothing
+                    }
                     break;
                 default:
                     break;

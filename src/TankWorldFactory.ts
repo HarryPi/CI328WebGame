@@ -2,7 +2,7 @@ import { Entity } from './entities/entity';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import { Guid } from './util/guid';
 import { DataConfig } from './config/data.config';
-import { Action, ComponentType, FsmStateName, States, TankLayout } from './constants/GameConstants';
+import {Action, ComponentType, FsmStateName, Sounds, States, TankLayout} from './constants/GameConstants';
 import { FsmStates } from './AI/fsm/fsm.states';
 import { CollisionComponents } from './component/collision.components';
 import { ControlComponents } from './component/control.components';
@@ -112,7 +112,7 @@ export default class TankWorldFactory {
         [new MovableComponent(),
           new CameraComponent(this._game),
           new PhysicsComponent(this._game),
-          new ShootComponent(this._game, this),
+          new ShootComponent(this),
           new LayerComponent(),
           new CollisionsComponent(),
           new HealthComponent(this._game, this._currentState),
@@ -158,7 +158,7 @@ export default class TankWorldFactory {
         [
           new MovableComponent(),
           new PhysicsComponent(this._game),
-          new ShootComponent(this._game, this),
+          new ShootComponent(this),
           new LayerComponent(),
           new CollisionsComponent(),
           new StateComponent(),
