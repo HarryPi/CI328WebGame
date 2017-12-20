@@ -16,13 +16,16 @@ export namespace CollisionComponents {
 
   export class CollisionsComponent extends Component {
     private _state: Phaser.State;
+    private _emitter: Phaser.Particles.Arcade.Emitter;
 
-    constructor(state?: Phaser.State) {
+    constructor(emitter: Phaser.Particles.Arcade.Emitter, state?: Phaser.State ) {
       super(ComponentType.COLLISION);
       this._requiredComponents = [
         ComponentType.PHYSICS
       ];
       this._state = state;
+      this._emitter = emitter;
+      this._emitter.makeParticles(TankLayout.TANK_SPRITESHEET, TankLayout.EXPLOSION_NINE);
     }
 
     public setCollisionGroup(ownerCollisionGroup: CollisionGroup): CollisionsComponent {
@@ -62,12 +65,18 @@ export namespace CollisionComponents {
 
                 heartManager.removeHeartByDamage(damage);
                 healthComp.dealDamage(damage);
+                this._emitter.x = body.sprite.x;
+                this._emitter.y = body.sprite.y;
+                this._emitter.start(true, 500, null, 30);
               });
               break;
             }
             body.collides(collidesWith, () => {
               const damage = tankComp ? DataConfig.playerDamage * tankComp.bulletDmg : DataConfig.playerDamage; // if its not bullet
               healthComp.dealDamage(damage);
+              this._emitter.x = body.sprite.x;
+              this._emitter.y = body.sprite.y;
+              this._emitter.start(true, 500, null, 30);
             });
             break;
           case Action.POWER_UP:

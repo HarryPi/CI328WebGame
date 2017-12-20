@@ -30,8 +30,6 @@ var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = require("./component/state.component");
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
-const groupMananger_1 = require("./groups/groupMananger");
-var GroupMananger = groupMananger_1.Groups.GroupMananger;
 /**
  * @class TankWorldFactory
  * @description
@@ -54,6 +52,7 @@ class TankWorldFactory {
         this._entities = [];
         this._game = game;
         this._currentState = state;
+        this._emitter = this._game.add.emitter(0, 0, 20);
     }
     /**
      * Initializes the factory
@@ -67,7 +66,6 @@ class TankWorldFactory {
         this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
-        GroupMananger.setGroup(groupMananger_1.Groups.GroupName.GAME_LAYER, this._game.add.group());
         // Have to do this here as we cannot enforce layer to be Entity to attach component
         levelCollisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);
@@ -93,7 +91,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new ShootComponent(this),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new HealthComponent(this._game, this._currentState),
             new PowerUpComponent(state, this._player),
             new TankComponent(data_config_1.DataConfig.tank)]);
@@ -128,7 +126,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new ShootComponent(this),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new state_component_1.StateComponent(),
             new AiComponent(this._player, this._entities.filter((entity) => {
                 return entity.hasComponent(GameConstants_1.ComponentType.AI);
@@ -174,7 +172,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new LayerComponent(),
             new BulletComponent(this._game),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new HealthComponent(this._game, this._currentState),
             new OwnerComponent()
         ]);
@@ -209,7 +207,7 @@ class TankWorldFactory {
             .withComponent([
             new PhysicsComponent(this._game),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new DisasterComponent(),
             new HealthComponent(this._game, this._currentState)
         ]);
@@ -260,7 +258,7 @@ class TankWorldFactory {
             .withComponent([
             new PhysicsComponent(this._game),
             new LayerComponent(),
-            new CollisionsComponent()
+            new CollisionsComponent(this._emitter)
         ]);
         powerUp.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics(false);

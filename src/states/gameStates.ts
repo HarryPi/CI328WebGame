@@ -26,6 +26,7 @@ export namespace GameStates {
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
   import MenuManager = UiManagers.MenuManager;
   import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
+  import Emitter = Phaser.Particles.Arcade.Emitter;
 
   export abstract class GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class
@@ -120,7 +121,6 @@ export namespace GameStates {
     private _activeDisasters: number = 0;
     private _activeLevel: Levels;
     private _buttons: Phaser.Sprite[];
-
     constructor() {
       super();
       this._input = new Input();

@@ -8,12 +8,14 @@ var CollisionComponents;
 (function (CollisionComponents) {
     var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class CollisionsComponent extends component_1.Component {
-        constructor(state) {
+        constructor(emitter, state) {
             super(GameConstants_1.ComponentType.COLLISION);
             this._requiredComponents = [
                 GameConstants_1.ComponentType.PHYSICS
             ];
             this._state = state;
+            this._emitter = emitter;
+            this._emitter.makeParticles(GameConstants_1.TankLayout.TANK_SPRITESHEET, GameConstants_1.TankLayout.EXPLOSION_NINE);
         }
         setCollisionGroup(ownerCollisionGroup) {
             this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
@@ -44,12 +46,18 @@ var CollisionComponents;
                                 const damage = tankComp.bulletDmg * data_config_1.DataConfig.enemyDamage;
                                 heartManager.removeHeartByDamage(damage);
                                 healthComp.dealDamage(damage);
+                                this._emitter.x = body.sprite.x;
+                                this._emitter.y = body.sprite.y;
+                                this._emitter.start(true, 500, null, 30);
                             });
                             break;
                         }
                         body.collides(collidesWith, () => {
                             const damage = tankComp ? data_config_1.DataConfig.playerDamage * tankComp.bulletDmg : data_config_1.DataConfig.playerDamage; // if its not bullet
                             healthComp.dealDamage(damage);
+                            this._emitter.x = body.sprite.x;
+                            this._emitter.y = body.sprite.y;
+                            this._emitter.start(true, 500, null, 30);
                         });
                         break;
                     case GameConstants_1.Action.POWER_UP:

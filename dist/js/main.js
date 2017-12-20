@@ -476,10 +476,9 @@ var UiManagers;
                 this._fakeMap = null;
                 return;
             }
-            let textArr = ['New Game', 'High Score', 'Preferences'];
+            let textArr = ['New Game', 'Preferences'];
             let config = new menu_config_1.MenuConfig();
-            let arr = this.drawBoxes(3, [
-                new vector_1.default(state.game.world.centerX, state.game.world.centerY - this._buttonHeight * 2),
+            let arr = this.drawBoxes(2, [
                 new vector_1.default(state.game.world.centerX, state.game.world.centerY - this._buttonHeight),
                 new vector_1.default(state.game.world.centerX, state.game.world.centerY)
             ], state, textArr);
@@ -1604,15 +1603,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Assets_1 = __webpack_require__(34);
 const GameConstants_1 = __webpack_require__(0);
 const TankWorldFactory_1 = __webpack_require__(61);
-const input_1 = __webpack_require__(83);
+const input_1 = __webpack_require__(82);
 const data_config_1 = __webpack_require__(1);
-const levels_tankLevels_1 = __webpack_require__(84);
+const levels_tankLevels_1 = __webpack_require__(83);
 const math_util_1 = __webpack_require__(3);
 const uimanagers_1 = __webpack_require__(5);
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
 const vector_1 = __webpack_require__(9);
-const SoundPlayer_1 = __webpack_require__(85);
+const SoundPlayer_1 = __webpack_require__(84);
 var GameStates;
 (function (GameStates) {
     var MenuManager = uimanagers_1.UiManagers.MenuManager;
@@ -2194,8 +2193,6 @@ var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = __webpack_require__(80);
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
-const groupMananger_1 = __webpack_require__(82);
-var GroupMananger = groupMananger_1.Groups.GroupMananger;
 /**
  * @class TankWorldFactory
  * @description
@@ -2218,6 +2215,7 @@ class TankWorldFactory {
         this._entities = [];
         this._game = game;
         this._currentState = state;
+        this._emitter = this._game.add.emitter(0, 0, 20);
     }
     /**
      * Initializes the factory
@@ -2231,7 +2229,6 @@ class TankWorldFactory {
         this._enemyTankCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
         this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
-        GroupMananger.setGroup(groupMananger_1.Groups.GroupName.GAME_LAYER, this._game.add.group());
         // Have to do this here as we cannot enforce layer to be Entity to attach component
         levelCollisionLayer.forEach((layer) => {
             layer.setCollisionGroup(this._groundCollisionGroup);
@@ -2257,7 +2254,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new ShootComponent(this),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new HealthComponent(this._game, this._currentState),
             new PowerUpComponent(state, this._player),
             new TankComponent(data_config_1.DataConfig.tank)]);
@@ -2292,7 +2289,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new ShootComponent(this),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new state_component_1.StateComponent(),
             new AiComponent(this._player, this._entities.filter((entity) => {
                 return entity.hasComponent(GameConstants_1.ComponentType.AI);
@@ -2338,7 +2335,7 @@ class TankWorldFactory {
             new PhysicsComponent(this._game),
             new LayerComponent(),
             new BulletComponent(this._game),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new HealthComponent(this._game, this._currentState),
             new OwnerComponent()
         ]);
@@ -2373,7 +2370,7 @@ class TankWorldFactory {
             .withComponent([
             new PhysicsComponent(this._game),
             new LayerComponent(),
-            new CollisionsComponent(),
+            new CollisionsComponent(this._emitter),
             new DisasterComponent(),
             new HealthComponent(this._game, this._currentState)
         ]);
@@ -2424,7 +2421,7 @@ class TankWorldFactory {
             .withComponent([
             new PhysicsComponent(this._game),
             new LayerComponent(),
-            new CollisionsComponent()
+            new CollisionsComponent(this._emitter)
         ]);
         powerUp.getComponent(GameConstants_1.ComponentType.PHYSICS)
             .addPhysics(false);
@@ -2674,12 +2671,14 @@ var CollisionComponents;
 (function (CollisionComponents) {
     var PlayerVisualsManager = uimanagers_1.UiManagers.PlayerVisualsManager;
     class CollisionsComponent extends component_1.Component {
-        constructor(state) {
+        constructor(emitter, state) {
             super(GameConstants_1.ComponentType.COLLISION);
             this._requiredComponents = [
                 GameConstants_1.ComponentType.PHYSICS
             ];
             this._state = state;
+            this._emitter = emitter;
+            this._emitter.makeParticles(GameConstants_1.TankLayout.TANK_SPRITESHEET, GameConstants_1.TankLayout.EXPLOSION_NINE);
         }
         setCollisionGroup(ownerCollisionGroup) {
             this.target.sprite.body.setCollisionGroup(ownerCollisionGroup);
@@ -2710,12 +2709,18 @@ var CollisionComponents;
                                 const damage = tankComp.bulletDmg * data_config_1.DataConfig.enemyDamage;
                                 heartManager.removeHeartByDamage(damage);
                                 healthComp.dealDamage(damage);
+                                this._emitter.x = body.sprite.x;
+                                this._emitter.y = body.sprite.y;
+                                this._emitter.start(true, 500, null, 30);
                             });
                             break;
                         }
                         body.collides(collidesWith, () => {
                             const damage = tankComp ? data_config_1.DataConfig.playerDamage * tankComp.bulletDmg : data_config_1.DataConfig.playerDamage; // if its not bullet
                             healthComp.dealDamage(damage);
+                            this._emitter.x = body.sprite.x;
+                            this._emitter.y = body.sprite.y;
+                            this._emitter.start(true, 500, null, 30);
                         });
                         break;
                     case GameConstants_1.Action.POWER_UP:
@@ -3209,35 +3214,6 @@ exports.default = StateMachine;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Groups;
-(function (Groups) {
-    class GroupMananger {
-        static getGroup(group) {
-            return GroupMananger.groups.get(group);
-        }
-        static setGroup(groupName, group) {
-            GroupMananger.groups.set(groupName, group);
-        }
-    }
-    GroupMananger.groups = new Map();
-    Groups.GroupMananger = GroupMananger;
-    let GroupName;
-    (function (GroupName) {
-        GroupName["ENEMIES"] = "entites";
-        GroupName["GAME_LAYER"] = "game_layer";
-        GroupName["DISASTER_BULLETS"] = "disaster_Bullets";
-        GroupName["POWER_UPS"] = "power_ups";
-    })(GroupName = Groups.GroupName || (Groups.GroupName = {}));
-})(Groups = exports.Groups || (exports.Groups = {}));
-
-
-/***/ }),
-/* 83 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
 const Subject_1 = __webpack_require__(11);
 class Input {
     constructor() {
@@ -3262,7 +3238,7 @@ exports.default = Input;
 
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3353,8 +3329,8 @@ var TankGameLevels;
             this._playerStartPos = new vector_1.default(this._game.world.bounds.left, this._game.world.centerY + 100);
             this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
             this._capEnemies = 3;
-            this._totalEnemies = 30;
-            this._randomDisasterSpawnTime = 7000;
+            this._totalEnemies = 40;
+            this._randomDisasterSpawnTime = 8000;
             this._enemyTankKind = [GameConstants_1.TankLayout.DARK_RECON, GameConstants_1.TankLayout.DARK_ARTILLERY, GameConstants_1.TankLayout.DARK_FORTRESS, GameConstants_1.TankLayout.DARK_LIGHT, GameConstants_1.TankLayout.DARK_HUNTER];
         }
         isCleared() {
@@ -3385,7 +3361,7 @@ var TankGameLevels;
             this._playerStartPos = new vector_1.default(this._game.world.bounds.left, this._game.world.centerY + 100);
             this._enemyStartPos = new vector_1.default(this._game.world.bounds.right, this._game.world.centerY);
             this._capEnemies = 3;
-            this._totalEnemies = 30;
+            this._totalEnemies = 20;
             this._enemyTankKind = [GameConstants_1.TankLayout.GREY_LIGHT, GameConstants_1.TankLayout.GREY_RECON, GameConstants_1.TankLayout.GREY_HUNTER, GameConstants_1.TankLayout.GREY_FORTRESS, GameConstants_1.TankLayout.GREY_ARTILLERY];
             this._randomDisasterSpawnTime = 5000;
         }
@@ -3412,7 +3388,7 @@ var TankGameLevels;
 
 
 /***/ }),
-/* 85 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

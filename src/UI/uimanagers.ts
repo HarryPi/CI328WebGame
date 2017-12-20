@@ -131,12 +131,11 @@ export namespace UiManagers {
         this._fakeMap = null;
         return;
       }
-      let textArr = ['New Game', 'High Score', 'Preferences'];
+      let textArr = ['New Game', 'Preferences'];
       let config = new MenuConfig();
 
-      let arr = this.drawBoxes(3,
+      let arr = this.drawBoxes(2,
         [
-          new Vector(state.game.world.centerX, state.game.world.centerY - this._buttonHeight * 2),
           new Vector(state.game.world.centerX, state.game.world.centerY - this._buttonHeight),
           new Vector(state.game.world.centerX, state.game.world.centerY)],
         state,

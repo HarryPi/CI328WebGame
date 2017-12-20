@@ -93,10 +93,9 @@ var UiManagers;
                 this._fakeMap = null;
                 return;
             }
-            let textArr = ['New Game', 'High Score', 'Preferences'];
+            let textArr = ['New Game', 'Preferences'];
             let config = new menu_config_1.MenuConfig();
-            let arr = this.drawBoxes(3, [
-                new vector_1.default(state.game.world.centerX, state.game.world.centerY - this._buttonHeight * 2),
+            let arr = this.drawBoxes(2, [
                 new vector_1.default(state.game.world.centerX, state.game.world.centerY - this._buttonHeight),
                 new vector_1.default(state.game.world.centerX, state.game.world.centerY)
             ], state, textArr);

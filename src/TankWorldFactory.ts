@@ -2,7 +2,7 @@ import { Entity } from './entities/entity';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
 import { Guid } from './util/guid';
 import { DataConfig } from './config/data.config';
-import {Action, ComponentType, FsmStateName, Sounds, States, TankLayout} from './constants/GameConstants';
+import { Action, ComponentType, FsmStateName, TankLayout } from './constants/GameConstants';
 import { FsmStates } from './AI/fsm/fsm.states';
 import { CollisionComponents } from './component/collision.components';
 import { ControlComponents } from './component/control.components';
@@ -32,8 +32,7 @@ import EvadeState = FsmStates.EvadeState;
 import { StateComponent } from './component/state.component';
 import DisasterComponent = ControlComponents.DisasterComponent;
 import PowerUpComponent = ActionComponents.PowerUpComponent;
-import {Groups} from './groups/groupMananger';
-import GroupMananger = Groups.GroupMananger;
+import Emitter = Phaser.Particles.Arcade.Emitter;
 
 /**
  * @class TankWorldFactory
@@ -51,6 +50,7 @@ export default class TankWorldFactory {
   private _player: Entity;
   private _entitiesSubscriptions = []; // Keep a record of the subscriptions to remove later
   private _currentState: Phaser.State;
+  private _emitter: Emitter;
 
   // Arrays
   private _entities: Array<Entity> = [];
@@ -70,6 +70,7 @@ export default class TankWorldFactory {
   constructor(game: Phaser.Game, state: Phaser.State) {
     this._game = game;
     this._currentState = state;
+    this._emitter = this._game.add.emitter(0, 0, 20);
   }
 
   /**
@@ -85,7 +86,6 @@ export default class TankWorldFactory {
     this._enemyBulletsCollisionGroup = this._game.physics.p2.createCollisionGroup();
     this._enviromentCollisionGroup = this._game.physics.p2.createCollisionGroup();
 
-    GroupMananger.setGroup(Groups.GroupName.GAME_LAYER, this._game.add.group());
     // Have to do this here as we cannot enforce layer to be Entity to attach component
     levelCollisionLayer.forEach((layer) => {
       layer.setCollisionGroup(this._groundCollisionGroup);
@@ -114,7 +114,7 @@ export default class TankWorldFactory {
           new PhysicsComponent(this._game),
           new ShootComponent(this),
           new LayerComponent(),
-          new CollisionsComponent(),
+          new CollisionsComponent(this._emitter),
           new HealthComponent(this._game, this._currentState),
           new PowerUpComponent(state, this._player),
           new TankComponent(DataConfig.tank)]);
@@ -160,7 +160,7 @@ export default class TankWorldFactory {
           new PhysicsComponent(this._game),
           new ShootComponent(this),
           new LayerComponent(),
-          new CollisionsComponent(),
+          new CollisionsComponent(this._emitter),
           new StateComponent(),
           new AiComponent(this._player, this._entities.filter((entity: Entity) => {
             return entity.hasComponent(ComponentType.AI);
@@ -217,7 +217,7 @@ export default class TankWorldFactory {
         new PhysicsComponent(this._game),
         new LayerComponent(),
         new BulletComponent(this._game),
-        new CollisionsComponent(),
+        new CollisionsComponent(this._emitter),
         new HealthComponent(this._game, this._currentState),
         new OwnerComponent()]);
 
@@ -260,7 +260,7 @@ export default class TankWorldFactory {
       .withComponent([
         new PhysicsComponent(this._game),
         new LayerComponent(),
-        new CollisionsComponent(),
+        new CollisionsComponent(this._emitter),
         new DisasterComponent(),
         new HealthComponent(this._game, this._currentState)
       ]);
@@ -321,7 +321,7 @@ export default class TankWorldFactory {
       .withComponent([
         new PhysicsComponent(this._game),
         new LayerComponent(),
-        new CollisionsComponent()
+        new CollisionsComponent(this._emitter)
       ]);
 
     powerUp.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
