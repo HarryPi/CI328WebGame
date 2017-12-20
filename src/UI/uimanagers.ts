@@ -735,9 +735,10 @@ export namespace UiManagers {
     }
 
     public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
-      const paddingHeight = - 60;
-      const paddingWidth = 20;
-      const repairIconLocation: Vector = new Vector(this._state.game.camera.x + paddingWidth, this._state.game.camera.y + paddingHeight);
+      const relevantSprite = PlayerVisualsManager._heartList[0];
+      const paddingHeight = -22;
+      const paddingWidth = 8;
+      const repairIconLocation: Vector = new Vector(relevantSprite.x + paddingWidth, relevantSprite.y + paddingHeight);
 
       switch (powerUpKind) {
         case TankLayout.CRATE_REPAIR:
