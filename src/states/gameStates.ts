@@ -19,6 +19,7 @@ import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
 import Vector from '../util/vector';
 import {SoundPlayer} from '../UI/SoundPlayer';
+import {ScreenSize} from '../util/ScreenMetrics';
 
 
 export namespace GameStates {
@@ -26,7 +27,6 @@ export namespace GameStates {
   import PhysicsComponent = CollisionComponents.PhysicsComponent;
   import MenuManager = UiManagers.MenuManager;
   import PlayerVisualsManager = UiManagers.PlayerVisualsManager;
-  import Emitter = Phaser.Particles.Arcade.Emitter;
 
   export abstract class GameState extends Phaser.State {
     game: Phaser.Game; // Necessary if we add property to `App` class
@@ -46,10 +46,10 @@ export namespace GameStates {
     preload(): void {
       AssetsUtils.init(this.load);
       AssetsUtils.loadBoot();
+      this.scale.setGameSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio); // set size with correct pixel ratio
       this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
       this.scale.pageAlignVertically = true;
       this.scale.pageAlignHorizontally = true;
-      this.scale.setGameSize(window.innerWidth, window.innerHeight);
     }
 
     create(): void {

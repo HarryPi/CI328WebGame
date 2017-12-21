@@ -6,7 +6,6 @@ require('p2');
 require('phaser');
 require("styles/style.styl");
 const GameConstants_1 = require("./constants/GameConstants");
-const ScreenMetrics_1 = require("./util/ScreenMetrics");
 const gameStates_1 = require("./states/gameStates");
 var BootState = gameStates_1.GameStates.BootState;
 var PreloadState = gameStates_1.GameStates.PreloadState;
@@ -32,16 +31,7 @@ exports.App = App;
 // of another program or it is executable.
 if (!module.parent) {
     window.onload = () => {
-        let gameWidth = ScreenMetrics_1.DEFAULT_GAME_WIDTH;
-        let gameHeight = ScreenMetrics_1.DEFAULT_GAME_HEIGHT;
-        if (ScreenMetrics_1.SCALE_MODE === 'USER_SCALE') {
-            let screenMetrics = ScreenMetrics_1.ScreenUtils.calculateScreenMetrics(gameWidth, gameHeight);
-            gameWidth = screenMetrics.gameWidth;
-            gameHeight = screenMetrics.gameHeight;
-        }
         const config = {
-            width: gameWidth,
-            height: gameHeight,
             renderer: Phaser.AUTO,
             parent: '',
             resolution: 1,

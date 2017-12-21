@@ -29,10 +29,10 @@ var GameStates;
         preload() {
             Assets_1.default.init(this.load);
             Assets_1.default.loadBoot();
+            this.scale.setGameSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio); // set size with correct pixel ratio
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             this.scale.pageAlignVertically = true;
             this.scale.pageAlignHorizontally = true;
-            this.scale.setGameSize(window.innerWidth, window.innerHeight);
         }
         create() {
             this.game.stage.backgroundColor = '#FFF';

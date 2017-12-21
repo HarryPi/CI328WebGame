@@ -386,7 +386,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GameConstants_1 = __webpack_require__(0);
 const vector_1 = __webpack_require__(9);
 const data_config_1 = __webpack_require__(1);
-const menu_config_1 = __webpack_require__(76);
+const menu_config_1 = __webpack_require__(75);
 const entity_1 = __webpack_require__(10);
 const data_components_1 = __webpack_require__(16);
 var TankComponent = data_components_1.DataComponents.TankComponent;
@@ -1191,7 +1191,7 @@ exports.Entity = Entity;
 Object.defineProperty(exports, "__esModule", { value: true });
 const component_1 = __webpack_require__(4);
 const GameConstants_1 = __webpack_require__(0);
-const tank_util_1 = __webpack_require__(77);
+const tank_util_1 = __webpack_require__(76);
 const data_config_1 = __webpack_require__(1);
 const uimanagers_1 = __webpack_require__(5);
 var DataComponents;
@@ -1437,8 +1437,7 @@ __webpack_require__(21);
 __webpack_require__(23);
 __webpack_require__(26);
 const GameConstants_1 = __webpack_require__(0);
-const ScreenMetrics_1 = __webpack_require__(32);
-const gameStates_1 = __webpack_require__(33);
+const gameStates_1 = __webpack_require__(32);
 var BootState = gameStates_1.GameStates.BootState;
 var PreloadState = gameStates_1.GameStates.PreloadState;
 var GameState = gameStates_1.GameStates.MainGameState;
@@ -1463,16 +1462,7 @@ exports.App = App;
 // of another program or it is executable.
 if (!module.parent) {
     window.onload = () => {
-        let gameWidth = ScreenMetrics_1.DEFAULT_GAME_WIDTH;
-        let gameHeight = ScreenMetrics_1.DEFAULT_GAME_HEIGHT;
-        if (ScreenMetrics_1.SCALE_MODE === 'USER_SCALE') {
-            let screenMetrics = ScreenMetrics_1.ScreenUtils.calculateScreenMetrics(gameWidth, gameHeight);
-            gameWidth = screenMetrics.gameWidth;
-            gameHeight = screenMetrics.gameHeight;
-        }
         const config = {
-            width: gameWidth,
-            height: gameHeight,
             renderer: Phaser.AUTO,
             parent: '',
             resolution: 1,
@@ -1510,101 +1500,18 @@ if (!module.parent) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-/*
-    All credits for this class belong to http://sbcgamesdev.blogspot.co.uk/2015/04/phaser-tutorial-manage-different-screen.html
-    The Screen[...] classes are modified versions of the classes in an article I found.
-    Author: Tomáš Rychnovský
-    Article: http://sbcgamesdev.blogspot.ca/2015/04/phaser-tutorial-manage-different-screen.html
-    Date: Thursday, April 9, 2015
-    Big thanks to Tomáš!
-
- */
-var ScreenOrientation;
-(function (ScreenOrientation) {
-    ScreenOrientation[ScreenOrientation["PORTRAIT"] = 0] = "PORTRAIT";
-    ScreenOrientation[ScreenOrientation["LANDSCAPE"] = 1] = "LANDSCAPE";
-})(ScreenOrientation = exports.ScreenOrientation || (exports.ScreenOrientation = {}));
-class ScreenMetrics {
-}
-exports.ScreenMetrics = ScreenMetrics;
-class ScreenUtils {
-    static calculateScreenMetrics(defaultWidth, defaultHeight, orientation = ScreenOrientation.LANDSCAPE, maxGameWidth, maxGameHeight) {
-        // Just to give some explanation as to the numbers and colors in the included background;
-        // The GREEN is the safe area and will be displayed fully on any device and is based on 16:10 aspect ratio, build your actual gameplay here
-        // The YELLOW is the extra area that will be visible on devices with a 3:2 aspect ratio (iPhone 4S and below)
-        // The BLUE is the extra area that will be visible on devices with a 4:3 aspect ratio (iPads)
-        // The RED is the extra area that will be visible on devices with a 16:9 aspect ratio (iPhone 5 and above) (this is probably the most common ratio overall...)
-        // The GREY area will most likely never be seen, unless some device has a really odd aspect ratio (and with Android, I wouldn't be surprised if there is a few out there)
-        this.screenMetrics = new ScreenMetrics();
-        this.screenMetrics.windowWidth = window.innerWidth;
-        this.screenMetrics.windowHeight = window.innerHeight;
-        this.screenMetrics.defaultGameWidth = defaultWidth;
-        this.screenMetrics.defaultGameHeight = defaultHeight;
-        // Swap width and height if necessary to match the specified orientation
-        let dimensionsOppositeForLandscape = ((this.screenMetrics.windowWidth < this.screenMetrics.windowHeight) && orientation === ScreenOrientation.LANDSCAPE);
-        let dimensionsOppositeForPortrait = ((this.screenMetrics.windowHeight < this.screenMetrics.windowWidth) && orientation === ScreenOrientation.PORTRAIT);
-        if (dimensionsOppositeForLandscape || dimensionsOppositeForPortrait) {
-            [this.screenMetrics.windowWidth, this.screenMetrics.windowHeight] = [this.screenMetrics.windowHeight, this.screenMetrics.windowWidth];
-        }
-        // Calculate the max width and max height if not provided; ratios are based off iPad (4:3) and iPhone 5+ (16:9) as the extremes in both width and height
-        if (!maxGameWidth || !maxGameHeight) {
-            if (orientation === ScreenOrientation.LANDSCAPE) {
-                this.screenMetrics.maxGameWidth = Math.round(this.screenMetrics.defaultGameWidth * (exports.MAX_GAME_WIDTH / exports.DEFAULT_GAME_WIDTH));
-                this.screenMetrics.maxGameHeight = Math.round(this.screenMetrics.defaultGameHeight * (exports.MAX_GAME_HEIGHT / exports.DEFAULT_GAME_HEIGHT));
-            }
-            else {
-                this.screenMetrics.maxGameWidth = Math.round(this.screenMetrics.defaultGameWidth * (exports.MAX_GAME_HEIGHT / exports.DEFAULT_GAME_HEIGHT));
-                this.screenMetrics.maxGameHeight = Math.round(this.screenMetrics.defaultGameHeight * (exports.MAX_GAME_WIDTH / exports.DEFAULT_GAME_WIDTH));
-            }
-        }
-        else {
-            this.screenMetrics.maxGameWidth = maxGameWidth;
-            this.screenMetrics.maxGameHeight = maxGameHeight;
-        }
-        let defaultAspectRatio = ((orientation === ScreenOrientation.LANDSCAPE) ? (exports.DEFAULT_GAME_WIDTH / exports.DEFAULT_GAME_HEIGHT) : (exports.DEFAULT_GAME_HEIGHT / exports.DEFAULT_GAME_WIDTH));
-        let windowAspectRatio = (this.screenMetrics.windowWidth / this.screenMetrics.windowHeight);
-        if (windowAspectRatio > defaultAspectRatio) {
-            this.screenMetrics.gameHeight = this.screenMetrics.defaultGameHeight;
-            this.screenMetrics.gameWidth = (Math.ceil((this.screenMetrics.gameHeight * windowAspectRatio) * 0.5) * 2);
-            this.screenMetrics.gameWidth = Math.min(this.screenMetrics.gameWidth, this.screenMetrics.maxGameWidth);
-            this.screenMetrics.offsetX = ((this.screenMetrics.gameWidth - this.screenMetrics.defaultGameWidth) * 0.5);
-            this.screenMetrics.offsetY = 0;
-        }
-        else {
-            this.screenMetrics.gameWidth = this.screenMetrics.defaultGameWidth;
-            this.screenMetrics.gameHeight = (Math.ceil((this.screenMetrics.gameWidth / windowAspectRatio) * 0.5) * 2);
-            this.screenMetrics.gameHeight = Math.min(this.screenMetrics.gameHeight, this.screenMetrics.maxGameHeight);
-            this.screenMetrics.offsetX = 0;
-            this.screenMetrics.offsetY = ((this.screenMetrics.gameHeight - this.screenMetrics.defaultGameHeight) * 0.5);
-        }
-        // Calculate scaling
-        this.screenMetrics.scaleX = (this.screenMetrics.windowWidth / this.screenMetrics.gameWidth);
-        this.screenMetrics.scaleY = (this.screenMetrics.windowHeight / this.screenMetrics.gameHeight);
-        return this.screenMetrics;
-    }
-}
-exports.ScreenUtils = ScreenUtils;
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const Assets_1 = __webpack_require__(34);
+const Assets_1 = __webpack_require__(33);
 const GameConstants_1 = __webpack_require__(0);
-const TankWorldFactory_1 = __webpack_require__(61);
-const input_1 = __webpack_require__(82);
+const TankWorldFactory_1 = __webpack_require__(60);
+const input_1 = __webpack_require__(81);
 const data_config_1 = __webpack_require__(1);
-const levels_tankLevels_1 = __webpack_require__(83);
+const levels_tankLevels_1 = __webpack_require__(82);
 const math_util_1 = __webpack_require__(3);
 const uimanagers_1 = __webpack_require__(5);
 var LevelOne = levels_tankLevels_1.TankGameLevels.LevelOne;
 var LevelTwo = levels_tankLevels_1.TankGameLevels.LevelTwo;
 const vector_1 = __webpack_require__(9);
-const SoundPlayer_1 = __webpack_require__(84);
+const SoundPlayer_1 = __webpack_require__(83);
 var GameStates;
 (function (GameStates) {
     var MenuManager = uimanagers_1.UiManagers.MenuManager;
@@ -1622,10 +1529,10 @@ var GameStates;
         preload() {
             Assets_1.default.init(this.load);
             Assets_1.default.loadBoot();
+            this.scale.setGameSize(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio); // set size with correct pixel ratio
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             this.scale.pageAlignVertically = true;
             this.scale.pageAlignHorizontally = true;
-            this.scale.setGameSize(window.innerWidth, window.innerHeight);
         }
         create() {
             this.game.stage.backgroundColor = '#FFF';
@@ -1875,7 +1782,7 @@ var GameStates;
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1895,36 +1802,36 @@ class AssetLoader {
         // Since Webpack is running in build-time, it can't figure out which modules to bundle when the name is a dynamic variable.
         // Therefor all required targets must be hardcoded
         // Images
-        this._progressBarUrl = __webpack_require__(35);
-        this._logoUrl = __webpack_require__(36);
-        this._levelOneImgUrl = __webpack_require__(37);
-        this._levelTwoImgUrl = __webpack_require__(38);
-        this._tank1Url = __webpack_require__(39);
-        this._tank2Url = __webpack_require__(40);
-        this._tank3Url = __webpack_require__(41);
-        this._tank4Url = __webpack_require__(42);
-        this._tank5Url = __webpack_require__(43);
+        this._progressBarUrl = __webpack_require__(34);
+        this._logoUrl = __webpack_require__(35);
+        this._levelOneImgUrl = __webpack_require__(36);
+        this._levelTwoImgUrl = __webpack_require__(37);
+        this._tank1Url = __webpack_require__(38);
+        this._tank2Url = __webpack_require__(39);
+        this._tank3Url = __webpack_require__(40);
+        this._tank4Url = __webpack_require__(41);
+        this._tank5Url = __webpack_require__(42);
         // Levels
-        this._levelOneUrl = __webpack_require__(44);
-        this._levelTwoUrl = __webpack_require__(45);
+        this._levelOneUrl = __webpack_require__(43);
+        this._levelTwoUrl = __webpack_require__(44);
         // Atlas
-        this._tankSpritesheetUrlXLM = __webpack_require__(46);
-        this._tankSpritesheetUrl = __webpack_require__(47);
+        this._tankSpritesheetUrlXLM = __webpack_require__(45);
+        this._tankSpritesheetUrl = __webpack_require__(46);
         // Spritesheet
-        this._grassLayerUrl = __webpack_require__(48);
-        this._candyLayerUrl = __webpack_require__(49);
-        this._backgroundUrl = __webpack_require__(50);
-        this._uiBackgroundUrl = __webpack_require__(51);
-        this.uiBackgroundUrlXML = __webpack_require__(52);
-        this._playerVisualsSpritesheetUrl = __webpack_require__(53);
-        this._playerVisualsSpritesheetUrlXML = __webpack_require__(54);
+        this._grassLayerUrl = __webpack_require__(47);
+        this._candyLayerUrl = __webpack_require__(48);
+        this._backgroundUrl = __webpack_require__(49);
+        this._uiBackgroundUrl = __webpack_require__(50);
+        this.uiBackgroundUrlXML = __webpack_require__(51);
+        this._playerVisualsSpritesheetUrl = __webpack_require__(52);
+        this._playerVisualsSpritesheetUrlXML = __webpack_require__(53);
         // Sounds
-        this._missileFireUrl = __webpack_require__(55);
-        this._missileFireUrlOGG = __webpack_require__(56);
-        this._gameMusicUrl = __webpack_require__(57);
-        this._gameMusicUrlOGG = __webpack_require__(58);
-        this._mainMenuMusicUrl = __webpack_require__(59);
-        this._mainMenuMusicUrlOGG = __webpack_require__(60);
+        this._missileFireUrl = __webpack_require__(54);
+        this._missileFireUrlOGG = __webpack_require__(55);
+        this._gameMusicUrl = __webpack_require__(56);
+        this._gameMusicUrlOGG = __webpack_require__(57);
+        this._mainMenuMusicUrl = __webpack_require__(58);
+        this._mainMenuMusicUrlOGG = __webpack_require__(59);
     }
     /**
      * Run once during Boot state to pass reference to loader.
@@ -1998,177 +1905,177 @@ exports.default = AssetsUtils;
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/progressBar.png";
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/logo.png";
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/levelOneImage.png";
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/levelTwoImage.png";
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/tanks_tankDesert1.png";
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/tanks_tankDesert2.png";
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/tanks_tankDesert3.png";
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/tanks_tankDesert4.png";
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/images/tanks_tankDesert5.png";
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/levels/level1.json";
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/levels/level2.json";
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/tanks_xml.xml";
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/tanks.png";
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/grassLayer.png";
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/candyLayer.png";
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/backgroundElements.png";
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/UISpritesheet.png";
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/UISpritesheet_xml.xml";
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/playerVisuals.png";
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/spritesheet/playerVisuals.xml";
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/missile_fire.mp3";
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/missile_fire.ogg";
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/gameMusic.mp3";
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/gameMusic.ogg";
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/mainMenu.ogg";
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "assets/muisc/mainMenu.mp3";
 
 /***/ }),
-/* 61 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const entity_1 = __webpack_require__(10);
-const guid_1 = __webpack_require__(73);
+const guid_1 = __webpack_require__(72);
 const data_config_1 = __webpack_require__(1);
 const GameConstants_1 = __webpack_require__(0);
-const fsm_states_1 = __webpack_require__(74);
-const collision_components_1 = __webpack_require__(75);
-const control_components_1 = __webpack_require__(78);
+const fsm_states_1 = __webpack_require__(73);
+const collision_components_1 = __webpack_require__(74);
+const control_components_1 = __webpack_require__(77);
 const data_components_1 = __webpack_require__(16);
-const action_components_1 = __webpack_require__(79);
+const action_components_1 = __webpack_require__(78);
 var IdleState = fsm_states_1.FsmStates.IdleState;
 var PursuingState = fsm_states_1.FsmStates.PursuingState;
 var FleeState = fsm_states_1.FsmStates.FleeState;
@@ -2187,7 +2094,7 @@ var ShootComponent = action_components_1.ActionComponents.ShootComponent;
 var SuicideState = fsm_states_1.FsmStates.SuicideState;
 const math_util_1 = __webpack_require__(3);
 var EvadeState = fsm_states_1.FsmStates.EvadeState;
-const state_component_1 = __webpack_require__(80);
+const state_component_1 = __webpack_require__(79);
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
 /**
@@ -2476,6 +2383,7 @@ exports.default = TankWorldFactory;
 
 
 /***/ }),
+/* 61 */,
 /* 62 */,
 /* 63 */,
 /* 64 */,
@@ -2486,8 +2394,7 @@ exports.default = TankWorldFactory;
 /* 69 */,
 /* 70 */,
 /* 71 */,
-/* 72 */,
-/* 73 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2505,7 +2412,7 @@ exports.Guid = Guid;
 
 
 /***/ }),
-/* 74 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2654,7 +2561,7 @@ var FsmStates;
 
 
 /***/ }),
-/* 75 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2775,7 +2682,7 @@ var CollisionComponents;
 
 
 /***/ }),
-/* 76 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2830,7 +2737,7 @@ exports.MenuConfig = MenuConfig;
 
 
 /***/ }),
-/* 77 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2857,7 +2764,7 @@ exports.TankUtil = TankUtil;
 
 
 /***/ }),
-/* 78 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3019,7 +2926,7 @@ var ControlComponents;
 
 
 /***/ }),
-/* 79 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3130,13 +3037,13 @@ var ActionComponents;
 
 
 /***/ }),
-/* 80 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const stateMachine_1 = __webpack_require__(81);
+const stateMachine_1 = __webpack_require__(80);
 const GameConstants_1 = __webpack_require__(0);
 const component_1 = __webpack_require__(4);
 class StateComponent extends component_1.Component {
@@ -3169,7 +3076,7 @@ exports.StateComponent = StateComponent;
 
 
 /***/ }),
-/* 81 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3205,7 +3112,7 @@ exports.default = StateMachine;
 
 
 /***/ }),
-/* 82 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3235,7 +3142,7 @@ exports.default = Input;
 
 
 /***/ }),
-/* 83 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3385,7 +3292,7 @@ var TankGameLevels;
 
 
 /***/ }),
-/* 84 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -1,14 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /*
-    All credits for this class belong to http://sbcgamesdev.blogspot.co.uk/2015/04/phaser-tutorial-manage-different-screen.html
-    The Screen[...] classes are modified versions of the classes in an article I found.
-    Author: Tomáš Rychnovský
+    All credits for this class belong to http://sbcgamesdev.blogspot.co.uk/2015/04/phaser-tutorial-manage-different-screen.html and
     Article: http://sbcgamesdev.blogspot.ca/2015/04/phaser-tutorial-manage-different-screen.html
-    Date: Thursday, April 9, 2015
-    Big thanks to Tomáš!
 
  */
+class ScreenSize {
+}
+exports.ScreenSize = ScreenSize;
 var ScreenOrientation;
 (function (ScreenOrientation) {
     ScreenOrientation[ScreenOrientation["PORTRAIT"] = 0] = "PORTRAIT";

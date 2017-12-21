@@ -8,7 +8,10 @@ require('phaser');
 import 'styles/style.styl';
 import { States } from './constants/GameConstants';
 
-import { DEFAULT_GAME_HEIGHT, DEFAULT_GAME_WIDTH, SCALE_MODE, ScreenMetrics, ScreenUtils } from './util/ScreenMetrics';
+import {
+  DEFAULT_GAME_HEIGHT, DEFAULT_GAME_WIDTH, SCALE_MODE, ScreenMetrics, ScreenSize,
+  ScreenUtils
+} from './util/ScreenMetrics';
 import { GameStates } from './states/gameStates';
 
 import BootState = GameStates.BootState;
@@ -37,19 +40,8 @@ export class App extends Phaser.Game {
 // of another program or it is executable.
 if (!module.parent) {
   window.onload = () => {
-    let gameWidth: number = DEFAULT_GAME_WIDTH;
-    let gameHeight: number = DEFAULT_GAME_HEIGHT;
-
-    if (SCALE_MODE === 'USER_SCALE') {
-      let screenMetrics: ScreenMetrics = ScreenUtils.calculateScreenMetrics(gameWidth, gameHeight);
-
-      gameWidth = screenMetrics.gameWidth;
-      gameHeight = screenMetrics.gameHeight;
-    }
 
     const config: Phaser.IGameConfig = {
-      width: gameWidth, // width of canvas
-      height: gameHeight, // height of canvas
       renderer: Phaser.AUTO, // rendering context. The recommended parameter is Phaser.AUTO
       parent: '',
       resolution: 1,
