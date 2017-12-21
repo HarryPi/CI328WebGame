@@ -4,7 +4,7 @@ const GameConstants_1 = require("../constants/GameConstants");
 /**
  * @class
  * Class to load assets into the cached memory
- * */
+ */
 class AssetLoader {
     /**
      * @constructor

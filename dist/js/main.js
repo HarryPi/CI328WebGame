@@ -1041,25 +1041,18 @@ var UiManagers;
             PlayerVisualsManager._heartList = [];
             PlayerVisualsManager._repairIcon = undefined;
         }
-        buildControlButtons(input) {
-            const paneWidth = 100;
-            const paneHeight = 100;
-            const paddingHeight = 15;
+        buildControlButtons() {
             const paddingWidth = 100;
             const bottomLeft = new vector_1.default(this._state.game.world.left, this._state.game.world.bottom / 2);
             const bottomRight = new vector_1.default(this._state.game.world.right, this._state.game.world.bottom / 2);
             const moveLeftBtn = this._state.game.add.sprite(bottomLeft.x + paddingWidth / 4, bottomLeft.y, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.PANEL);
             const moveRight = this._state.game.add.sprite(bottomRight.x - paddingWidth, bottomRight.y, GameConstants_1.UIComponents.UI_SPRITESHEET, GameConstants_1.UIComponents.PANEL);
-            // const fireBtn = this._state.game.add.sprite(bottomRight.x, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
             moveLeftBtn.alpha = 0.6;
             moveRight.alpha = 0.6;
-            // fireBtn.alpha = 0.6;
             moveLeftBtn.inputEnabled = true;
             moveRight.inputEnabled = true;
-            // fireBtn.inputEnabled = true;
             moveLeftBtn.fixedToCamera = true;
             moveRight.fixedToCamera = true;
-            // fireBtn.fixedToCamera = true;
             return [moveLeftBtn, moveRight];
         }
     }
@@ -1732,18 +1725,22 @@ var GameStates;
                 fill: '#ff0044'
             });
             this._scoreText.fixedToCamera = true;
-            this._buttons = playerUIBuilder.buildControlButtons(this._input);
+            if (!this.game.device.desktop) {
+                this._buttons = playerUIBuilder.buildControlButtons();
+            }
         }
         update() {
             const activeLevel = this._levels.get(this._activeLevel);
-            if (this.game.input.activePointer.isDown && this._buttons[0].input.checkPointerOver(this.game.input.activePointer)) {
-                this._input.emitter.next(GameConstants_1.InputType.LEFT_INPUT); // For mobile design check if left button is clicked
-            }
-            if (this.game.input.activePointer.isDown && this._buttons[1].input.checkPointerOver(this.game.input.activePointer)) {
-                this._input.emitter.next(GameConstants_1.InputType.RIGHT_INPUT); // for mobile design check if right button is clicked
-            }
-            if (this.game.input.activePointer.isDown && !(this._buttons[1].input.checkPointerOver(this.game.input.activePointer) || this._buttons[0].input.checkPointerOver(this.game.input.activePointer))) {
-                this._input.emitter.next(GameConstants_1.InputType.SHOOT); // for mobile design check if touch but not on buttons
+            if (!this.game.device.desktop) {
+                if (this.game.input.activePointer.isDown && this._buttons[0].input.checkPointerOver(this.game.input.activePointer)) {
+                    this._input.emitter.next(GameConstants_1.InputType.LEFT_INPUT); // For mobile design check if left button is clicked
+                }
+                if (this.game.input.activePointer.isDown && this._buttons[1].input.checkPointerOver(this.game.input.activePointer)) {
+                    this._input.emitter.next(GameConstants_1.InputType.RIGHT_INPUT); // for mobile design check if right button is clicked
+                }
+                if (this.game.input.activePointer.isDown && !(this._buttons[1].input.checkPointerOver(this.game.input.activePointer) || this._buttons[0].input.checkPointerOver(this.game.input.activePointer))) {
+                    this._input.emitter.next(GameConstants_1.InputType.SHOOT); // for mobile design check if touch but not on buttons
+                }
             }
             if (this.canSpawnPowerUp(activeLevel)) {
                 this.spawnPowerUp();
@@ -1888,7 +1885,7 @@ const GameConstants_1 = __webpack_require__(0);
 /**
  * @class
  * Class to load assets into the cached memory
- * */
+ */
 class AssetLoader {
     /**
      * @constructor
@@ -3078,10 +3075,10 @@ var ActionComponents;
             }
         }
         moveRight() {
-            this.target.sprite.body.velocity.x = (this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.moveRight(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         moveLeft() {
-            this.target.sprite.body.velocity.x = -(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.moveLeft(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         update() {
             switch (this._direction) {
@@ -3405,7 +3402,7 @@ class SoundPlayer {
     static playSound(sound) {
         switch (sound) {
             case GameConstants_1.Sounds.MISSILE_FIRE:
-                this._missileSound.play();
+                this._missileSound.play(null, null, 0.6, false, false);
                 break;
             case GameConstants_1.Sounds.MAIN_MENU:
                 this._mainMenuSound.play(null, null, 0.6, true);

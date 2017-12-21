@@ -16,7 +16,7 @@ export class SoundPlayer {
   public static playSound(sound: Sounds) {
     switch (sound) {
       case Sounds.MISSILE_FIRE:
-        this._missileSound.play();
+        this._missileSound.play(null, null, 0.6, false, false);
         break;
       case Sounds.MAIN_MENU:
         this._mainMenuSound.play(null, null, 0.6, true);

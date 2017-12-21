@@ -5,7 +5,7 @@ import {
 /**
  * @class
  * Class to load assets into the cached memory
- * */
+ */
 class AssetLoader {
 
   // Asset URL;

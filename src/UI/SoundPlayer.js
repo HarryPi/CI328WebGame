@@ -11,7 +11,7 @@ class SoundPlayer {
     static playSound(sound) {
         switch (sound) {
             case GameConstants_1.Sounds.MISSILE_FIRE:
-                this._missileSound.play();
+                this._missileSound.play(null, null, 0.6, false, false);
                 break;
             case GameConstants_1.Sounds.MAIN_MENU:
                 this._mainMenuSound.play(null, null, 0.6, true);

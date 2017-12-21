@@ -50,10 +50,10 @@ var ActionComponents;
             }
         }
         moveRight() {
-            this.target.sprite.body.velocity.x = (this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.moveRight(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         moveLeft() {
-            this.target.sprite.body.velocity.x = -(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
+            this.target.sprite.body.moveLeft(this.target.getComponent(GameConstants_1.ComponentType.TANK).speed);
         }
         update() {
             switch (this._direction) {

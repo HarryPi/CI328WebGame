@@ -125,6 +125,7 @@ export namespace CollisionComponents {
     }
 
     public scaleSprite(scale: number): PhysicsComponent {
+
       this.target.sprite.scale.x = scale;
       return this;
     }

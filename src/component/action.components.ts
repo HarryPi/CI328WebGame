@@ -72,11 +72,11 @@ export namespace ActionComponents {
     }
 
     private moveRight(): void {
-      this.target.sprite.body.velocity.x = (this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
+      this.target.sprite.body.moveRight(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
 
     private moveLeft(): void {
-      this.target.sprite.body.velocity.x = -(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
+      this.target.sprite.body.moveLeft(this.target.getComponent<TankComponent>(ComponentType.TANK).speed);
     }
 
     public update() {

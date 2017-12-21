@@ -784,29 +784,22 @@ export namespace UiManagers {
       PlayerVisualsManager._repairIcon = undefined;
     }
 
-    public buildControlButtons(input: Input) {
-      const paneWidth = 100;
-      const paneHeight = 100;
-      const paddingHeight = 15;
+    public buildControlButtons() {
       const paddingWidth = 100;
       const bottomLeft = new Vector(this._state.game.world.left, this._state.game.world.bottom / 2);
       const bottomRight = new Vector(this._state.game.world.right, this._state.game.world.bottom / 2);
 
       const moveLeftBtn = this._state.game.add.sprite(bottomLeft.x + paddingWidth / 4, bottomLeft.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
       const moveRight = this._state.game.add.sprite(bottomRight.x  - paddingWidth, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
-      // const fireBtn = this._state.game.add.sprite(bottomRight.x, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
 
       moveLeftBtn.alpha = 0.6;
       moveRight.alpha = 0.6;
-      // fireBtn.alpha = 0.6;
 
       moveLeftBtn.inputEnabled = true;
       moveRight.inputEnabled = true;
-      // fireBtn.inputEnabled = true;
 
       moveLeftBtn.fixedToCamera = true;
       moveRight.fixedToCamera = true;
-      // fireBtn.fixedToCamera = true;
 
       return [moveLeftBtn, moveRight];
     }

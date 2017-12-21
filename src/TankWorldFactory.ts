@@ -223,6 +223,7 @@ export default class TankWorldFactory {
 
     bullet.getComponent<OwnerComponent>(ComponentType.OWNER).owner = owner;
     bullet.getComponent<HealthComponent>(ComponentType.HEALTH).setHealth(1);
+
     bullet.getComponent<PhysicsComponent>(ComponentType.PHYSICS)
       .addPhysics(false)
       .scaleSprite(owner.sprite.scale.x);
