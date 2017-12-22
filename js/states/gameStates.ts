@@ -19,7 +19,6 @@ import LevelOne = TankGameLevels.LevelOne;
 import LevelTwo = TankGameLevels.LevelTwo;
 import Vector from '../util/vector';
 import {SoundPlayer} from '../UI/SoundPlayer';
-import {ScreenSize} from '../util/ScreenMetrics';
 
 
 export namespace GameStates {

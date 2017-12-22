@@ -90,14 +90,14 @@ const onlyDev = (fn, fail) => only(!IS_PRODUCTION, fn, fail);
 
 module.exports = {
   entry: {
-    main: path.join(__dirname, 'src/index.ts')
+    main: path.join(__dirname, 'js/index.ts')
   },
   output: {
     path: outputPath,
     filename: `js/[name]${onlyProd(() => '.[chunkhash]', () => '')}.js`,
     chunkFilename: `js/[name]${onlyProd(() => '.[chunkhash]', () => '')}.chunk.js`,
     sourceMapFilename: '[file].map',
-    publicPath: './' // for development use '/' for production use './'
+    publicPath: '/' // for development use '/' for production use './'
   },
   devtool: onlyDev(() => 'source-map', () => ''), // Disable sourcemaps on production
   resolve: {

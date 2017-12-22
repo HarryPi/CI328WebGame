@@ -15,7 +15,7 @@
     "./node_modules/phaser/typescript/pixi.comments.d.ts"
   ],
   "include": [
-    "./src/**/*.ts",
+    "./js/**/*.ts",
     "./node_modules/@types/**/*.ts"
   ]
 }

@@ -612,10 +612,11 @@ var UiManagers;
             }
         }
         addPowerUpIcon(powerUpKind) {
-            const relevantSprite = PlayerVisualsManager._heartList[0];
-            const paddingHeight = -22;
-            const paddingWidth = 8;
-            const repairIconLocation = new vector_1.default(relevantSprite.x + paddingWidth, relevantSprite.y + paddingHeight);
+            let left = this._state.game.world.left;
+            let top = this._state.game.world.top;
+            let paddingWidth = 13;
+            let paddingHeight = 80;
+            const repairIconLocation = new vector_1.default(left + paddingWidth, top + paddingHeight);
             switch (powerUpKind) {
                 case GameConstants_1.TankLayout.CRATE_REPAIR:
                     if (PlayerVisualsManager._repairIcon) {

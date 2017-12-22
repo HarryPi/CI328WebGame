@@ -734,10 +734,12 @@ export namespace UiManagers {
     }
 
     public addPowerUpIcon(powerUpKind: TankLayout.CRATE_REPAIR) {
-      const relevantSprite = PlayerVisualsManager._heartList[0];
-      const paddingHeight = -22;
-      const paddingWidth = 8;
-      const repairIconLocation: Vector = new Vector(relevantSprite.x + paddingWidth, relevantSprite.y + paddingHeight);
+      let left = this._state.game.world.left;
+      let top = this._state.game.world.top;
+      let paddingWidth = 13;
+      let paddingHeight = 80;
+
+      const repairIconLocation: Vector = new Vector(left + paddingWidth, top + paddingHeight);
 
       switch (powerUpKind) {
         case TankLayout.CRATE_REPAIR:
@@ -760,7 +762,7 @@ export namespace UiManagers {
         case TankLayout.CRATE_REPAIR:
           try {
             PlayerVisualsManager._repairIcon.kill();
-          } catch (e){
+          } catch (e) {
             console.warn(e.toString()); // do nothing
           }
           break;
@@ -790,7 +792,7 @@ export namespace UiManagers {
       const bottomRight = new Vector(this._state.game.world.right, this._state.game.world.bottom / 2);
 
       const moveLeftBtn = this._state.game.add.sprite(bottomLeft.x + paddingWidth / 4, bottomLeft.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
-      const moveRight = this._state.game.add.sprite(bottomRight.x  - paddingWidth, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
+      const moveRight = this._state.game.add.sprite(bottomRight.x - paddingWidth, bottomRight.y, UIComponents.UI_SPRITESHEET, UIComponents.PANEL);
 
       moveLeftBtn.alpha = 0.6;
       moveRight.alpha = 0.6;
