@@ -97,7 +97,7 @@ module.exports = {
     filename: `js/[name]${onlyProd(() => '.[chunkhash]', () => '')}.js`,
     chunkFilename: `js/[name]${onlyProd(() => '.[chunkhash]', () => '')}.chunk.js`,
     sourceMapFilename: '[file].map',
-    publicPath: '/' // for development use '/' for production use './'
+    publicPath: './' // for development use '/' for production use './'
   },
   devtool: onlyDev(() => 'source-map', () => ''), // Disable sourcemaps on production
   resolve: {
