@@ -35,7 +35,7 @@ if (!module.parent) {
             renderer: Phaser.AUTO,
             parent: '',
             resolution: 1,
-            forceSetTimeOut: false // tell Phaser to use `setTimeOut` even if `requestAnimationFrame` is available.
+            forceSetTimeOut: false
         };
         new App(config); // Initialize the application. It will automatically inject <canvas /> into <body />
     };

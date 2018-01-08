@@ -7,11 +7,6 @@ require('phaser');
 
 import 'styles/style.styl';
 import { States } from './constants/GameConstants';
-
-import {
-  DEFAULT_GAME_HEIGHT, DEFAULT_GAME_WIDTH, SCALE_MODE, ScreenMetrics, ScreenSize,
-  ScreenUtils
-} from './util/ScreenMetrics';
 import { GameStates } from './states/gameStates';
 
 import BootState = GameStates.BootState;
@@ -42,10 +37,10 @@ if (!module.parent) {
   window.onload = () => {
 
     const config: Phaser.IGameConfig = {
-      renderer: Phaser.AUTO, // rendering context. The recommended parameter is Phaser.AUTO
+      renderer: Phaser.AUTO,
       parent: '',
       resolution: 1,
-      forceSetTimeOut: false // tell Phaser to use `setTimeOut` even if `requestAnimationFrame` is available.
+      forceSetTimeOut: false
     };
 
    new App(config); // Initialize the application. It will automatically inject <canvas /> into <body />
