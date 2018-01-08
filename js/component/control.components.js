@@ -32,7 +32,7 @@ var ControlComponents;
          * @description
          * Initiates a normal bullet tank bullet and ensures it will reach the target
          * If this is an AI the target passed at the AI else at the mouse pointer of the player
-         * */
+         */
         bulletInit() {
             let cOwner = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
             let seekObject = {
@@ -42,30 +42,46 @@ var ControlComponents;
             // Check if there is an AIComponent if yes this is not our player
             let aiComponent = cOwner ? cOwner.owner.getComponent(GameConstants_1.ComponentType.AI) : null;
             if (aiComponent) {
-                // If yes do not fire bulet according to mouse but to player; AIComponent knows where the player is
+                // If yes do not fire bullet according to mouse but to player; AIComponent knows where the player is
                 seekObject.x = aiComponent.player.sprite.x;
                 seekObject.y = aiComponent.player.sprite.y;
+            }
+            if (!aiComponent) {
+                console.log(seekObject);
+                console.log(`Player Postion: ${cOwner.owner.sprite.x}`);
+                console.log(`Player scale: ${cOwner.owner.sprite.scale.x}`);
             }
             this.accelerateToObject(this.target.sprite, seekObject, aiComponent
                 ? cOwner.owner.getComponent(GameConstants_1.ComponentType.TANK).bulletSpeed
                 : Math.abs(cOwner.owner.getComponent(GameConstants_1.ComponentType.TANK).bulletSpeed));
         }
-        accelerateToObject(obj1, obj2, velocity = 500) {
-            let angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
+        accelerateToObject(owner, seekTarget, velocity = 500) {
+            let angle = Math.atan2(seekTarget.y - owner.y, seekTarget.x - owner.x);
             const ownerComponent = this.target.getComponent(GameConstants_1.ComponentType.OWNER);
             let aiComponent = ownerComponent.owner.getComponent(GameConstants_1.ComponentType.AI);
             let aiAngle;
             ownerComponent.owner.sprite.scale.x > 0 ? aiAngle = -45 : aiAngle = 180;
-            aiComponent
-                ? obj1.body.velocity.x = calculateVelocityX(true, velocity, aiAngle)
-                : obj1.body.velocity.x = calculateVelocityX(false, velocity, angle);
-            aiComponent
-                ? obj1.body.velocity.y = calculateVelocityY(true, velocity, aiAngle)
-                : obj1.body.velocity.y = calculateVelocityY(false, velocity, angle);
-            function calculateVelocityX(isAi = true, tankSpeed, angle) {
+            if (aiComponent) {
+                owner.body.velocity.x = calculateVelocityX(velocity, aiAngle);
+                owner.body.velocity.y = calculateVelocityY(velocity, aiAngle);
+            }
+            else {
+                owner.body.velocity.x = calculateVelocityX(velocity, angle);
+                owner.body.velocity.y = calculateVelocityY(velocity, angle);
+                correctBulletScale(ownerComponent, this);
+            }
+            function correctBulletScale(cOwner, self) {
+                if (cOwner.owner.sprite.scale.x > 0 && owner.x > seekTarget.x) {
+                    self.target.sprite.scale.x = -1;
+                }
+                if (cOwner.owner.sprite.scale.x < 0 && owner.x < seekTarget.x) {
+                    self.target.sprite.scale.x = 1;
+                }
+            }
+            function calculateVelocityX(tankSpeed, angle) {
                 return velocity * Math.cos(angle);
             }
-            function calculateVelocityY(isAi = true, tankSpeed, angle) {
+            function calculateVelocityY(tankSpeed, angle) {
                 return velocity * Math.sin(angle);
             }
         }
@@ -122,7 +138,7 @@ var ControlComponents;
             const physicsComponent = this.target.getComponent(GameConstants_1.ComponentType.PHYSICS);
             const distance = this._player.sprite.x - this.target.sprite.x;
             const velocityYi = tankComponent.bulletSpeed * Math.sin(tankComponent.angle);
-            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity;
+            const rangeOfProjectile = (2 * ((velocityYi) * (velocityYi)) * Math.sin(tankComponent.angle) * Math.cos(tankComponent.angle)) / physicsComponent.gravity; // From Physics laws
             const decisionMakingDistance = 300;
             if (math_util_1.MathUtil.isBetween(rangeOfProjectile, Math.abs(distance) + decisionMakingDistance, Math.abs(distance) - decisionMakingDistance)) {
                 return GameConstants_1.AIConstant.CAN_HIT_ENEMY;

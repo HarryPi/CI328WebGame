@@ -85,6 +85,7 @@ export enum ComponentType {
   MOVABLE = 'movable_component'
 }
 export enum Sounds {
+  EXPLOSION = 'explosion',
   GAME_MUSIC = 'game_music',
   MISSILE_FIRE = 'missile_fire',
   MAIN_MENU = 'main_menu'

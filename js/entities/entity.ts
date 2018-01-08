@@ -34,6 +34,8 @@ export class Entity {
     return component;
   }
   public hasComponent(componentName: ComponentType) {
+    console.log(componentName);
+    console.log(this._components);
     return this._components.has(componentName);
   }
   /**
@@ -47,7 +49,7 @@ export class Entity {
   }
 
   public update(): void {
-    this._components.forEach((componentType) => {
+    this._components.forEach((componentType: Component) => {
       this._components.get(componentType.name).update();
     });
   }

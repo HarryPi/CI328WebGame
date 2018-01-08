@@ -1,14 +1,14 @@
-import { Entity } from './entities/entity';
+import {Entity} from './entities/entity';
 import CollisionGroup = Phaser.Physics.P2.CollisionGroup;
-import { Guid } from './util/guid';
-import { DataConfig } from './config/data.config';
-import { Action, ComponentType, FsmStateName, TankLayout } from './constants/GameConstants';
-import { FsmStates } from './AI/fsm/fsm.states';
-import { CollisionComponents } from './component/collision.components';
-import { ControlComponents } from './component/control.components';
-import { DataComponents } from './component/data.components';
-import { ActionComponents } from './component/action.components';
-import { TankGameLevels } from './config/levels/levels.tankLevels';
+import {Guid} from './util/guid';
+import {DataConfig} from './config/data.config';
+import {Action, ComponentType, FsmStateName, Sounds, TankLayout} from './constants/GameConstants';
+import {FsmStates} from './AI/fsm/fsm.states';
+import {CollisionComponents} from './component/collision.components';
+import {ControlComponents} from './component/control.components';
+import {DataComponents} from './component/data.components';
+import {ActionComponents} from './component/action.components';
+import {TankGameLevels} from './config/levels/levels.tankLevels';
 
 import IdleState = FsmStates.IdleState;
 import PursuingState = FsmStates.PursuingState;
@@ -27,12 +27,13 @@ import MovableComponent = ActionComponents.MovableComponent;
 import ShootComponent = ActionComponents.ShootComponent;
 import TankLevel = TankGameLevels.TankLevel;
 import SuicideState = FsmStates.SuicideState;
-import { MathUtil } from './util/math.util';
+import {MathUtil} from './util/math.util';
 import EvadeState = FsmStates.EvadeState;
-import { StateComponent } from './component/state.component';
+import {StateComponent} from './component/state.component';
 import DisasterComponent = ControlComponents.DisasterComponent;
 import PowerUpComponent = ActionComponents.PowerUpComponent;
 import Emitter = Phaser.Particles.Arcade.Emitter;
+import {SoundPlayer} from './UI/SoundPlayer';
 
 /**
  * @class TankWorldFactory
@@ -62,6 +63,7 @@ export default class TankWorldFactory {
   private _enemyBulletsCollisionGroup: CollisionGroup;
   private _groundCollisionGroup: CollisionGroup;
   private _enviromentCollisionGroup: CollisionGroup;
+
   /**
    * @constructor
    * @param {Phaser.Game} game
@@ -238,6 +240,11 @@ export default class TankWorldFactory {
       .collidesWith(this._enemyTankCollisionGroup, [Action.DAMAGE])
       .collidesWith(this._groundCollisionGroup, [Action.DAMAGE]);
 
+    let ownerComponent = bullet.getComponent<OwnerComponent>(ComponentType.OWNER);
+    if (!ownerComponent.owner.hasComponent(ComponentType.AI)) {
+      SoundPlayer.playSound(Sounds.MISSILE_FIRE);
+    }
+
     bullet.getComponent<LayerComponent>(ComponentType.LAYER).addAnimation(
       Action.EXPLODE,
       Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
@@ -247,6 +254,11 @@ export default class TankWorldFactory {
       const index = this._entities.indexOf(bullet);
       this._entities.splice(index, 1);
       sub.unsubscribe();
+      SoundPlayer.stopSound(Sounds.MISSILE_FIRE);
+      if (!ownerComponent.owner.hasComponent(ComponentType.AI)) {
+        SoundPlayer.playSound(Sounds.EXPLOSION);
+      }
+
     });
     this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
     bullet.sprite.data = {
@@ -368,11 +380,13 @@ export default class TankWorldFactory {
       e.unsubscribe();
     });
   }
+
   public getEntityFromTag(tag: number): Entity {
-    return this._entities.find( (e) => {
+    return this._entities.find((e) => {
       return e.sprite.data.tag === tag;
     });
   }
+
   get entities(): Array<Entity> {
     return this._entities;
   }

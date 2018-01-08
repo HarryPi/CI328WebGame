@@ -49,6 +49,8 @@ class AssetLoader {
 
   // loader
   private _loader: Phaser.Loader;
+  private _explosionSoundUrl: string;
+  private _explosionSoundUrlOGG: string;
 
 
   /**
@@ -95,6 +97,8 @@ class AssetLoader {
     this._gameMusicUrlOGG = require('assets/muisc/gameMusic.ogg');
     this._mainMenuMusicUrl = require('assets/muisc/mainMenu.ogg');
     this._mainMenuMusicUrlOGG = require('assets/muisc/mainMenu.mp3');
+    this._explosionSoundUrl = require('assets/muisc/explosion.mp3');
+    this._explosionSoundUrlOGG = require('assets/muisc/explosion.ogg');
   }
 
   /**
@@ -147,6 +151,8 @@ class AssetLoader {
     // Music load
     this.loader.audio(Sounds.MAIN_MENU, [this._mainMenuMusicUrl, this._mainMenuMusicUrlOGG]);
     this.loader.audio(Sounds.GAME_MUSIC, [this._gameMusicUrl, this._gameMusicUrlOGG]);
+    this.loader.audio(Sounds.MISSILE_FIRE, [this._missileFireUrl, this._missileFireUrlOGG]);
+    this.loader.audio(Sounds.EXPLOSION, [this._explosionSoundUrl, this._explosionSoundUrlOGG]);
   }
 
 
@@ -154,7 +160,7 @@ class AssetLoader {
    * @description
    * Returns the cached memory object see {@link Phaser.Loader}
    * @return {Phaser.Loader} AssetLoader._loader
-   * */
+   */
   get loader(): Phaser.Loader {
     if (this._loader === null) {
       throw new Error('Loader cannot be empty, ensure AssetsUtils.init() has run before');
@@ -166,7 +172,7 @@ class AssetLoader {
    * @description
    * Sets current loader
    * @param {Phaser.Loader} value
-   * */
+   */
   set loader(value: Phaser.Loader) {
     this._loader = value;
   }

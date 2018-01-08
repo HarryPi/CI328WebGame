@@ -4,8 +4,8 @@ All assets used for this project are under **License: (CC0 1.0 Universal) No Cop
 >The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law.
 >You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission
  
-All assets used for this project can be found and downloaded at [Kenney's Webiste](https://kenney.nl)
-
+All visual assets used for this project can be found and downloaded at [Kenney's Webiste](https://kenney.nl)
+<br>All sound assets used for this project can be found and downloaded at [Dl Sounds](https://www.dl-sounds.com)
 ## Project license
 This project is under MIT License
 Copyright (c) 2017 [Charalambos Pitsillides](harryspitsillides@hotmail.com)

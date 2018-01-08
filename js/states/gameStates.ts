@@ -299,23 +299,23 @@ export namespace GameStates {
 
     init(args) {
       this._args = args;
-      SoundPlayer.init(this.game);
     }
 
     preload() {
     }
 
     create() {
-      SoundPlayer.playSound(Sounds.MAIN_MENU);
-      let config: MenuConfig = MenuManager.drawMainMenu(this);
-      this.game.camera.unfollow(); // stop following the main menu
-      config.allSprites.forEach((sprite: Phaser.Sprite) => {
-        // This is when the game restart
-        // The sprites must be set to top and visible otherwise will be hidden
-        sprite.bringToTop();
-        sprite.visible = true;
+      SoundPlayer.init(this.game).then( () => {
+        SoundPlayer.playSound(Sounds.MAIN_MENU);
+        let config: MenuConfig = MenuManager.drawMainMenu(this);
+        this.game.camera.unfollow(); // stop following the main menu
+        config.allSprites.forEach((sprite: Phaser.Sprite) => {
+          // This is when the game restart
+          // The sprites must be set to top and visible otherwise will be hidden
+          sprite.bringToTop();
+          sprite.visible = true;
+        });
       });
-
     }
 
     update() {

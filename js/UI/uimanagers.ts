@@ -54,7 +54,7 @@ export namespace UiManagers {
                              componentToDraw: UIComponents = UIComponents.FULL_BUTTON,
                              childRelevantPosition: Vector = new Vector(0.5, 0.5)): Array<Phaser.Sprite> {
       let arr = [];
-
+      let num = 1; let typeNum: number = 1;
       for (let i = 0; i < noOfBoxes; i++) {
 
         let sprite = state.add.sprite(location[i].x, location[i].y, UIComponents.UI_SPRITESHEET, componentToDraw);

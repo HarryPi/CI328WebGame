@@ -83,6 +83,7 @@ var ComponentType;
 })(ComponentType = exports.ComponentType || (exports.ComponentType = {}));
 var Sounds;
 (function (Sounds) {
+    Sounds["EXPLOSION"] = "explosion";
     Sounds["GAME_MUSIC"] = "game_music";
     Sounds["MISSILE_FIRE"] = "missile_fire";
     Sounds["MAIN_MENU"] = "main_menu";

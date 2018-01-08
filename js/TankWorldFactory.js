@@ -30,6 +30,7 @@ var EvadeState = fsm_states_1.FsmStates.EvadeState;
 const state_component_1 = require("./component/state.component");
 var DisasterComponent = control_components_1.ControlComponents.DisasterComponent;
 var PowerUpComponent = action_components_1.ActionComponents.PowerUpComponent;
+const SoundPlayer_1 = require("./UI/SoundPlayer");
 /**
  * @class TankWorldFactory
  * @description
@@ -189,12 +190,20 @@ class TankWorldFactory {
             .collidesWith(this._tankCollisionGroup, [GameConstants_1.Action.DAMAGE])
             .collidesWith(this._enemyTankCollisionGroup, [GameConstants_1.Action.DAMAGE])
             .collidesWith(this._groundCollisionGroup, [GameConstants_1.Action.DAMAGE]);
+        let ownerComponent = bullet.getComponent(GameConstants_1.ComponentType.OWNER);
+        if (!ownerComponent.owner.hasComponent(GameConstants_1.ComponentType.AI)) {
+            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MISSILE_FIRE);
+        }
         bullet.getComponent(GameConstants_1.ComponentType.LAYER).addAnimation(GameConstants_1.Action.EXPLODE, Phaser.Animation.generateFrameNames('tank_explosion', 1, 8, '.png'), 15, false);
         this._entities.push(bullet);
         let sub = bullet.whenDestroyed.subscribe(() => {
             const index = this._entities.indexOf(bullet);
             this._entities.splice(index, 1);
             sub.unsubscribe();
+            SoundPlayer_1.SoundPlayer.stopSound(GameConstants_1.Sounds.MISSILE_FIRE);
+            if (!ownerComponent.owner.hasComponent(GameConstants_1.ComponentType.AI)) {
+                SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.EXPLOSION);
+            }
         });
         this._entitiesSubscriptions.push(sub); // In case player dies before all entites we still need to clean up the memory
         bullet.sprite.data = {

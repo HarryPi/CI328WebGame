@@ -234,19 +234,20 @@ var GameStates;
     class MainMenuState extends GameState {
         init(args) {
             this._args = args;
-            SoundPlayer_1.SoundPlayer.init(this.game);
         }
         preload() {
         }
         create() {
-            SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MAIN_MENU);
-            let config = MenuManager.drawMainMenu(this);
-            this.game.camera.unfollow(); // stop following the main menu
-            config.allSprites.forEach((sprite) => {
-                // This is when the game restart
-                // The sprites must be set to top and visible otherwise will be hidden
-                sprite.bringToTop();
-                sprite.visible = true;
+            SoundPlayer_1.SoundPlayer.init(this.game).then(() => {
+                SoundPlayer_1.SoundPlayer.playSound(GameConstants_1.Sounds.MAIN_MENU);
+                let config = MenuManager.drawMainMenu(this);
+                this.game.camera.unfollow(); // stop following the main menu
+                config.allSprites.forEach((sprite) => {
+                    // This is when the game restart
+                    // The sprites must be set to top and visible otherwise will be hidden
+                    sprite.bringToTop();
+                    sprite.visible = true;
+                });
             });
         }
         update() {

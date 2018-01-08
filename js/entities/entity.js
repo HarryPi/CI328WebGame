@@ -29,6 +29,8 @@ class Entity {
         return component;
     }
     hasComponent(componentName) {
+        console.log(componentName);
+        console.log(this._components);
         return this._components.has(componentName);
     }
     /**
